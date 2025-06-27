@@ -55,23 +55,37 @@ const FreelancerFinance = () => {
     <div className="min-h-screen bg-gray-50">
       <FreelancerHeader />
       
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
+      {/* Back Button - Mobile First */}
+      <div className="px-4 py-3 bg-white border-b lg:hidden">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => navigate('/freelancer/dashboard')}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Voltar
+        </Button>
+      </div>
+      
+      <div className="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
         <div className="flex items-center gap-4 mb-6">
+          {/* Back Button - Desktop */}
           <Button 
             variant="outline" 
             size="sm" 
             onClick={() => navigate('/freelancer/dashboard')}
-            className="flex items-center gap-2"
+            className="hidden lg:flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
             Voltar
           </Button>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold">Financeiro</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold">Financeiro</h1>
             <p className="text-gray-600">Gerencie seus ganhos e pagamentos</p>
           </div>
           <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-40 lg:w-48">
               <SelectValue placeholder="Selecionar período" />
             </SelectTrigger>
             <SelectContent>
@@ -84,14 +98,14 @@ const FreelancerFinance = () => {
         </div>
 
         {/* Cards de Resumo */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 lg:gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Saldo Disponível</CardTitle>
               <DollarSign className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">R$ 1.850</div>
+              <div className="text-xl lg:text-2xl font-bold text-green-600">R$ 1.850</div>
               <p className="text-xs text-muted-foreground">Pronto para saque</p>
             </CardContent>
           </Card>
@@ -102,7 +116,7 @@ const FreelancerFinance = () => {
               <Clock className="h-4 w-4 text-orange-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-600">R$ 1.000</div>
+              <div className="text-xl lg:text-2xl font-bold text-orange-600">R$ 1.000</div>
               <p className="text-xs text-muted-foreground">Em processamento</p>
             </CardContent>
           </Card>
@@ -113,7 +127,7 @@ const FreelancerFinance = () => {
               <Wallet className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">R$ 2.850</div>
+              <div className="text-xl lg:text-2xl font-bold">R$ 2.850</div>
               <p className="text-xs text-muted-foreground">+15% em relação ao mês anterior</p>
             </CardContent>
           </Card>
@@ -124,7 +138,7 @@ const FreelancerFinance = () => {
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">R$ 750</div>
+              <div className="text-xl lg:text-2xl font-bold">R$ 750</div>
               <p className="text-xs text-muted-foreground">2 pagamentos aguardando</p>
             </CardContent>
           </Card>
@@ -135,7 +149,7 @@ const FreelancerFinance = () => {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">R$ 18.450</div>
+              <div className="text-xl lg:text-2xl font-bold">R$ 18.450</div>
               <p className="text-xs text-muted-foreground">Últimos 6 meses</p>
             </CardContent>
           </Card>
@@ -146,7 +160,7 @@ const FreelancerFinance = () => {
               <CreditCard className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">R$ 1.200</div>
+              <div className="text-xl lg:text-2xl font-bold">R$ 1.200</div>
               <p className="text-xs text-muted-foreground">Previsão para próxima semana</p>
             </CardContent>
           </Card>
@@ -156,7 +170,7 @@ const FreelancerFinance = () => {
         <div className="flex justify-center">
           <Button 
             onClick={handleWithdrawRequest}
-            className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
+            className="bg-green-600 hover:bg-green-700 text-white px-6 lg:px-8 py-2 lg:py-3 text-base lg:text-lg w-full sm:w-auto"
             size="lg"
           >
             <DollarSign className="w-5 h-5 mr-2" />
@@ -166,10 +180,10 @@ const FreelancerFinance = () => {
 
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-            <TabsTrigger value="transactions">Transações</TabsTrigger>
-            <TabsTrigger value="simulator">Simulador</TabsTrigger>
-            <TabsTrigger value="settings">Configurações</TabsTrigger>
+            <TabsTrigger value="overview" className="text-xs lg:text-sm">Visão Geral</TabsTrigger>
+            <TabsTrigger value="transactions" className="text-xs lg:text-sm">Transações</TabsTrigger>
+            <TabsTrigger value="simulator" className="text-xs lg:text-sm">Simulador</TabsTrigger>
+            <TabsTrigger value="settings" className="text-xs lg:text-sm">Configurações</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -179,7 +193,7 @@ const FreelancerFinance = () => {
                 <CardDescription>Evolução dos seus ganhos nos últimos 6 meses</CardDescription>
               </CardHeader>
               <CardContent>
-                <ChartContainer config={{}} className="h-80">
+                <ChartContainer config={{}} className="h-64 lg:h-80">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={earningsData}>
                       <XAxis dataKey="month" />
@@ -195,43 +209,45 @@ const FreelancerFinance = () => {
 
           <TabsContent value="transactions" className="space-y-6">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
+              <CardHeader className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
                 <div>
                   <CardTitle>Histórico de Transações</CardTitle>
                   <CardDescription>Todas as suas transações financeiras</CardDescription>
                 </div>
-                <Button variant="outline">
+                <Button variant="outline" className="w-full lg:w-auto">
                   <Download className="w-4 h-4 mr-2" />
                   Baixar Relatório
                 </Button>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Evento</TableHead>
-                      <TableHead>Data</TableHead>
-                      <TableHead>Valor</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {transactions.map((transaction) => (
-                      <TableRow key={transaction.id}>
-                        <TableCell className="font-medium">{transaction.event}</TableCell>
-                        <TableCell>{transaction.date}</TableCell>
-                        <TableCell>R$ {transaction.amount}</TableCell>
-                        <TableCell>{getStatusBadge(transaction.status)}</TableCell>
-                        <TableCell>
-                          <Button variant="ghost" size="sm">
-                            <Download className="w-4 h-4" />
-                          </Button>
-                        </TableCell>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Evento</TableHead>
+                        <TableHead>Data</TableHead>
+                        <TableHead>Valor</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Ações</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {transactions.map((transaction) => (
+                        <TableRow key={transaction.id}>
+                          <TableCell className="font-medium">{transaction.event}</TableCell>
+                          <TableCell>{transaction.date}</TableCell>
+                          <TableCell>R$ {transaction.amount}</TableCell>
+                          <TableCell>{getStatusBadge(transaction.status)}</TableCell>
+                          <TableCell>
+                            <Button variant="ghost" size="sm">
+                              <Download className="w-4 h-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -247,17 +263,17 @@ const FreelancerFinance = () => {
                   <div className="p-4 border rounded-lg text-center">
                     <h3 className="font-medium mb-2">Cenário Conservador</h3>
                     <p className="text-sm text-gray-600 mb-2">2 eventos/mês</p>
-                    <p className="text-2xl font-bold text-blue-600">R$ 1.200</p>
+                    <p className="text-xl lg:text-2xl font-bold text-blue-600">R$ 1.200</p>
                   </div>
                   <div className="p-4 border rounded-lg text-center">
                     <h3 className="font-medium mb-2">Cenário Moderado</h3>
                     <p className="text-sm text-gray-600 mb-2">4 eventos/mês</p>
-                    <p className="text-2xl font-bold text-green-600">R$ 2.400</p>
+                    <p className="text-xl lg:text-2xl font-bold text-green-600">R$ 2.400</p>
                   </div>
                   <div className="p-4 border rounded-lg text-center">
                     <h3 className="font-medium mb-2">Cenário Otimista</h3>
                     <p className="text-sm text-gray-600 mb-2">6 eventos/mês</p>
-                    <p className="text-2xl font-bold text-purple-600">R$ 3.600</p>
+                    <p className="text-xl lg:text-2xl font-bold text-purple-600">R$ 3.600</p>
                   </div>
                 </div>
               </CardContent>
@@ -278,7 +294,7 @@ const FreelancerFinance = () => {
                     <p className="text-sm text-gray-600">Agência: 1234-5</p>
                     <p className="text-sm text-gray-600">Conta: 12345-6</p>
                   </div>
-                  <Button variant="outline">
+                  <Button variant="outline" className="w-full lg:w-auto">
                     <CreditCard className="w-4 h-4 mr-2" />
                     Atualizar Dados Bancários
                   </Button>
