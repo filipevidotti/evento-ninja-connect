@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { User, Briefcase, Mail, Lock, MapPin, Phone, AlertCircle } from 'lucide-react';
+import { User, Briefcase, Mail, Lock, MapPin, Phone, AlertCircle, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 const Login = () => {
@@ -31,22 +31,33 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!loginData.email || !loginData.password) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha email e senha.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
     setShowEmailNotConfirmed(false);
     
     try {
-      const success = await login(loginData.email, loginData.password, loginData.type);
-      if (success) {
-        toast({
-          title: "Login realizado com sucesso!",
-          description: `Bem-vindo(a) ${loginData.type === 'freelancer' ? 'freelancer' : 'produtor'}!`
-        });
-        navigate(loginData.type === 'freelancer' ? '/freelancer/dashboard' : '/producer/dashboard');
-      }
+      await login(loginData.email, loginData.password, loginData.type);
+      
+      toast({
+        title: "Login realizado com sucesso!",
+        description: `Bem-vindo(a) ${loginData.type === 'freelancer' ? 'freelancer' : 'produtor'}!`
+      });
+      
+      // Navigate based on user type
+      navigate(loginData.type === 'freelancer' ? '/freelancer/dashboard' : '/producer/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
       
-      if (error?.code === 'email_not_confirmed') {
+      if (error?.message?.includes('Email not confirmed')) {
         setEmailToConfirm(loginData.email);
         setShowEmailNotConfirmed(true);
         toast({
@@ -54,7 +65,7 @@ const Login = () => {
           description: "Você precisa confirmar seu email antes de fazer login. Verifique sua caixa de entrada.",
           variant: "destructive"
         });
-      } else if (error?.message?.includes('Invalid login credentials')) {
+      } else if (error?.message?.includes('Invalid login credentials') || error?.code === 'invalid_credentials') {
         toast({
           title: "Credenciais inválidas",
           description: "Email ou senha incorretos. Verifique suas informações.",
@@ -74,18 +85,48 @@ const Login = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!registerData.name || !registerData.email || !registerData.password || !registerData.city) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha todos os campos obrigatórios.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (registerData.password.length < 6) {
+      toast({
+        title: "Senha muito curta",
+        description: "A senha deve ter pelo menos 6 caracteres.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
     
     try {
-      const success = await register(registerData);
-      if (success) {
-        toast({
-          title: "Cadastro realizado com sucesso!",
-          description: "Verifique seu email para confirmar sua conta antes de fazer login."
-        });
-        setEmailToConfirm(registerData.email);
-        setShowEmailNotConfirmed(true);
-      }
+      await register(registerData);
+      
+      toast({
+        title: "Cadastro realizado com sucesso!",
+        description: "Verifique seu email para confirmar sua conta antes de fazer login."
+      });
+      
+      setEmailToConfirm(registerData.email);
+      setShowEmailNotConfirmed(true);
+      
+      // Reset form
+      setRegisterData({
+        name: '',
+        email: '',
+        password: '',
+        type: 'freelancer',
+        city: '',
+        phone: '',
+        description: ''
+      });
     } catch (error: any) {
       console.error('Register error:', error);
       
@@ -169,7 +210,14 @@ const Login = () => {
                 className="mt-3 w-full text-orange-700 border-orange-300 hover:bg-orange-100"
                 disabled={isLoading}
               >
-                Reenviar email de confirmação
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Reenviando...
+                  </>
+                ) : (
+                  'Reenviar email de confirmação'
+                )}
               </Button>
             </CardContent>
           </Card>
@@ -197,6 +245,7 @@ const Login = () => {
                       variant={loginData.type === 'freelancer' ? 'default' : 'outline'}
                       onClick={() => setLoginData({ ...loginData, type: 'freelancer' })}
                       className="flex items-center gap-2"
+                      disabled={isLoading}
                     >
                       <User className="w-4 h-4" />
                       Freelancer
@@ -206,6 +255,7 @@ const Login = () => {
                       variant={loginData.type === 'producer' ? 'default' : 'outline'}
                       onClick={() => setLoginData({ ...loginData, type: 'producer' })}
                       className="flex items-center gap-2"
+                      disabled={isLoading}
                     >
                       <Briefcase className="w-4 h-4" />
                       Produtor
@@ -224,6 +274,7 @@ const Login = () => {
                         value={loginData.email}
                         onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                         required
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
@@ -240,12 +291,20 @@ const Login = () => {
                         value={loginData.password}
                         onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                         required
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
                   
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? 'Entrando...' : 'Entrar'}
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Entrando...
+                      </>
+                    ) : (
+                      'Entrar'
+                    )}
                   </Button>
                 </form>
               </TabsContent>
@@ -258,6 +317,7 @@ const Login = () => {
                       variant={registerData.type === 'freelancer' ? 'default' : 'outline'}
                       onClick={() => setRegisterData({ ...registerData, type: 'freelancer' })}
                       className="flex items-center gap-2"
+                      disabled={isLoading}
                     >
                       <User className="w-4 h-4" />
                       Freelancer
@@ -267,6 +327,7 @@ const Login = () => {
                       variant={registerData.type === 'producer' ? 'default' : 'outline'}
                       onClick={() => setRegisterData({ ...registerData, type: 'producer' })}
                       className="flex items-center gap-2"
+                      disabled={isLoading}
                     >
                       <Briefcase className="w-4 h-4" />
                       Produtor
@@ -275,17 +336,18 @@ const Login = () => {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name">Nome</Label>
+                      <Label htmlFor="name">Nome *</Label>
                       <Input
                         id="name"
                         placeholder="Seu nome"
                         value={registerData.name}
                         onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })}
                         required
+                        disabled={isLoading}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="city">Cidade</Label>
+                      <Label htmlFor="city">Cidade *</Label>
                       <div className="relative">
                         <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                         <Input
@@ -295,13 +357,14 @@ const Login = () => {
                           value={registerData.city}
                           onChange={(e) => setRegisterData({ ...registerData, city: e.target.value })}
                           required
+                          disabled={isLoading}
                         />
                       </div>
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="reg-email">E-mail</Label>
+                    <Label htmlFor="reg-email">E-mail *</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
@@ -312,13 +375,14 @@ const Login = () => {
                         value={registerData.email}
                         onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
                         required
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="reg-password">Senha</Label>
+                      <Label htmlFor="reg-password">Senha *</Label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                         <Input
@@ -329,6 +393,8 @@ const Login = () => {
                           value={registerData.password}
                           onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
                           required
+                          disabled={isLoading}
+                          minLength={6}
                         />
                       </div>
                     </div>
@@ -342,13 +408,21 @@ const Login = () => {
                           className="pl-10"
                           value={registerData.phone}
                           onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
+                          disabled={isLoading}
                         />
                       </div>
                     </div>
                   </div>
                   
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? 'Cadastrando...' : 'Criar conta'}
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Cadastrando...
+                      </>
+                    ) : (
+                      'Criar conta'
+                    )}
                   </Button>
                 </form>
               </TabsContent>

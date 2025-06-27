@@ -39,6 +39,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const fetchUserProfile = async (userId: string) => {
     try {
@@ -82,14 +83,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
-        setSession(session);
+    let mounted = true;
+
+    const initializeAuth = async () => {
+      try {
+        console.log('Initializing auth...');
         
-        if (session?.user) {
+        // Set up auth state listener first
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (event, session) => {
+            if (!mounted) return;
+            
+            console.log('Auth state changed:', event, session?.user?.email);
+            setSession(session);
+            
+            if (session?.user) {
+              const profile = await fetchUserProfile(session.user.id);
+              if (profile && mounted) {
+                setUser({
+                  id: profile.id,
+                  name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
+                  email: session.user.email || '',
+                  type: profile.user_type as 'freelancer' | 'producer',
+                  city: profile.city || '',
+                  phone: profile.phone || '',
+                  rating: profile.rating || 0,
+                  avatar: profile.avatar_url || '',
+                  skills: profile.skills || [],
+                  description: profile.description || ''
+                });
+              }
+            } else {
+              if (mounted) {
+                setUser(null);
+              }
+            }
+          }
+        );
+
+        // Get current session
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user && mounted) {
           const profile = await fetchUserProfile(session.user.id);
-          if (profile) {
+          if (profile && mounted) {
             setUser({
               id: profile.id,
               name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
@@ -103,39 +139,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               description: profile.description || ''
             });
           }
-        } else {
-          setUser(null);
+          setSession(session);
+        }
+
+        if (mounted) {
+          setIsInitialized(true);
+        }
+
+        return () => {
+          subscription.unsubscribe();
+        };
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        if (mounted) {
+          setIsInitialized(true);
         }
       }
-    );
+    };
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session?.user) {
-        refreshUser();
-      }
-    });
+    initializeAuth();
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const login = async (email: string, password: string, type: 'freelancer' | 'producer'): Promise<boolean> => {
     try {
+      console.log('Attempting login for:', email);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Login error:', error);
+        throw error;
+      }
+
+      console.log('Login successful');
       return true;
     } catch (error) {
       console.error('Login error:', error);
-      return false;
+      throw error;
     }
   };
 
   const register = async (userData: Omit<User, 'id'> & { password: string }): Promise<boolean> => {
     try {
+      console.log('Attempting registration for:', userData.email);
+      
       const { data, error } = await supabase.auth.signUp({
         email: userData.email,
         password: userData.password,
@@ -145,25 +199,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             name: userData.name,
             type: userData.type,
             city: userData.city,
-            phone: userData.phone,
-            skills: userData.skills,
-            description: userData.description
+            phone: userData.phone || '',
+            skills: userData.skills || [],
+            description: userData.description || ''
           }
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Registration error:', error);
+        throw error;
+      }
+
+      console.log('Registration successful');
       return true;
     } catch (error) {
-      console.error('Register error:', error);
-      return false;
+      console.error('Registration error:', error);
+      throw error;
     }
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+      setSession(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   const updateUser = async (userData: Partial<User>): Promise<boolean> => {
@@ -192,6 +255,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return false;
     }
   };
+
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <AuthContext.Provider value={{ user, session, login, register, logout, updateUser, refreshUser }}>
