@@ -1,19 +1,25 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Star, MapPin, Calendar, Share2, Camera, Edit } from 'lucide-react';
+import { Star, MapPin, Calendar, Share2, Camera, Edit, Award } from 'lucide-react';
 import { useAuth } from '@/components/AuthContext';
 import VerificationBadge from '@/components/VerificationBadge';
 import BreadcrumbNav from '@/components/BreadcrumbNav';
 import FreelancerHeader from '@/components/FreelancerHeader';
+import ReputationBadge from '@/components/ReputationBadge';
+import { useCourses } from '@/hooks/useCourses';
 
 const FreelancerProfile = () => {
   const { user } = useAuth();
+  const { getCompletedCourses } = useCourses();
   const [portfolio, setPortfolio] = useState<string[]>([]);
   const [isAvailable, setIsAvailable] = useState(true);
+
+  const completedCourses = getCompletedCourses();
 
   const breadcrumbItems = [
     { label: 'Dashboard', path: '/freelancer/dashboard' },
@@ -66,7 +72,7 @@ const FreelancerProfile = () => {
                       <span>{user?.rating || 'Novo'} • 12 eventos</span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 mb-3">
                     <Badge variant={isAvailable ? "default" : "secondary"}>
                       {isAvailable ? "Disponível" : "Ocupado"}
                     </Badge>
@@ -79,6 +85,14 @@ const FreelancerProfile = () => {
                       Alterar Status
                     </Button>
                   </div>
+                  {/* Medalha de Reputação */}
+                  <div className="mt-2">
+                    <ReputationBadge 
+                      level="gold" 
+                      points={1250} 
+                      size="md" 
+                    />
+                  </div>
                 </div>
               </div>
               <Button onClick={shareProfile} variant="outline">
@@ -90,8 +104,9 @@ const FreelancerProfile = () => {
         </Card>
 
         <Tabs defaultValue="about" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="about">Sobre</TabsTrigger>
+            <TabsTrigger value="courses">Cursos</TabsTrigger>
             <TabsTrigger value="portfolio">Portfólio</TabsTrigger>
             <TabsTrigger value="history">Histórico</TabsTrigger>
             <TabsTrigger value="reviews">Avaliações</TabsTrigger>
@@ -125,6 +140,58 @@ const FreelancerProfile = () => {
                     </Badge>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="courses" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="w-5 h-5 text-yellow-500" />
+                  Cursos Concluídos
+                </CardTitle>
+                <CardDescription>
+                  Certificações e cursos que você completou ({completedCourses.length} cursos)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {completedCourses.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {completedCourses.map((course: any) => (
+                      <div key={course.id} className="border rounded-lg p-4 bg-green-50 border-green-200">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-green-900">{course.title}</h4>
+                            <p className="text-sm text-green-700 mt-1">{course.description}</p>
+                            <div className="flex items-center gap-2 mt-2">
+                              <Badge variant="outline" className="text-xs bg-green-100 text-green-800">
+                                {course.category}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs bg-green-100 text-green-800">
+                                {course.duration_hours}h
+                              </Badge>
+                            </div>
+                            {course.completed_at && (
+                              <p className="text-xs text-green-600 mt-2">
+                                Concluído em {new Date(course.completed_at).toLocaleDateString('pt-BR')}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex items-center text-green-600 ml-4">
+                            <Award className="w-6 h-6" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <Award className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                    <p>Nenhum curso concluído ainda.</p>
+                    <p className="text-sm mt-1">Acesse a seção de Cursos para começar a aprender!</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
