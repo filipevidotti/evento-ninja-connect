@@ -52,6 +52,14 @@ const ProducerHeader: React.FC<ProducerHeaderProps> = ({ user, onLogout, onCreat
             
             <Button 
               variant="ghost" 
+              onClick={() => navigate('/producer/create-team')}
+              className="text-sm"
+            >
+              Criar Equipe
+            </Button>
+            
+            <Button 
+              variant="ghost" 
               onClick={() => navigate('/producer/team-management')}
               className="text-sm"
             >
