@@ -69,7 +69,8 @@ export const useVerification = () => {
 
       if (error) throw error;
 
-      setVerification(verificationData);
+      // Type assertion para converter o tipo do Supabase para nosso tipo específico
+      setVerification(verificationData as Verification);
     } finally {
       setLoading(false);
     }
@@ -89,7 +90,9 @@ export const useVerification = () => {
         .maybeSingle();
 
       if (error) throw error;
-      setVerification(data);
+      
+      // Type assertion para converter o tipo do Supabase para nosso tipo específico
+      setVerification(data as Verification);
     } catch (error) {
       console.error('Error checking verification status:', error);
     } finally {
