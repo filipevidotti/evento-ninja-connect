@@ -20,7 +20,7 @@ interface AdminVerification {
   user_profiles?: {
     name: string;
     city: string;
-  };
+  } | null;
 }
 
 const AdminVerifications = () => {
@@ -36,13 +36,14 @@ const AdminVerifications = () => {
         .from('verifications')
         .select(`
           *,
-          user_profiles!inner(name, city)
+          user_profiles(name, city)
         `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      // Type assertion to fix the TypeScript error
-      setVerifications((data || []) as AdminVerification[]);
+      
+      // Convert to proper type with unknown first to satisfy TypeScript
+      setVerifications((data || []) as unknown as AdminVerification[]);
     } catch (error) {
       console.error('Error fetching verifications:', error);
       toast({
@@ -170,8 +171,8 @@ const AdminVerifications = () => {
                   <TableRow key={verification.id}>
                     <TableCell>
                       <div>
-                        <div className="font-medium">{verification.user_profiles?.name}</div>
-                        <div className="text-sm text-gray-500">{verification.user_profiles?.city}</div>
+                        <div className="font-medium">{verification.user_profiles?.name || 'Nome não disponível'}</div>
+                        <div className="text-sm text-gray-500">{verification.user_profiles?.city || 'Cidade não disponível'}</div>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -231,11 +232,11 @@ const AdminVerifications = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="font-medium text-gray-700">Usuário:</label>
-                    <p>{selectedVerification.user_profiles?.name}</p>
+                    <p>{selectedVerification.user_profiles?.name || 'Nome não disponível'}</p>
                   </div>
                   <div>
                     <label className="font-medium text-gray-700">Cidade:</label>
-                    <p>{selectedVerification.user_profiles?.city}</p>
+                    <p>{selectedVerification.user_profiles?.city || 'Cidade não disponível'}</p>
                   </div>
                   <div>
                     <label className="font-medium text-gray-700">Tipo de Documento:</label>
