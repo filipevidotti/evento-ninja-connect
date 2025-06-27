@@ -97,7 +97,7 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         produtor_id: event.produtor_id,
         producer_name: event.user_profiles?.name || 'Produtor',
         functions: event.functions || [],
-        status: event.status,
+        status: event.status as 'open' | 'closed' | 'completed',
         created_at: event.created_at
       }));
 
@@ -135,7 +135,7 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         id: app.id,
         user_id: app.user_id,
         function_id: app.function_id,
-        status: app.status,
+        status: app.status as 'pendente' | 'aprovado' | 'recusado',
         applied_at: app.applied_at,
         user_name: app.user_profiles?.name,
         user_email: app.user_profiles?.email,

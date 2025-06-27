@@ -24,28 +24,32 @@ const ProducerDashboard = () => {
 
   const userEvents = user ? getEventsByProducer(user.id) : [];
 
-  const handleCreateEvent = (eventData: any) => {
+  const handleCreateEvent = async (eventData: any) => {
     if (!user) return;
     
-    createEvent({
+    const success = await createEvent({
       ...eventData,
-      producerId: user.id,
-      producerName: user.name,
-      status: 'open'
+      produtor_id: user.id,
+      status: 'open' as const
     });
 
-    toast({
-      title: "Evento criado!",
-      description: "Seu evento foi publicado com sucesso."
-    });
+    if (success) {
+      toast({
+        title: "Evento criado!",
+        description: "Seu evento foi publicado com sucesso."
+      });
+      setShowCreateEvent(false);
+    }
   };
 
-  const handleApplicationAction = (applicationId: string, action: 'approved' | 'rejected') => {
-    updateApplicationStatus(applicationId, action);
-    toast({
-      title: action === 'approved' ? "Candidato aprovado!" : "Candidato recusado",
-      description: `A candidatura foi ${action === 'approved' ? 'aprovada' : 'recusada'} com sucesso.`
-    });
+  const handleApplicationAction = async (applicationId: string, action: 'aprovado' | 'recusado') => {
+    const success = await updateApplicationStatus(applicationId, action);
+    if (success) {
+      toast({
+        title: action === 'aprovado' ? "Candidato aprovado!" : "Candidato recusado",
+        description: `A candidatura foi ${action === 'aprovado' ? 'aprovada' : 'recusada'} com sucesso.`
+      });
+    }
   };
 
   return (
@@ -92,7 +96,7 @@ const ProducerDashboard = () => {
                 {userEvents.map(event => {
                   const eventApplications = getApplicationsByEvent(event.id);
                   const totalApplications = eventApplications.length;
-                  const approvedApplications = eventApplications.filter(app => app.status === 'approved').length;
+                  const approvedApplications = eventApplications.filter(app => app.status === 'aprovado').length;
                   
                   return (
                     <ProducerEventCard

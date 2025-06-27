@@ -10,7 +10,7 @@ import { Event, Application } from '@/components/EventContext';
 interface ApplicationsManagerProps {
   events: Event[];
   getApplicationsByEvent: (eventId: string) => Application[];
-  onApplicationAction: (applicationId: string, action: 'approved' | 'rejected') => void;
+  onApplicationAction: (applicationId: string, action: 'aprovado' | 'recusado') => void;
 }
 
 const ApplicationsManager: React.FC<ApplicationsManagerProps> = ({ 
@@ -41,35 +41,35 @@ const ApplicationsManager: React.FC<ApplicationsManagerProps> = ({
               
               return (
                 <div key={event.id} className="border rounded-lg p-4">
-                  <h3 className="font-medium text-lg mb-4">{event.title}</h3>
+                  <h3 className="font-medium text-lg mb-4">{event.name}</h3>
                   <div className="space-y-3">
                     {eventApplications.map(application => {
-                      const eventFunction = event.functions.find(f => f.id === application.functionId);
+                      const eventFunction = event.functions.find(f => f.id === application.function_id);
                       
                       return (
                         <div key={application.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center space-x-3">
                             <Avatar>
-                              <AvatarFallback>{application.userName.charAt(0)}</AvatarFallback>
+                              <AvatarFallback>{application.user_name?.charAt(0) || 'U'}</AvatarFallback>
                             </Avatar>
                             <div>
-                              <p className="font-medium">{application.userName}</p>
-                              <p className="text-sm text-gray-600">{application.userEmail}</p>
+                              <p className="font-medium">{application.user_name}</p>
+                              <p className="text-sm text-gray-600">{application.user_email}</p>
                               <p className="text-sm text-gray-600">
-                                <strong>Função:</strong> {eventFunction?.role}
+                                <strong>Função:</strong> {eventFunction?.cargo}
                               </p>
                               <p className="text-xs text-gray-500">
-                                Candidatou-se em {new Date(application.appliedAt).toLocaleDateString('pt-BR')}
+                                Candidatou-se em {new Date(application.applied_at).toLocaleDateString('pt-BR')}
                               </p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            {application.status === 'pending' ? (
+                            {application.status === 'pendente' ? (
                               <>
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  onClick={() => onApplicationAction(application.id, 'rejected')}
+                                  onClick={() => onApplicationAction(application.id, 'recusado')}
                                   className="text-red-600 hover:text-red-700 hover:bg-red-50"
                                 >
                                   <XCircle className="w-4 h-4 mr-1" />
@@ -77,7 +77,7 @@ const ApplicationsManager: React.FC<ApplicationsManagerProps> = ({
                                 </Button>
                                 <Button
                                   size="sm"
-                                  onClick={() => onApplicationAction(application.id, 'approved')}
+                                  onClick={() => onApplicationAction(application.id, 'aprovado')}
                                   className="bg-green-600 hover:bg-green-700"
                                 >
                                   <CheckCircle className="w-4 h-4 mr-1" />
@@ -86,10 +86,10 @@ const ApplicationsManager: React.FC<ApplicationsManagerProps> = ({
                               </>
                             ) : (
                               <Badge 
-                                className={application.status === 'approved' ? 
+                                className={application.status === 'aprovado' ? 
                                   'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}
                               >
-                                {application.status === 'approved' ? (
+                                {application.status === 'aprovado' ? (
                                   <><CheckCircle className="w-3 h-3 mr-1" />Aprovado</>
                                 ) : (
                                   <><XCircle className="w-3 h-3 mr-1" />Recusado</>

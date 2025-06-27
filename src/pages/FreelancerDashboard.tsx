@@ -23,21 +23,21 @@ const FreelancerDashboard = () => {
   const userApplications = user ? getApplicationsByUser(user.id) : [];
   
   const filteredEvents = events.filter(event => {
-    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.location.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         event.local.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = filterRole === 'all' || 
-                       event.functions.some(func => func.role.toLowerCase().includes(filterRole.toLowerCase()));
-    const matchesCity = filterCity === 'all' || event.city === filterCity;
+                       event.functions.some(func => func.cargo.toLowerCase().includes(filterRole.toLowerCase()));
+    const matchesCity = filterCity === 'all' || event.local.toLowerCase().includes(filterCity.toLowerCase());
     const isOpen = event.status === 'open';
     
     return matchesSearch && matchesRole && matchesCity && isOpen;
   });
 
-  const handleApply = (eventId: string, functionId: string) => {
+  const handleApply = async (functionId: string) => {
     if (!user) return;
     
     const hasApplied = userApplications.some(app => 
-      app.eventId === eventId && app.functionId === functionId
+      app.function_id === functionId
     );
     
     if (hasApplied) {
@@ -49,16 +49,18 @@ const FreelancerDashboard = () => {
       return;
     }
     
-    applyToEvent(eventId, functionId, user.id, user.name, user.email);
-    toast({
-      title: "Candidatura enviada!",
-      description: "Sua candidatura foi enviada com sucesso."
-    });
+    const success = await applyToEvent(functionId);
+    if (success) {
+      toast({
+        title: "Candidatura enviada!",
+        description: "Sua candidatura foi enviada com sucesso."
+      });
+    }
   };
 
-  const getApplicationStatus = (eventId: string, functionId: string) => {
+  const getApplicationStatus = (functionId: string) => {
     return userApplications.find(app => 
-      app.eventId === eventId && app.functionId === functionId
+      app.function_id === functionId
     )?.status;
   };
 

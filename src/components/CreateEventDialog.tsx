@@ -12,34 +12,32 @@ interface CreateEventDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCreateEvent: (eventData: {
-    title: string;
-    description: string;
-    date: string;
-    location: string;
-    city: string;
-    functions: EventFunction[];
+    name: string;
+    descricao: string;
+    data: string;
+    local: string;
+    functions: Omit<EventFunction, 'id'>[];
   }) => void;
 }
 
 const CreateEventDialog: React.FC<CreateEventDialogProps> = ({ open, onOpenChange, onCreateEvent }) => {
   const { toast } = useToast();
   const [newEvent, setNewEvent] = useState({
-    title: '',
-    description: '',
-    date: '',
-    location: '',
-    city: '',
-    functions: [] as EventFunction[]
+    name: '',
+    descricao: '',
+    data: '',
+    local: '',
+    functions: [] as Omit<EventFunction, 'id'>[]
   });
   const [newFunction, setNewFunction] = useState({
-    role: '',
-    quantity: 1,
-    salary: 0,
+    cargo: '',
+    quantidade: 1,
+    valor: 0,
     requirements: ''
   });
 
   const handleCreateEvent = () => {
-    if (!newEvent.title || !newEvent.date || !newEvent.location || newEvent.functions.length === 0) {
+    if (!newEvent.name || !newEvent.data || !newEvent.local || newEvent.functions.length === 0) {
       toast({
         title: "Erro",
         description: "Preencha todos os campos obrigatórios e adicione pelo menos uma função.",
@@ -50,18 +48,17 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({ open, onOpenChang
 
     onCreateEvent(newEvent);
     setNewEvent({
-      title: '',
-      description: '',
-      date: '',
-      location: '',
-      city: '',
+      name: '',
+      descricao: '',
+      data: '',
+      local: '',
       functions: []
     });
     onOpenChange(false);
   };
 
   const addFunction = () => {
-    if (!newFunction.role || !newFunction.salary) {
+    if (!newFunction.cargo || !newFunction.valor) {
       toast({
         title: "Erro",
         description: "Preencha pelo menos o cargo e salário.",
@@ -70,26 +67,21 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({ open, onOpenChang
       return;
     }
 
-    const functionWithId = {
-      ...newFunction,
-      id: Math.random().toString(36).substr(2, 9)
-    };
-
     setNewEvent({
       ...newEvent,
-      functions: [...newEvent.functions, functionWithId]
+      functions: [...newEvent.functions, newFunction]
     });
 
     setNewFunction({
-      role: '',
-      quantity: 1,
-      salary: 0,
+      cargo: '',
+      quantidade: 1,
+      valor: 0,
       requirements: ''
     });
 
     toast({
       title: "Função adicionada!",
-      description: `${functionWithId.role} foi adicionado ao evento.`
+      description: `${newFunction.cargo} foi adicionado ao evento.`
     });
   };
 
@@ -116,16 +108,16 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({ open, onOpenChang
               <label className="text-sm font-medium">Nome do Evento *</label>
               <Input
                 placeholder="Ex: Festa Corporativa 2025"
-                value={newEvent.title}
-                onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                value={newEvent.name}
+                onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
               />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Data *</label>
               <Input
                 type="date"
-                value={newEvent.date}
-                onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+                value={newEvent.data}
+                onChange={(e) => setNewEvent({ ...newEvent, data: e.target.value })}
               />
             </div>
           </div>
@@ -134,28 +126,18 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({ open, onOpenChang
             <label className="text-sm font-medium">Descrição</label>
             <Textarea
               placeholder="Descreva seu evento..."
-              value={newEvent.description}
-              onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+              value={newEvent.descricao}
+              onChange={(e) => setNewEvent({ ...newEvent, descricao: e.target.value })}
             />
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Local *</label>
-              <Input
-                placeholder="Ex: Centro de Convenções"
-                value={newEvent.location}
-                onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Cidade *</label>
-              <Input
-                placeholder="Ex: São Paulo"
-                value={newEvent.city}
-                onChange={(e) => setNewEvent({ ...newEvent, city: e.target.value })}
-              />
-            </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Local *</label>
+            <Input
+              placeholder="Ex: Centro de Convenções, São Paulo"
+              value={newEvent.local}
+              onChange={(e) => setNewEvent({ ...newEvent, local: e.target.value })}
+            />
           </div>
           
           {/* Add Function Section */}
@@ -166,8 +148,8 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({ open, onOpenChang
                 <label className="text-sm font-medium">Cargo *</label>
                 <Input
                   placeholder="Ex: Garçom"
-                  value={newFunction.role}
-                  onChange={(e) => setNewFunction({ ...newFunction, role: e.target.value })}
+                  value={newFunction.cargo}
+                  onChange={(e) => setNewFunction({ ...newFunction, cargo: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
@@ -175,8 +157,8 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({ open, onOpenChang
                 <Input
                   type="number"
                   min="1"
-                  value={newFunction.quantity}
-                  onChange={(e) => setNewFunction({ ...newFunction, quantity: parseInt(e.target.value) || 1 })}
+                  value={newFunction.quantidade}
+                  onChange={(e) => setNewFunction({ ...newFunction, quantidade: parseInt(e.target.value) || 1 })}
                 />
               </div>
               <div className="space-y-2">
@@ -184,8 +166,8 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({ open, onOpenChang
                 <Input
                   type="number"
                   min="0"
-                  value={newFunction.salary}
-                  onChange={(e) => setNewFunction({ ...newFunction, salary: parseFloat(e.target.value) || 0 })}
+                  value={newFunction.valor}
+                  onChange={(e) => setNewFunction({ ...newFunction, valor: parseFloat(e.target.value) || 0 })}
                 />
               </div>
               <div className="space-y-2">
@@ -210,9 +192,9 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({ open, onOpenChang
               {newEvent.functions.map((func, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div>
-                    <span className="font-medium">{func.role}</span>
+                    <span className="font-medium">{func.cargo}</span>
                     <span className="text-sm text-gray-600 ml-2">
-                      ({func.quantity}x) - R$ {func.salary}
+                      ({func.quantidade}x) - R$ {func.valor}
                     </span>
                     {func.requirements && (
                       <p className="text-xs text-gray-500">{func.requirements}</p>
