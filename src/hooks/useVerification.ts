@@ -1,6 +1,5 @@
 
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/AuthContext';
 
 interface VerificationData {
@@ -25,79 +24,45 @@ export const useVerification = () => {
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
 
-  const uploadFile = async (file: File, folder: string): Promise<string> => {
-    if (!user) throw new Error('User not authenticated');
-
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${folder}/${user.id}/${Date.now()}.${fileExt}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from('verification-documents')
-      .upload(fileName, file);
-
-    if (uploadError) throw uploadError;
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('verification-documents')
-      .getPublicUrl(fileName);
-
-    return publicUrl;
-  };
-
   const submitVerification = useCallback(async (data: VerificationData) => {
     if (!user) throw new Error('User not authenticated');
 
     setLoading(true);
-    try {
-      // Upload dos arquivos
-      const documentUrl = await uploadFile(data.documentFile, 'documents');
-      const selfieUrl = await uploadFile(data.selfieFile, 'selfies');
+    
+    // Simular upload e processamento
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Inserir dados de verificação
-      const { data: verificationData, error } = await supabase
-        .from('verifications')
-        .insert({
-          user_id: user.id,
-          tipo_documento: data.documentType,
-          numero_documento: data.documentNumber,
-          foto_documento_url: documentUrl,
-          selfie_url: selfieUrl,
-          status: 'pendente'
-        })
-        .select()
-        .single();
+    const newVerification: Verification = {
+      id: Date.now().toString(),
+      status: 'pendente',
+      tipo_documento: data.documentType,
+      numero_documento: data.documentNumber,
+      created_at: new Date().toISOString()
+    };
 
-      if (error) throw error;
-
-      // Type assertion para converter o tipo do Supabase para nosso tipo específico
-      setVerification(verificationData as Verification);
-    } finally {
-      setLoading(false);
-    }
+    setVerification(newVerification);
+    setLoading(false);
   }, [user]);
 
   const checkVerificationStatus = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('verifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (error) throw error;
-      
-      // Type assertion para converter o tipo do Supabase para nosso tipo específico
-      setVerification(data as Verification);
-    } catch (error) {
-      console.error('Error checking verification status:', error);
-    } finally {
-      setLoading(false);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Simular verificação existente
+    if (Math.random() > 0.5) {
+      setVerification({
+        id: '1',
+        status: 'aprovado',
+        tipo_documento: 'rg',
+        numero_documento: '123456789',
+        created_at: '2024-06-20',
+        data_verificacao: '2024-06-21'
+      });
     }
+    
+    setLoading(false);
   }, [user]);
 
   return {

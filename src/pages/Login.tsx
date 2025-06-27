@@ -8,11 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { User, Briefcase, Mail, Lock, MapPin, Phone, AlertCircle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { User, Briefcase, Mail, Lock, MapPin, Phone } from 'lucide-react';
 
 const Login = () => {
-  const [loginData, setLoginData] = useState({ email: '', password: '', type: 'freelancer' as 'freelancer' | 'producer' });
+  const [loginData, setLoginData] = useState({ 
+    email: '', 
+    password: '', 
+    type: 'freelancer' as 'freelancer' | 'producer' 
+  });
   const [registerData, setRegisterData] = useState({
     name: '',
     email: '',
@@ -23,16 +26,23 @@ const Login = () => {
     description: ''
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [showEmailNotConfirmed, setShowEmailNotConfirmed] = useState(false);
-  const [emailToConfirm, setEmailToConfirm] = useState('');
   const { login, register } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!loginData.email || !loginData.password) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha email e senha.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
-    setShowEmailNotConfirmed(false);
     
     try {
       const success = await login(loginData.email, loginData.password, loginData.type);
@@ -43,30 +53,12 @@ const Login = () => {
         });
         navigate(loginData.type === 'freelancer' ? '/freelancer/dashboard' : '/producer/dashboard');
       }
-    } catch (error: any) {
-      console.error('Login error:', error);
-      
-      if (error?.code === 'email_not_confirmed') {
-        setEmailToConfirm(loginData.email);
-        setShowEmailNotConfirmed(true);
-        toast({
-          title: "Email não confirmado",
-          description: "Você precisa confirmar seu email antes de fazer login. Verifique sua caixa de entrada.",
-          variant: "destructive"
-        });
-      } else if (error?.message?.includes('Invalid login credentials')) {
-        toast({
-          title: "Credenciais inválidas",
-          description: "Email ou senha incorretos. Verifique suas informações.",
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Erro no login",
-          description: "Ocorreu um erro inesperado. Tente novamente.",
-          variant: "destructive"
-        });
-      }
+    } catch (error) {
+      toast({
+        title: "Erro no login",
+        description: "Verifique suas credenciais e tente novamente.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -74,6 +66,16 @@ const Login = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!registerData.name || !registerData.email || !registerData.password) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha todos os campos obrigatórios.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
     
     try {
@@ -81,56 +83,14 @@ const Login = () => {
       if (success) {
         toast({
           title: "Cadastro realizado com sucesso!",
-          description: "Verifique seu email para confirmar sua conta antes de fazer login."
+          description: "Você foi logado automaticamente."
         });
-        setEmailToConfirm(registerData.email);
-        setShowEmailNotConfirmed(true);
+        navigate(registerData.type === 'freelancer' ? '/freelancer/dashboard' : '/producer/dashboard');
       }
-    } catch (error: any) {
-      console.error('Register error:', error);
-      
-      if (error?.message?.includes('User already registered')) {
-        toast({
-          title: "Email já cadastrado",
-          description: "Este email já está registrado. Tente fazer login ou use outro email.",
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Erro no cadastro",
-          description: "Ocorreu um erro ao criar sua conta. Tente novamente.",
-          variant: "destructive"
-        });
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleResendConfirmation = async () => {
-    if (!emailToConfirm) return;
-    
-    setIsLoading(true);
-    try {
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: emailToConfirm,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`
-        }
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Email reenviado!",
-        description: "Verifique sua caixa de entrada para confirmar sua conta."
-      });
     } catch (error) {
-      console.error('Resend error:', error);
       toast({
-        title: "Erro ao reenviar email",
-        description: "Não foi possível reenviar o email de confirmação. Tente novamente.",
+        title: "Erro no cadastro",
+        description: "Não foi possível criar sua conta. Tente novamente.",
         variant: "destructive"
       });
     } finally {
@@ -147,33 +107,6 @@ const Login = () => {
           </h1>
           <p className="text-gray-600 mt-2">Conectando talentos aos melhores eventos</p>
         </div>
-
-        {showEmailNotConfirmed && (
-          <Card className="mb-4 border-orange-200 bg-orange-50">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <AlertCircle className="h-5 w-5 text-orange-600" />
-                <div className="flex-1">
-                  <p className="text-sm text-orange-800 font-medium">
-                    Email não confirmado
-                  </p>
-                  <p className="text-xs text-orange-700 mt-1">
-                    Verifique sua caixa de entrada e clique no link de confirmação.
-                  </p>
-                </div>
-              </div>
-              <Button
-                onClick={handleResendConfirmation}
-                variant="outline"
-                size="sm"
-                className="mt-3 w-full text-orange-700 border-orange-300 hover:bg-orange-100"
-                disabled={isLoading}
-              >
-                Reenviar email de confirmação
-              </Button>
-            </CardContent>
-          </Card>
-        )}
 
         <Card className="shadow-xl border-0 bg-white/70 backdrop-blur-sm">
           <CardHeader>

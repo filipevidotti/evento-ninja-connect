@@ -1,7 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { User as SupabaseUser, Session } from '@supabase/supabase-js';
+import React, { createContext, useContext, useState } from 'react';
 
 export interface User {
   id: string;
@@ -20,7 +18,6 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
-  session: Session | null;
   loading: boolean;
   login: (email: string, password: string, type: 'freelancer' | 'producer') => Promise<boolean>;
   register: (userData: Omit<User, 'id'> & { password: string }) => Promise<boolean>;
@@ -41,204 +38,78 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetchUserProfile = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('id', userId)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching user profile:', error);
-        return null;
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      return null;
-    }
-  };
-
-  const refreshUser = async () => {
-    setLoading(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const profile = await fetchUserProfile(session.user.id);
-        if (profile) {
-          setUser({
-            id: profile.id,
-            name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
-            email: session.user.email || '',
-            type: profile.user_type as 'freelancer' | 'producer',
-            city: profile.city || '',
-            phone: profile.phone || '',
-            rating: profile.rating || 0,
-            avatar: profile.avatar_url || '',
-            skills: profile.skills || [],
-            description: profile.description || '',
-            courses: profile.courses || [],
-            otherKnowledge: profile.other_knowledge || ''
-          });
-        }
-      } else {
-        setUser(null);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    let mounted = true;
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
-        
-        if (!mounted) return;
-
-        setSession(session);
-        
-        if (session?.user) {
-          const profile = await fetchUserProfile(session.user.id);
-          if (profile && mounted) {
-            setUser({
-              id: profile.id,
-              name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
-              email: session.user.email || '',
-              type: profile.user_type as 'freelancer' | 'producer',
-              city: profile.city || '',
-              phone: profile.phone || '',
-              rating: profile.rating || 0,
-              avatar: profile.avatar_url || '',
-              skills: profile.skills || [],
-              description: profile.description || '',
-              courses: profile.courses || [],
-              otherKnowledge: profile.other_knowledge || ''
-            });
-          }
-        } else if (mounted) {
-          setUser(null);
-        }
-        
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    );
-
-    // Initial session check
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (mounted) {
-        setSession(session);
-        if (session?.user) {
-          refreshUser();
-        } else {
-          setLoading(false);
-        }
-      }
-    });
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
+  const [loading, setLoading] = useState(false);
 
   const login = async (email: string, password: string, type: 'freelancer' | 'producer'): Promise<boolean> => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-      return true;
-    } catch (error) {
-      console.error('Login error:', error);
-      return false;
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    
+    // Simular delay de login
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Criar usuário mockado
+    const mockUser: User = {
+      id: '1',
+      name: email.split('@')[0],
+      email,
+      type,
+      city: 'São Paulo',
+      phone: '(11) 99999-9999',
+      rating: type === 'freelancer' ? 4.5 : undefined,
+      avatar: '',
+      skills: type === 'freelancer' ? ['Fotografia', 'Edição'] : [],
+      description: `${type === 'freelancer' ? 'Freelancer' : 'Produtor'} experiente`,
+      courses: [],
+      otherKnowledge: ''
+    };
+    
+    setUser(mockUser);
+    setLoading(false);
+    return true;
   };
 
   const register = async (userData: Omit<User, 'id'> & { password: string }): Promise<boolean> => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase.auth.signUp({
-        email: userData.email,
-        password: userData.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
-          data: {
-            name: userData.name,
-            type: userData.type,
-            city: userData.city,
-            phone: userData.phone,
-            skills: userData.skills,
-            description: userData.description,
-            courses: userData.courses,
-            otherKnowledge: userData.otherKnowledge
-          }
-        }
-      });
-
-      if (error) throw error;
-      return true;
-    } catch (error) {
-      console.error('Register error:', error);
-      return false;
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    
+    // Simular delay de registro
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const newUser: User = {
+      ...userData,
+      id: Date.now().toString(),
+      rating: userData.type === 'freelancer' ? 0 : undefined,
+      skills: userData.skills || []
+    };
+    
+    setUser(newUser);
+    setLoading(false);
+    return true;
   };
 
-  const logout = async () => {
-    setLoading(true);
-    await supabase.auth.signOut();
+  const logout = () => {
     setUser(null);
-    setSession(null);
-    setLoading(false);
   };
 
   const updateUser = async (userData: Partial<User>): Promise<boolean> => {
     if (!user) return false;
+    
+    setUser(prev => prev ? { ...prev, ...userData } : null);
+    return true;
+  };
 
-    try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({
-          name: userData.name,
-          city: userData.city,
-          phone: userData.phone,
-          skills: userData.skills,
-          description: userData.description,
-          avatar_url: userData.avatar,
-          courses: userData.courses,
-          other_knowledge: userData.otherKnowledge,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      setUser(prev => prev ? { ...prev, ...userData } : null);
-      return true;
-    } catch (error) {
-      console.error('Update user error:', error);
-      return false;
-    }
+  const refreshUser = async () => {
+    // No-op para compatibilidade
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, login, register, logout, updateUser, refreshUser }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      login, 
+      register, 
+      logout, 
+      updateUser, 
+      refreshUser 
+    }}>
       {children}
     </AuthContext.Provider>
   );

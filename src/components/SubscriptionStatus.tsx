@@ -21,11 +21,6 @@ const SubscriptionStatus: React.FC = () => {
     );
   }
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return null;
-    return new Date(dateString).toLocaleDateString('pt-BR');
-  };
-
   const getTierDisplayName = (tier: string) => {
     const names = {
       free: 'Gratuito',
@@ -59,7 +54,7 @@ const SubscriptionStatus: React.FC = () => {
               <span>Renovação:</span>
             </span>
             <span className="text-sm text-gray-600">
-              {formatDate(subscription.subscription_end)}
+              {new Date(subscription.subscription_end).toLocaleDateString('pt-BR')}
             </span>
           </div>
         )}

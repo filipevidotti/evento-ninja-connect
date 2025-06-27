@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/AuthContext';
 
 interface SubscriptionData {
@@ -22,24 +21,20 @@ export const useSubscription = () => {
       return;
     }
 
-    try {
-      setLoading(true);
-      const { data, error } = await supabase.functions.invoke('check-subscription');
-      
-      if (error) throw error;
-      
-      setSubscription(data);
-    } catch (error) {
-      console.error('Error checking subscription:', error);
-      setSubscription({
-        subscribed: false,
-        subscription_tier: 'free',
-        subscription_end: null,
-        user_type: user.type
-      });
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    
+    // Simular delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Dados mockados de assinatura
+    setSubscription({
+      subscribed: false,
+      subscription_tier: 'free',
+      subscription_end: null,
+      user_type: user.type
+    });
+    
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -48,26 +43,16 @@ export const useSubscription = () => {
 
   const createCheckout = async (plan: string) => {
     if (!user) throw new Error('User not authenticated');
-
-    const { data, error } = await supabase.functions.invoke('create-checkout', {
-      body: { plan, userType: user.type }
-    });
-
-    if (error) throw error;
     
-    // Open Stripe checkout in a new tab
-    window.open(data.url, '_blank');
+    // Simular abertura do checkout
+    alert(`Redirecionando para checkout do plano: ${plan}`);
   };
 
   const openCustomerPortal = async () => {
     if (!user) throw new Error('User not authenticated');
-
-    const { data, error } = await supabase.functions.invoke('customer-portal');
     
-    if (error) throw error;
-    
-    // Open customer portal in a new tab
-    window.open(data.url, '_blank');
+    // Simular abertura do portal
+    alert('Redirecionando para portal do cliente');
   };
 
   return {
