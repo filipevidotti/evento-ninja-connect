@@ -37,67 +37,42 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  // Usuário mockado sempre logado
+  const [user] = useState<User>({
+    id: '1',
+    name: 'Usuário Demo',
+    email: 'demo@exemplo.com',
+    type: 'freelancer',
+    city: 'São Paulo',
+    phone: '(11) 99999-9999',
+    rating: 4.5,
+    avatar: '',
+    skills: ['Fotografia', 'Edição'],
+    description: 'Freelancer experiente',
+    courses: [],
+    otherKnowledge: ''
+  });
+  
+  const [loading] = useState(false);
 
-  const login = async (email: string, password: string, type: 'freelancer' | 'producer'): Promise<boolean> => {
-    setLoading(true);
-    
-    // Simular delay de login
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Criar usuário mockado
-    const mockUser: User = {
-      id: '1',
-      name: email.split('@')[0],
-      email,
-      type,
-      city: 'São Paulo',
-      phone: '(11) 99999-9999',
-      rating: type === 'freelancer' ? 4.5 : undefined,
-      avatar: '',
-      skills: type === 'freelancer' ? ['Fotografia', 'Edição'] : [],
-      description: `${type === 'freelancer' ? 'Freelancer' : 'Produtor'} experiente`,
-      courses: [],
-      otherKnowledge: ''
-    };
-    
-    setUser(mockUser);
-    setLoading(false);
+  const login = async (): Promise<boolean> => {
     return true;
   };
 
-  const register = async (userData: Omit<User, 'id'> & { password: string }): Promise<boolean> => {
-    setLoading(true);
-    
-    // Simular delay de registro
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const newUser: User = {
-      ...userData,
-      id: Date.now().toString(),
-      rating: userData.type === 'freelancer' ? 0 : undefined,
-      skills: userData.skills || []
-    };
-    
-    setUser(newUser);
-    setLoading(false);
+  const register = async (): Promise<boolean> => {
     return true;
   };
 
   const logout = () => {
-    setUser(null);
+    // Mock - não faz nada
   };
 
-  const updateUser = async (userData: Partial<User>): Promise<boolean> => {
-    if (!user) return false;
-    
-    setUser(prev => prev ? { ...prev, ...userData } : null);
+  const updateUser = async (): Promise<boolean> => {
     return true;
   };
 
   const refreshUser = async () => {
-    // No-op para compatibilidade
+    // Mock - não faz nada
   };
 
   return (

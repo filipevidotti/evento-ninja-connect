@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/components/AuthContext';
 
 interface SubscriptionData {
   subscribed: boolean;
@@ -10,49 +9,24 @@ interface SubscriptionData {
 }
 
 export const useSubscription = () => {
-  const { user } = useAuth();
-  const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [subscription, setSubscription] = useState<SubscriptionData>({
+    subscribed: false,
+    subscription_tier: 'free',
+    subscription_end: null,
+    user_type: 'freelancer'
+  });
+  const [loading, setLoading] = useState(false);
 
   const checkSubscription = async () => {
-    if (!user) {
-      setSubscription(null);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    
-    // Simular delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Dados mockados de assinatura
-    setSubscription({
-      subscribed: false,
-      subscription_tier: 'free',
-      subscription_end: null,
-      user_type: user.type
-    });
-    
-    setLoading(false);
+    // Mock - não faz nada
   };
 
-  useEffect(() => {
-    checkSubscription();
-  }, [user]);
-
   const createCheckout = async (plan: string) => {
-    if (!user) throw new Error('User not authenticated');
-    
-    // Simular abertura do checkout
-    alert(`Redirecionando para checkout do plano: ${plan}`);
+    alert(`Simulação: Checkout do plano ${plan}`);
   };
 
   const openCustomerPortal = async () => {
-    if (!user) throw new Error('User not authenticated');
-    
-    // Simular abertura do portal
-    alert('Redirecionando para portal do cliente');
+    alert('Simulação: Portal do cliente');
   };
 
   return {
