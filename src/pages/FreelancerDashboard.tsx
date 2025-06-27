@@ -51,30 +51,33 @@ const FreelancerDashboard = () => {
     <div className="min-h-screen bg-gray-50">
       <FreelancerHeader />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 space-y-4 sm:space-y-0">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600">Bem-vindo de volta, {user?.name}!</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-gray-600 text-sm sm:text-base">Bem-vindo de volta, {user?.name}!</p>
           </div>
-          <div className="flex space-x-4">
-            <Button onClick={() => navigate('/freelancer/profile')} variant="outline">
+          <div className="flex flex-wrap gap-2 sm:space-x-4 sm:gap-0">
+            <Button onClick={() => navigate('/freelancer/profile')} variant="outline" size="sm">
               <User className="w-4 h-4 mr-2" />
-              Meu Perfil
+              <span className="hidden sm:inline">Meu Perfil</span>
+              <span className="sm:hidden">Perfil</span>
             </Button>
-            <Button onClick={() => navigate('/freelancer/calendar')} variant="outline">
+            <Button onClick={() => navigate('/freelancer/calendar')} variant="outline" size="sm">
               <Calendar className="w-4 h-4 mr-2" />
-              Calendário
+              <span className="hidden sm:inline">Calendário</span>
+              <span className="sm:hidden">Agenda</span>
             </Button>
-            <Button onClick={() => navigate('/freelancer/finance')} variant="outline">
+            <Button onClick={() => navigate('/freelancer/finance')} variant="outline" size="sm">
               <Wallet className="w-4 h-4 mr-2" />
-              Financeiro
+              <span className="hidden sm:inline">Financeiro</span>
+              <span className="sm:hidden">Grana</span>
             </Button>
           </div>
         </div>
 
         {/* Cards de Resumo */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Eventos Aplicados</CardTitle>
@@ -120,32 +123,35 @@ const FreelancerDashboard = () => {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Eventos Disponíveis */}
           <div className="lg:col-span-2">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
+              <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
                 <div>
-                  <CardTitle>Eventos Disponíveis</CardTitle>
-                  <CardDescription>Novos eventos em sua área</CardDescription>
+                  <CardTitle className="text-lg sm:text-xl">Eventos Disponíveis</CardTitle>
+                  <CardDescription className="text-sm">Novos eventos em sua área</CardDescription>
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                   <Button 
                     variant="outline" 
                     size="sm"
                     onClick={() => navigate('/freelancer/favorites')}
+                    className="w-full sm:w-auto"
                   >
                     <Heart className="w-4 h-4 mr-1" />
                     Favoritos
                   </Button>
-                  <EventFilters 
-                    searchTerm={searchTerm}
-                    setSearchTerm={setSearchTerm}
-                    filterRole={filterRole}
-                    setFilterRole={setFilterRole}
-                    filterCity={filterCity}
-                    setFilterCity={setFilterCity}
-                  />
+                  <div className="w-full sm:w-auto">
+                    <EventFilters 
+                      searchTerm={searchTerm}
+                      setSearchTerm={setSearchTerm}
+                      filterRole={filterRole}
+                      setFilterRole={setFilterRole}
+                      filterCity={filterCity}
+                      setFilterCity={setFilterCity}
+                    />
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
@@ -168,7 +174,7 @@ const FreelancerDashboard = () => {
             {/* Perfil Rápido */}
             <Card>
               <CardHeader>
-                <CardTitle>Meu Perfil</CardTitle>
+                <CardTitle className="text-lg">Meu Perfil</CardTitle>
               </CardHeader>
               <CardContent>
                 <FreelancerProfile />
@@ -178,15 +184,15 @@ const FreelancerDashboard = () => {
             {/* Próximos Eventos */}
             <Card>
               <CardHeader>
-                <CardTitle>Próximos Eventos</CardTitle>
+                <CardTitle className="text-lg">Próximos Eventos</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {[1, 2, 3].map((event) => (
                     <div key={event} className="flex items-center space-x-3 p-3 border rounded-lg">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <div className="flex-1">
-                        <p className="font-medium text-sm">Evento {event}</p>
+                      <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">Evento {event}</p>
                         <p className="text-xs text-gray-600">25 Jan, 14:00</p>
                       </div>
                     </div>
@@ -195,6 +201,7 @@ const FreelancerDashboard = () => {
                 <Button 
                   variant="outline" 
                   className="w-full mt-4"
+                  size="sm"
                   onClick={() => navigate('/freelancer/calendar')}
                 >
                   Ver Calendário Completo
@@ -205,7 +212,7 @@ const FreelancerDashboard = () => {
             {/* Minhas Aplicações */}
             <Card>
               <CardHeader>
-                <CardTitle>Minhas Aplicações</CardTitle>
+                <CardTitle className="text-lg">Minhas Aplicações</CardTitle>
               </CardHeader>
               <CardContent>
                 <ApplicationsList 
