@@ -41,6 +41,8 @@ interface UserProfile {
   phone?: string;
   rating?: number;
   total_reviews?: number;
+  courses?: string[];
+  other_knowledge?: string;
 }
 
 const AdminUsers = () => {
@@ -68,7 +70,14 @@ const AdminUsers = () => {
 
       if (error) throw error;
       
-      setUsers(data || []);
+      // Type cast the data to match our interface
+      const typedUsers = (data || []).map(user => ({
+        ...user,
+        user_type: user.user_type as 'freelancer' | 'producer',
+        email: user.id // We'll need to get email from auth if needed
+      })) as UserProfile[];
+      
+      setUsers(typedUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast({
@@ -355,6 +364,25 @@ const AdminUsers = () => {
                     <p className="font-medium">{formatDate(selectedUser.created_at)}</p>
                   </div>
                 </div>
+
+                {selectedUser.user_type === 'freelancer' && (
+                  <div className="space-y-4">
+                    <div>
+                      <Label>Cursos</Label>
+                      <p className="font-medium">
+                        {selectedUser.courses && selectedUser.courses.length > 0 
+                          ? selectedUser.courses.join(', ') 
+                          : 'Nenhum curso informado'}
+                      </p>
+                    </div>
+                    <div>
+                      <Label>Outros Conhecimentos</Label>
+                      <p className="font-medium">
+                        {selectedUser.other_knowledge || 'Nenhum conhecimento adicional informado'}
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex justify-end space-x-3">
                   <Button variant="outline" onClick={() => setSelectedUser(null)}>

@@ -244,10 +244,12 @@ export type Database = {
         Row: {
           avatar_url: string | null
           city: string | null
+          courses: string[] | null
           created_at: string
           description: string | null
           id: string
           name: string | null
+          other_knowledge: string | null
           phone: string | null
           rating: number | null
           skills: string[] | null
@@ -259,10 +261,12 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           city?: string | null
+          courses?: string[] | null
           created_at?: string
           description?: string | null
           id: string
           name?: string | null
+          other_knowledge?: string | null
           phone?: string | null
           rating?: number | null
           skills?: string[] | null
@@ -274,10 +278,12 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           city?: string | null
+          courses?: string[] | null
           created_at?: string
           description?: string | null
           id?: string
           name?: string | null
+          other_knowledge?: string | null
           phone?: string | null
           rating?: number | null
           skills?: string[] | null
