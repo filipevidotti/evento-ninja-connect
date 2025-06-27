@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -119,7 +118,7 @@ const Index = () => {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              A plataforma que conecta <strong>freelancers qualificados</strong> com <strong>produtores de eventos</strong> 
+              A plataforma que conecta <strong>freelancers qualificados</strong> com <strong>organizadores de eventos</strong> 
               de forma rápida, segura e sem burocracia.
             </p>
             
@@ -140,7 +139,7 @@ const Index = () => {
                 onClick={() => navigate('/login')}
               >
                 <Briefcase className="w-5 h-5 mr-2" />
-                Sou Produtor
+                Sou Organizador
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </div>
@@ -310,13 +309,13 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            {/* For Producers */}
+            {/* For Organizers */}
             <Card className="border-0 bg-white/70 backdrop-blur-sm">
               <CardHeader className="text-center">
                 <div className="mx-auto mb-4 p-3 bg-purple-100 rounded-full w-fit">
                   <Briefcase className="w-8 h-8 text-purple-600" />
                 </div>
-                <CardTitle className="text-2xl text-purple-600">Para Produtores</CardTitle>
+                <CardTitle className="text-2xl text-purple-600">Para Organizadores</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-start space-x-3">
@@ -433,7 +432,7 @@ const Index = () => {
               onClick={() => navigate('/login')}
             >
               <Briefcase className="w-5 h-5 mr-2" />
-              Cadastrar como Produtor
+              Cadastrar como Organizador
             </Button>
           </div>
         </div>
@@ -556,7 +555,7 @@ const Index = () => {
                     onClick={() => navigate('/login')}
                     className="hover:text-white transition-colors"
                   >
-                    Cadastro Produtor
+                    Cadastro Organizador
                   </button>
                 </li>
                 <li>

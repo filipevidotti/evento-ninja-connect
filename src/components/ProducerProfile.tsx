@@ -29,7 +29,7 @@ const ProducerProfile: React.FC<ProducerProfileProps> = ({ user, events, getAppl
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Briefcase className="w-5 h-5" />
-            Estatísticas do Produtor
+            Estatísticas do Organizador
           </CardTitle>
           <CardDescription>Resumo da sua atividade na plataforma</CardDescription>
         </CardHeader>

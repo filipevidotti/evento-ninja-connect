@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -34,7 +33,7 @@ const ProducerHeader: React.FC<ProducerHeaderProps> = ({ user, onLogout, onCreat
             >
               EventConnect
             </h1>
-            <Badge variant="secondary" className="bg-purple-100 text-purple-800 text-xs sm:text-sm">Produtor</Badge>
+            <Badge variant="secondary" className="bg-purple-100 text-purple-800 text-xs sm:text-sm">Organizador</Badge>
           </div>
           
           {/* Desktop Navigation */}
