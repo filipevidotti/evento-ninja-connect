@@ -9,6 +9,156 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      applications: {
+        Row: {
+          applied_at: string
+          function_id: string | null
+          id: string
+          status: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          applied_at?: string
+          function_id?: string | null
+          id?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          applied_at?: string
+          function_id?: string | null
+          id?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_function_id_fkey"
+            columns: ["function_id"]
+            isOneToOne: false
+            referencedRelation: "functions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          created_at: string
+          data: string
+          descricao: string | null
+          id: string
+          local: string
+          name: string
+          produtor_id: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data: string
+          descricao?: string | null
+          id?: string
+          local: string
+          name: string
+          produtor_id?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          descricao?: string | null
+          id?: string
+          local?: string
+          name?: string
+          produtor_id?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      functions: {
+        Row: {
+          cargo: string
+          created_at: string
+          evento_id: string | null
+          id: string
+          quantidade: number
+          requirements: string | null
+          valor: number
+        }
+        Insert: {
+          cargo: string
+          created_at?: string
+          evento_id?: string | null
+          id?: string
+          quantidade: number
+          requirements?: string | null
+          valor: number
+        }
+        Update: {
+          cargo?: string
+          created_at?: string
+          evento_id?: string | null
+          id?: string
+          quantidade?: number
+          requirements?: string | null
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "functions_evento_id_fkey"
+            columns: ["evento_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          comentario: string | null
+          created_at: string
+          event_id: string | null
+          id: string
+          nota: number
+          reviewed_id: string | null
+          reviewer_id: string | null
+          tipo: string
+        }
+        Insert: {
+          comentario?: string | null
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          nota: number
+          reviewed_id?: string | null
+          reviewer_id?: string | null
+          tipo: string
+        }
+        Update: {
+          comentario?: string | null
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          nota?: number
+          reviewed_id?: string | null
+          reviewer_id?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscribers: {
         Row: {
           created_at: string
@@ -86,6 +236,51 @@ export type Database = {
           subscription_tier?: string
           updated_at?: string
           user_id?: string | null
+          user_type?: string
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          avatar_url: string | null
+          city: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string | null
+          phone: string | null
+          rating: number | null
+          skills: string[] | null
+          total_reviews: number | null
+          updated_at: string
+          user_type: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          city?: string | null
+          created_at?: string
+          description?: string | null
+          id: string
+          name?: string | null
+          phone?: string | null
+          rating?: number | null
+          skills?: string[] | null
+          total_reviews?: number | null
+          updated_at?: string
+          user_type: string
+        }
+        Update: {
+          avatar_url?: string | null
+          city?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string | null
+          phone?: string | null
+          rating?: number | null
+          skills?: string[] | null
+          total_reviews?: number | null
+          updated_at?: string
           user_type?: string
         }
         Relationships: []

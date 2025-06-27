@@ -1,48 +1,53 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from './AuthContext';
 
 export interface EventFunction {
   id: string;
-  role: string;
-  quantity: number;
-  salary: number;
+  cargo: string;
+  quantidade: number;
+  valor: number;
   requirements?: string;
 }
 
 export interface Event {
   id: string;
-  title: string;
-  description: string;
-  date: string;
-  location: string;
-  city: string;
-  producerId: string;
-  producerName: string;
+  name: string;
+  descricao: string;
+  data: string;
+  local: string;
+  produtor_id: string;
+  producer_name: string;
   functions: EventFunction[];
   status: 'open' | 'closed' | 'completed';
-  createdAt: string;
+  created_at: string;
 }
 
 export interface Application {
   id: string;
-  userId: string;
-  userName: string;
-  userEmail: string;
-  eventId: string;
-  functionId: string;
-  status: 'pending' | 'approved' | 'rejected';
-  appliedAt: string;
+  user_id: string;
+  function_id: string;
+  status: 'pendente' | 'aprovado' | 'recusado';
+  applied_at: string;
+  user_name?: string;
+  user_email?: string;
+  event_name?: string;
+  function_cargo?: string;
 }
 
 interface EventContextType {
   events: Event[];
   applications: Application[];
-  createEvent: (event: Omit<Event, 'id' | 'createdAt'>) => void;
-  applyToEvent: (eventId: string, functionId: string, userId: string, userName: string, userEmail: string) => void;
-  updateApplicationStatus: (applicationId: string, status: 'approved' | 'rejected') => void;
+  loading: boolean;
+  createEvent: (event: Omit<Event, 'id' | 'created_at' | 'producer_name' | 'functions'> & { functions: Omit<EventFunction, 'id'>[] }) => Promise<boolean>;
+  applyToEvent: (functionId: string) => Promise<boolean>;
+  updateApplicationStatus: (applicationId: string, status: 'aprovado' | 'recusado') => Promise<boolean>;
   getEventsByProducer: (producerId: string) => Event[];
   getApplicationsByUser: (userId: string) => Application[];
   getApplicationsByEvent: (eventId: string) => Application[];
+  refreshEvents: () => Promise<void>;
+  refreshApplications: () => Promise<void>;
 }
 
 const EventContext = createContext<EventContextType | null>(null);
@@ -56,103 +61,214 @@ export const useEvents = () => {
 };
 
 export const EventProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const refreshEvents = async () => {
+    try {
+      const { data: eventsData, error: eventsError } = await supabase
+        .from('events')
+        .select(`
+          *,
+          functions (
+            id,
+            cargo,
+            quantidade,
+            valor,
+            requirements
+          ),
+          user_profiles!events_produtor_id_fkey (
+            name
+          )
+        `)
+        .eq('status', 'open')
+        .order('created_at', { ascending: false });
+
+      if (eventsError) throw eventsError;
+
+      const formattedEvents: Event[] = (eventsData || []).map(event => ({
+        id: event.id,
+        name: event.name,
+        descricao: event.descricao || '',
+        data: event.data,
+        local: event.local,
+        produtor_id: event.produtor_id,
+        producer_name: event.user_profiles?.name || 'Produtor',
+        functions: event.functions || [],
+        status: event.status,
+        created_at: event.created_at
+      }));
+
+      setEvents(formattedEvents);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    }
+  };
+
+  const refreshApplications = async () => {
+    if (!user) return;
+
+    try {
+      const { data: applicationsData, error: applicationsError } = await supabase
+        .from('applications')
+        .select(`
+          *,
+          functions (
+            cargo,
+            events (
+              name
+            )
+          ),
+          user_profiles!applications_user_id_fkey (
+            name,
+            email
+          )
+        `)
+        .or(`user_id.eq.${user.id},functions.events.produtor_id.eq.${user.id}`)
+        .order('applied_at', { ascending: false });
+
+      if (applicationsError) throw applicationsError;
+
+      const formattedApplications: Application[] = (applicationsData || []).map(app => ({
+        id: app.id,
+        user_id: app.user_id,
+        function_id: app.function_id,
+        status: app.status,
+        applied_at: app.applied_at,
+        user_name: app.user_profiles?.name,
+        user_email: app.user_profiles?.email,
+        event_name: app.functions?.events?.name,
+        function_cargo: app.functions?.cargo
+      }));
+
+      setApplications(formattedApplications);
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+    }
+  };
 
   useEffect(() => {
-    // Load mock data
-    const mockEvents: Event[] = [
-      {
-        id: '1',
-        title: 'Festa Corporativa Tech Summit 2025',
-        description: 'Grande evento corporativo com 500 convidados',
-        date: '2025-07-15',
-        location: 'Centro de Convenções Anhembi',
-        city: 'São Paulo',
-        producerId: 'prod1',
-        producerName: 'Eventos Premium',
-        functions: [
-          { id: 'f1', role: 'Garçom', quantity: 10, salary: 150, requirements: 'Experiência mínima de 6 meses' },
-          { id: 'f2', role: 'Operador de Caixa', quantity: 3, salary: 180 },
-          { id: 'f3', role: 'Segurança', quantity: 5, salary: 200, requirements: 'Curso de segurança obrigatório' }
-        ],
-        status: 'open',
-        createdAt: '2025-06-20'
-      },
-      {
-        id: '2',
-        title: 'Casamento de Luxo - Marina & Carlos',
-        description: 'Cerimônia elegante para 200 convidados',
-        date: '2025-08-22',
-        location: 'Villa Bisutti',
-        city: 'São Paulo',
-        producerId: 'prod2',
-        producerName: 'Casamentos dos Sonhos',
-        functions: [
-          { id: 'f4', role: 'Garçom', quantity: 8, salary: 160 },
-          { id: 'f5', role: 'Operador de Caixa', quantity: 2, salary: 170 }
-        ],
-        status: 'open',
-        createdAt: '2025-06-21'
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([refreshEvents(), refreshApplications()]);
+      setLoading(false);
+    };
+
+    loadData();
+  }, [user]);
+
+  const createEvent = async (eventData: Omit<Event, 'id' | 'created_at' | 'producer_name' | 'functions'> & { functions: Omit<EventFunction, 'id'>[] }): Promise<boolean> => {
+    if (!user) return false;
+
+    try {
+      const { data: eventResult, error: eventError } = await supabase
+        .from('events')
+        .insert({
+          name: eventData.name,
+          descricao: eventData.descricao,
+          data: eventData.data,
+          local: eventData.local,
+          produtor_id: user.id,
+          status: eventData.status
+        })
+        .select()
+        .single();
+
+      if (eventError) throw eventError;
+
+      if (eventData.functions.length > 0) {
+        const functionsToInsert = eventData.functions.map(func => ({
+          evento_id: eventResult.id,
+          cargo: func.cargo,
+          quantidade: func.quantidade,
+          valor: func.valor,
+          requirements: func.requirements
+        }));
+
+        const { error: functionsError } = await supabase
+          .from('functions')
+          .insert(functionsToInsert);
+
+        if (functionsError) throw functionsError;
       }
-    ];
-    
-    setEvents(mockEvents);
-  }, []);
 
-  const createEvent = (eventData: Omit<Event, 'id' | 'createdAt'>) => {
-    const newEvent: Event = {
-      ...eventData,
-      id: Math.random().toString(36).substr(2, 9),
-      createdAt: new Date().toISOString()
-    };
-    setEvents(prev => [...prev, newEvent]);
+      await refreshEvents();
+      return true;
+    } catch (error) {
+      console.error('Error creating event:', error);
+      return false;
+    }
   };
 
-  const applyToEvent = (eventId: string, functionId: string, userId: string, userName: string, userEmail: string) => {
-    const newApplication: Application = {
-      id: Math.random().toString(36).substr(2, 9),
-      userId,
-      userName,
-      userEmail,
-      eventId,
-      functionId,
-      status: 'pending',
-      appliedAt: new Date().toISOString()
-    };
-    setApplications(prev => [...prev, newApplication]);
+  const applyToEvent = async (functionId: string): Promise<boolean> => {
+    if (!user) return false;
+
+    try {
+      const { error } = await supabase
+        .from('applications')
+        .insert({
+          user_id: user.id,
+          function_id: functionId,
+          status: 'pendente'
+        });
+
+      if (error) throw error;
+
+      await refreshApplications();
+      return true;
+    } catch (error) {
+      console.error('Error applying to event:', error);
+      return false;
+    }
   };
 
-  const updateApplicationStatus = (applicationId: string, status: 'approved' | 'rejected') => {
-    setApplications(prev => 
-      prev.map(app => 
-        app.id === applicationId ? { ...app, status } : app
-      )
-    );
+  const updateApplicationStatus = async (applicationId: string, status: 'aprovado' | 'recusado'): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('applications')
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq('id', applicationId);
+
+      if (error) throw error;
+
+      await refreshApplications();
+      return true;
+    } catch (error) {
+      console.error('Error updating application status:', error);
+      return false;
+    }
   };
 
   const getEventsByProducer = (producerId: string) => {
-    return events.filter(event => event.producerId === producerId);
+    return events.filter(event => event.produtor_id === producerId);
   };
 
   const getApplicationsByUser = (userId: string) => {
-    return applications.filter(app => app.userId === userId);
+    return applications.filter(app => app.user_id === userId);
   };
 
   const getApplicationsByEvent = (eventId: string) => {
-    return applications.filter(app => app.eventId === eventId);
+    return applications.filter(app => {
+      const event = events.find(e => e.id === eventId);
+      return event?.functions.some(f => f.id === app.function_id);
+    });
   };
 
   return (
     <EventContext.Provider value={{
       events,
       applications,
+      loading,
       createEvent,
       applyToEvent,
       updateApplicationStatus,
       getEventsByProducer,
       getApplicationsByUser,
-      getApplicationsByEvent
+      getApplicationsByEvent,
+      refreshEvents,
+      refreshApplications
     }}>
       {children}
     </EventContext.Provider>
