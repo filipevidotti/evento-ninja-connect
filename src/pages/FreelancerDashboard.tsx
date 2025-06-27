@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, CheckCircle, Clock, User, Wallet, Heart } from 'lucide-react';
@@ -17,28 +16,22 @@ const FreelancerDashboard = () => {
   const { events } = useEvents();
   const navigate = useNavigate();
 
-  // State for filters
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterRole, setFilterRole] = useState('all');
-  const [filterCity, setFilterCity] = useState('all');
+  const stats = [
+    { label: 'Eventos Aplicados', value: 12, trend: '+2 desde a última semana' },
+    { label: 'Eventos Confirmados', value: 5, trend: '+1 desde ontem' },
+    { label: 'Próximos Eventos', value: 3, trend: 'Nos próximos 7 dias' },
+    { label: 'Ganhos Este Mês', value: 'R$ 2.850', trend: '+15% vs mês anterior' },
+  ];
 
-  // Mock user applications for now - this should come from a context or API
-  const [userApplications] = useState([]);
-
-  // Function to handle event applications
-  const handleApply = (eventId: string, functionId: string) => {
-    console.log('Applying to event:', eventId, 'function:', functionId);
-    // Here you would implement the application logic
-  };
-
-  // Function to get application status
-  const getApplicationStatus = (eventId: string, functionId: string) => {
-    // This would check the user's applications for this event/function
-    const application = userApplications.find(
-      (app: any) => app.eventId === eventId && app.functionId === functionId
-    );
-    return application?.status;
-  };
+  const data = [
+    { name: 'Jan', uv: 4000, pv: 2400, amt: 2400 },
+    { name: 'Fev', uv: 3000, pv: 1398, amt: 2210 },
+    { name: 'Mar', uv: 2000, pv: 9800, amt: 2290 },
+    { name: 'Abr', uv: 2780, pv: 3908, amt: 2000 },
+    { name: 'Mai', uv: 1890, pv: 4800, amt: 2181 },
+    { name: 'Jun', uv: 2390, pv: 3800, amt: 2500 },
+    { name: 'Jul', uv: 3490, pv: 4300, amt: 2100 },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -131,25 +124,13 @@ const FreelancerDashboard = () => {
                     <Heart className="w-4 h-4 mr-1" />
                     Favoritos
                   </Button>
-                  <EventFilters 
-                    searchTerm={searchTerm}
-                    setSearchTerm={setSearchTerm}
-                    filterRole={filterRole}
-                    setFilterRole={setFilterRole}
-                    filterCity={filterCity}
-                    setFilterCity={setFilterCity}
-                  />
+                  <EventFilters />
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {events.slice(0, 5).map((event) => (
-                    <EventCard 
-                      key={event.id} 
-                      event={event} 
-                      onApply={handleApply}
-                      getApplicationStatus={getApplicationStatus}
-                    />
+                    <EventCard key={event.id} event={event} />
                   ))}
                 </div>
               </CardContent>
@@ -201,10 +182,7 @@ const FreelancerDashboard = () => {
                 <CardTitle>Minhas Aplicações</CardTitle>
               </CardHeader>
               <CardContent>
-                <ApplicationsList 
-                  userApplications={userApplications}
-                  events={events}
-                />
+                <ApplicationsList />
               </CardContent>
             </Card>
           </div>
