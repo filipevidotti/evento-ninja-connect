@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { toast } from '@/components/ui/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { MessageSquare, Clock, FileText, AlertTriangle, CheckCircle, XCircle, Upload } from 'lucide-react';
 
 interface Dispute {
@@ -65,34 +63,46 @@ const AdminDisputes = () => {
 
   const fetchDisputes = async () => {
     try {
-      const { data, error } = await supabase
-        .from('disputes')
-        .select(`
-          *,
-          events(name)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      // Enrich with user names
-      const enrichedDisputes = await Promise.all(
-        (data || []).map(async (dispute) => {
-          const [complainantData, defendantData] = await Promise.all([
-            supabase.from('user_profiles').select('name').eq('id', dispute.complainant_id).single(),
-            supabase.from('user_profiles').select('name').eq('id', dispute.defendant_id).single()
-          ]);
-
-          return {
-            ...dispute,
-            event_name: dispute.events?.name || 'Evento não encontrado',
-            complainant_name: complainantData.data?.name || 'Usuário não encontrado',
-            defendant_name: defendantData.data?.name || 'Usuário não encontrado'
-          };
-        })
-      );
-
-      setDisputes(enrichedDisputes);
+      setLoading(true);
+      
+      // Mock data - no database dependencies
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const mockDisputes: Dispute[] = [
+        {
+          id: '1',
+          event_id: 'event1',
+          complainant_id: 'user1',
+          defendant_id: 'user2',
+          title: 'Problema com pagamento',
+          description: 'O freelancer não recebeu o pagamento acordado.',
+          status: 'pending',
+          priority: 'high',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          event_name: 'Casamento Silva',
+          complainant_name: 'João Silva',
+          defendant_name: 'Maria Santos'
+        },
+        {
+          id: '2',
+          event_id: 'event2',
+          complainant_id: 'user3',
+          defendant_id: 'user4',
+          title: 'Trabalho não entregue',
+          description: 'O freelancer não entregou o trabalho no prazo.',
+          status: 'resolved',
+          priority: 'medium',
+          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          updated_at: new Date().toISOString(),
+          event_name: 'Evento Corporativo',
+          complainant_name: 'Pedro Costa',
+          defendant_name: 'Ana Oliveira',
+          resolution: 'Trabalho entregue com prazo estendido'
+        }
+      ];
+      
+      setDisputes(mockDisputes);
     } catch (error) {
       console.error('Error fetching disputes:', error);
       toast({
@@ -107,35 +117,31 @@ const AdminDisputes = () => {
 
   const fetchMessages = async (disputeId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('dispute_messages')
-        .select('*')
-        .eq('dispute_id', disputeId)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-
-      // Enrich with sender names
-      const enrichedMessages = await Promise.all(
-        (data || []).map(async (message) => {
-          if (message.sender_type === 'admin') {
-            return { ...message, sender_name: 'Administrador' };
-          }
-
-          const { data: userData } = await supabase
-            .from('user_profiles')
-            .select('name')
-            .eq('id', message.sender_id)
-            .single();
-
-          return {
-            ...message,
-            sender_name: userData?.name || 'Usuário'
-          };
-        })
-      );
-
-      setMessages(enrichedMessages);
+      // Mock messages data
+      const mockMessages: DisputeMessage[] = [
+        {
+          id: '1',
+          dispute_id: disputeId,
+          sender_id: 'user1',
+          sender_type: 'user',
+          message: 'Não recebi o pagamento acordado.',
+          message_type: 'text',
+          created_at: new Date().toISOString(),
+          sender_name: 'João Silva'
+        },
+        {
+          id: '2',
+          dispute_id: disputeId,
+          sender_id: 'admin1',
+          sender_type: 'admin',
+          message: 'Vamos analisar a situação.',
+          message_type: 'text',
+          created_at: new Date().toISOString(),
+          sender_name: 'Administrador'
+        }
+      ];
+      
+      setMessages(mockMessages);
     } catch (error) {
       console.error('Error fetching messages:', error);
     }
@@ -145,17 +151,8 @@ const AdminDisputes = () => {
     if (!newMessage.trim() || !selectedDispute) return;
 
     try {
-      const { error } = await supabase
-        .from('dispute_messages')
-        .insert({
-          dispute_id: selectedDispute.id,
-          sender_id: 'admin-user', // This should be the actual admin user ID
-          sender_type: 'admin',
-          message: newMessage,
-          message_type: 'text'
-        });
-
-      if (error) throw error;
+      // Mock sending message
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       setNewMessage('');
       fetchMessages(selectedDispute.id);
@@ -178,31 +175,8 @@ const AdminDisputes = () => {
     if (!selectedDispute) return;
 
     try {
-      const { error } = await supabase
-        .from('disputes')
-        .update({ 
-          status,
-          updated_at: new Date().toISOString(),
-          ...(status === 'resolved' && resolution ? { 
-            resolution,
-            resolution_date: new Date().toISOString()
-          } : {})
-        })
-        .eq('id', selectedDispute.id);
-
-      if (error) throw error;
-
-      if (status === 'resolved' && resolution) {
-        await supabase
-          .from('dispute_messages')
-          .insert({
-            dispute_id: selectedDispute.id,
-            sender_id: 'admin-user',
-            sender_type: 'admin',
-            message: `Disputa resolvida: ${resolution}`,
-            message_type: 'resolution'
-          });
-      }
+      // Mock updating dispute
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       fetchDisputes();
       setSelectedDispute(null);

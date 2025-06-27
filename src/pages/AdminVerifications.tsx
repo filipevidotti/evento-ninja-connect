@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle2, XCircle, Clock, Eye, FileText, User } from 'lucide-react';
 
 interface AdminVerification {
@@ -32,18 +31,43 @@ const AdminVerifications = () => {
 
   const fetchVerifications = async () => {
     try {
-      const { data, error } = await supabase
-        .from('verifications')
-        .select(`
-          *,
-          user_profiles(name, city)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
+      setLoading(true);
       
-      // Convert to proper type with unknown first to satisfy TypeScript
-      setVerifications((data || []) as unknown as AdminVerification[]);
+      // Mock data - no database dependencies
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const mockVerifications: AdminVerification[] = [
+        {
+          id: '1',
+          user_id: 'user1',
+          tipo_documento: 'cpf',
+          numero_documento: '123.456.789-00',
+          foto_documento_url: '/placeholder.svg',
+          selfie_url: '/placeholder.svg',
+          status: 'pendente',
+          created_at: new Date().toISOString(),
+          user_profiles: {
+            name: 'João Silva',
+            city: 'São Paulo'
+          }
+        },
+        {
+          id: '2',
+          user_id: 'user2',
+          tipo_documento: 'rg',
+          numero_documento: '12.345.678-9',
+          foto_documento_url: '/placeholder.svg',
+          selfie_url: '/placeholder.svg',
+          status: 'aprovado',
+          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          user_profiles: {
+            name: 'Maria Santos',
+            city: 'Rio de Janeiro'
+          }
+        }
+      ];
+      
+      setVerifications(mockVerifications);
     } catch (error) {
       console.error('Error fetching verifications:', error);
       toast({
@@ -66,28 +90,8 @@ const AdminVerifications = () => {
     reason?: string
   ) => {
     try {
-      const { error } = await supabase
-        .from('verifications')
-        .update({
-          status,
-          data_verificacao: new Date().toISOString(),
-          motivo_rejeicao: reason || null,
-          admin_id: (await supabase.auth.getUser()).data.user?.id
-        })
-        .eq('id', verificationId);
-
-      if (error) throw error;
-
-      // Atualizar status de verificação no perfil do usuário
-      if (status === 'aprovado') {
-        const verification = verifications.find(v => v.id === verificationId);
-        if (verification) {
-          await supabase
-            .from('user_profiles')
-            .update({ verificado: true })
-            .eq('id', verification.user_id);
-        }
-      }
+      // Mock update - no database dependencies
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       toast({
         title: status === 'aprovado' ? 'Verificação aprovada!' : 'Verificação rejeitada',

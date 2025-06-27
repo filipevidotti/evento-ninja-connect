@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/components/ui/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { DollarSign, TrendingUp, Clock, AlertCircle, Download, Settings } from 'lucide-react';
 
 interface Transaction {
@@ -70,63 +68,58 @@ const AdminFinance = () => {
     try {
       setLoading(true);
       
-      // Calculate date filter
-      const endDate = new Date();
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - parseInt(dateFilter));
-
-      // Build query
-      let query = supabase
-        .from('transactions')
-        .select(`
-          *,
-          events(name)
-        `)
-        .gte('created_at', startDate.toISOString())
-        .lte('created_at', endDate.toISOString())
-        .order('created_at', { ascending: false });
-
-      if (statusFilter !== 'all') {
-        query = query.eq('status', statusFilter);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      // Enrich with user names
-      const enrichedTransactions = await Promise.all(
-        (data || []).map(async (transaction) => {
-          const { data: userData } = await supabase
-            .from('user_profiles')
-            .select('name')
-            .eq('id', transaction.user_id)
-            .single();
-
-          return {
-            ...transaction,
-            user_name: userData?.name || 'Usuário não encontrado',
-            event_name: transaction.events?.name || 'N/A'
-          };
-        })
-      );
-
-      setTransactions(enrichedTransactions);
+      // Mock data - no database dependencies
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const mockTransactions: Transaction[] = [
+        {
+          id: '1',
+          event_id: 'event1',
+          user_id: 'user1',
+          type: 'payment',
+          amount: 1000,
+          commission_rate: 0.1,
+          commission_amount: 100,
+          net_amount: 900,
+          status: 'completed',
+          payment_method: 'credit_card',
+          created_at: new Date().toISOString(),
+          user_name: 'João Silva',
+          event_name: 'Casamento Silva'
+        },
+        {
+          id: '2',
+          event_id: 'event2',
+          user_id: 'user2',
+          type: 'payment',
+          amount: 500,
+          commission_rate: 0.1,
+          commission_amount: 50,
+          net_amount: 450,
+          status: 'pending',
+          payment_method: 'pix',
+          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          user_name: 'Maria Santos',
+          event_name: 'Evento Corporativo'
+        }
+      ];
+      
+      setTransactions(mockTransactions);
 
       // Calculate summary
-      const totalRevenue = enrichedTransactions
+      const totalRevenue = mockTransactions
         .filter(t => t.status === 'completed')
         .reduce((sum, t) => sum + t.amount, 0);
 
-      const totalCommissions = enrichedTransactions
+      const totalCommissions = mockTransactions
         .filter(t => t.status === 'completed' && t.commission_amount)
         .reduce((sum, t) => sum + (t.commission_amount || 0), 0);
 
-      const pendingPayments = enrichedTransactions
+      const pendingPayments = mockTransactions
         .filter(t => t.status === 'pending')
         .reduce((sum, t) => sum + t.amount, 0);
 
-      const disputedTransactions = enrichedTransactions
+      const disputedTransactions = mockTransactions
         .filter(t => t.status === 'disputed').length;
 
       setSummary({
@@ -150,13 +143,23 @@ const AdminFinance = () => {
 
   const fetchSettings = async () => {
     try {
-      const { data, error } = await supabase
-        .from('platform_settings')
-        .select('*')
-        .order('setting_key');
-
-      if (error) throw error;
-      setSettings(data || []);
+      // Mock settings data
+      const mockSettings: PlatformSetting[] = [
+        {
+          id: '1',
+          setting_key: 'commission_rate_freelancer',
+          setting_value: '10',
+          description: 'Taxa de comissão para freelancers'
+        },
+        {
+          id: '2',
+          setting_key: 'commission_rate_producer',
+          setting_value: '5',
+          description: 'Taxa de comissão para produtores'
+        }
+      ];
+      
+      setSettings(mockSettings);
     } catch (error) {
       console.error('Error fetching settings:', error);
     }
@@ -164,16 +167,8 @@ const AdminFinance = () => {
 
   const updateTransaction = async (transactionId: string, status: string) => {
     try {
-      const { error } = await supabase
-        .from('transactions')
-        .update({ 
-          status,
-          processed_at: status === 'completed' ? new Date().toISOString() : null,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', transactionId);
-
-      if (error) throw error;
+      // Mock update
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       fetchFinancialData();
       toast({
@@ -192,15 +187,8 @@ const AdminFinance = () => {
 
   const updateSetting = async (settingId: string, newValue: string) => {
     try {
-      const { error } = await supabase
-        .from('platform_settings')
-        .update({ 
-          setting_value: newValue,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', settingId);
-
-      if (error) throw error;
+      // Mock update
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       fetchSettings();
       setSelectedSetting(null);

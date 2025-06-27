@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,6 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { 
   Search, 
   Filter, 
@@ -57,27 +55,39 @@ const AdminUsers = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      let query = supabase
-        .from('user_profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (filterType !== 'all') {
-        query = query.eq('user_type', filterType);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
       
-      // Type cast the data to match our interface
-      const typedUsers = (data || []).map(user => ({
-        ...user,
-        user_type: user.user_type as 'freelancer' | 'producer',
-        email: user.id // We'll need to get email from auth if needed
-      })) as UserProfile[];
+      // Mock data - no database dependencies
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      setUsers(typedUsers);
+      const mockUsers: UserProfile[] = [
+        {
+          id: '1',
+          name: 'João Silva',
+          email: 'joao@email.com',
+          user_type: 'freelancer',
+          city: 'São Paulo',
+          verificado: true,
+          created_at: new Date().toISOString(),
+          avatar_url: '/placeholder.svg',
+          phone: '(11) 99999-9999',
+          rating: 4.8,
+          total_reviews: 25,
+          courses: ['Fotografia', 'Edição de Vídeo']
+        },
+        {
+          id: '2',
+          name: 'Maria Santos',
+          email: 'maria@email.com',
+          user_type: 'producer',
+          city: 'Rio de Janeiro',
+          verificado: false,
+          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          avatar_url: '/placeholder.svg',
+          phone: '(21) 88888-8888'
+        }
+      ];
+      
+      setUsers(mockUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast({
