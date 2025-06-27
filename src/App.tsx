@@ -60,6 +60,7 @@ function App() {
                 <Route path="/freelancer/calendar" element={<FreelancerCalendar />} />
                 <Route path="/freelancer/finance" element={<FreelancerFinance />} />
                 <Route path="/freelancer/reputation" element={<FreelancerReputation />} />
+                <Route path="/freelancer/checkin" element={<FreelancerCheckIn />} />
                 <Route path="/freelancer/checkin/:eventId" element={<FreelancerCheckIn />} />
                 
                 {/* Producer Routes */}

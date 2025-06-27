@@ -39,7 +39,10 @@ export const useCheckin = () => {
   };
 
   const performCheckin = async (eventId: string, pin: string): Promise<{ success: boolean; message: string }> => {
+    console.log('Iniciando check-in para evento:', eventId, 'com PIN:', pin);
+    
     if (!user) {
+      console.log('Usuário não autenticado');
       return { success: false, message: 'Usuário não autenticado' };
     }
 
@@ -50,6 +53,7 @@ export const useCheckin = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       const correctPin = mockEventPins[eventId];
+      console.log('PIN correto para evento', eventId, ':', correctPin);
       
       // Log da tentativa (sempre registrar para auditoria)
       const attempt: CheckinAttempt = {
@@ -70,6 +74,7 @@ export const useCheckin = () => {
         );
 
         if (existingCheckin) {
+          console.log('Usuário já fez check-in neste evento');
           return { success: false, message: 'Você já fez check-in neste evento' };
         }
 
@@ -85,6 +90,7 @@ export const useCheckin = () => {
         };
 
         setCheckins(prev => [...prev, newCheckin]);
+        console.log('Check-in realizado com sucesso:', newCheckin);
 
         toast({
           title: "Check-in realizado!",
@@ -93,6 +99,7 @@ export const useCheckin = () => {
 
         return { success: true, message: 'Check-in realizado com sucesso!' };
       } else {
+        console.log('PIN inválido fornecido');
         toast({
           title: "PIN inválido",
           description: "Verifique o PIN e tente novamente.",
@@ -110,13 +117,19 @@ export const useCheckin = () => {
   };
 
   const hasCheckedIn = (eventId: string): boolean => {
-    return checkins.some(c => c.event_id === eventId && c.user_id === user?.id);
+    const hasChecked = checkins.some(c => c.event_id === eventId && c.user_id === user?.id);
+    console.log('Verificando se usuário fez check-in no evento', eventId, ':', hasChecked);
+    return hasChecked;
   };
 
   const getCheckinTime = (eventId: string): string | null => {
     const checkin = checkins.find(c => c.event_id === eventId && c.user_id === user?.id);
-    return checkin ? checkin.checkin_time : null;
+    const time = checkin ? checkin.checkin_time : null;
+    console.log('Horário do check-in para evento', eventId, ':', time);
+    return time;
   };
+
+  console.log('useCheckin - Estado atual:', { user: user?.id, checkins: checkins.length, loading });
 
   return {
     performCheckin,

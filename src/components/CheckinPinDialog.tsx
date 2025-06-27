@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { CheckCircle, AlertCircle, Loader2, Key } from 'lucide-react';
 import { useCheckin } from '@/hooks/useCheckin';
 
 interface CheckinPinDialogProps {
@@ -66,6 +66,9 @@ const CheckinPinDialog = ({ open, onOpenChange, eventId, eventName }: CheckinPin
               <CheckCircle className="h-6 w-6 text-green-600" />
             </div>
             <DialogTitle className="text-green-900">Check-in Bem-Sucedido!</DialogTitle>
+            <DialogDescription>
+              Você registrou sua chegada no evento com sucesso.
+            </DialogDescription>
           </DialogHeader>
           <div className="text-center space-y-4">
             <p className="text-gray-600">
@@ -85,13 +88,19 @@ const CheckinPinDialog = ({ open, onOpenChange, eventId, eventName }: CheckinPin
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Check-in no Evento</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Key className="w-5 h-5" />
+            Check-in no Evento
+          </DialogTitle>
+          <DialogDescription>
+            Digite o PIN fornecido pelo organizador para registrar sua presença no evento.
+          </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="text-center space-y-2">
             <p className="text-gray-600">
-              Digite o PIN fornecido pelo organizador do evento:
+              Evento:
             </p>
             <p className="font-medium text-gray-900">{eventName}</p>
           </div>
@@ -99,7 +108,7 @@ const CheckinPinDialog = ({ open, onOpenChange, eventId, eventName }: CheckinPin
           <div className="space-y-2">
             <Input
               type="text"
-              placeholder="____"
+              placeholder="Digite o PIN"
               value={pin}
               onChange={(e) => setPin(formatPin(e.target.value))}
               className="text-center text-2xl font-mono tracking-widest"
@@ -107,7 +116,7 @@ const CheckinPinDialog = ({ open, onOpenChange, eventId, eventName }: CheckinPin
               autoFocus
             />
             <p className="text-xs text-gray-500 text-center">
-              Digite o código de 4-6 dígitos
+              Digite o código de 4-6 dígitos fornecido pelo organizador
             </p>
           </div>
 
