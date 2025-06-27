@@ -89,7 +89,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         console.log('Initializing auth...');
         
-        // Set up auth state listener first
+        // Get current session first
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting session:', error);
+        }
+
+        if (session?.user && mounted) {
+          console.log('User found in session:', session.user.email);
+          const profile = await fetchUserProfile(session.user.id);
+          if (profile && mounted) {
+            setUser({
+              id: profile.id,
+              name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
+              email: session.user.email || '',
+              type: profile.user_type as 'freelancer' | 'producer',
+              city: profile.city || '',
+              phone: profile.phone || '',
+              rating: profile.rating || 0,
+              avatar: profile.avatar_url || '',
+              skills: profile.skills || [],
+              description: profile.description || ''
+            });
+          }
+          setSession(session);
+        }
+
+        // Set up auth state listener
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, session) => {
             if (!mounted) return;
@@ -121,27 +148,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         );
 
-        // Get current session
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user && mounted) {
-          const profile = await fetchUserProfile(session.user.id);
-          if (profile && mounted) {
-            setUser({
-              id: profile.id,
-              name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
-              email: session.user.email || '',
-              type: profile.user_type as 'freelancer' | 'producer',
-              city: profile.city || '',
-              phone: profile.phone || '',
-              rating: profile.rating || 0,
-              avatar: profile.avatar_url || '',
-              skills: profile.skills || [],
-              description: profile.description || ''
-            });
-          }
-          setSession(session);
-        }
-
         if (mounted) {
           setIsInitialized(true);
         }
@@ -162,7 +168,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       mounted = false;
     };
-  }, []);
+  }, []); // Empty dependency array to run only once
 
   const login = async (email: string, password: string, type: 'freelancer' | 'producer'): Promise<boolean> => {
     try {
