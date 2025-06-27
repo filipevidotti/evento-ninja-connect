@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,14 +39,15 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({
     descricao: '',
     data: '',
     local: '',
-    functions: [] as (Omit<EventFunction, 'id'> & { team?: string })[]
+    functions: [] as (Omit<EventFunction, 'id'> & { team?: string; horario_chegada?: string })[]
   });
   const [newFunction, setNewFunction] = useState({
     cargo: '',
     quantidade: 1,
     valor: 0,
     requirements: '',
-    team: 'Geral'
+    team: 'Geral',
+    horario_chegada: ''
   });
 
   // Default teams including "Geral"
@@ -63,8 +65,8 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({
       return;
     }
 
-    // Remove team property before sending to onCreateEvent
-    const functionsForEvent = newEvent.functions.map(({ team, ...func }) => func);
+    // Remove team and horario_chegada properties before sending to onCreateEvent
+    const functionsForEvent = newEvent.functions.map(({ team, horario_chegada, ...func }) => func);
     
     onCreateEvent({
       ...newEvent,
@@ -83,16 +85,17 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({
       quantidade: 1,
       valor: 0,
       requirements: '',
-      team: 'Geral'
+      team: 'Geral',
+      horario_chegada: ''
     });
     onOpenChange(false);
   };
 
   const addFunction = () => {
-    if (!newFunction.cargo || !newFunction.valor) {
+    if (!newFunction.cargo || !newFunction.valor || !newFunction.horario_chegada) {
       toast({
         title: "Erro",
-        description: "Preencha pelo menos o cargo e salário.",
+        description: "Preencha pelo menos o cargo, salário e horário de chegada.",
         variant: "destructive"
       });
       return;
@@ -105,7 +108,8 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({
         quantidade: newFunction.quantidade,
         valor: newFunction.valor,
         requirements: newFunction.requirements,
-        team: newFunction.team
+        team: newFunction.team,
+        horario_chegada: newFunction.horario_chegada
       }]
     });
 
@@ -114,7 +118,8 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({
       quantidade: 1,
       valor: 0,
       requirements: '',
-      team: 'Geral'
+      team: 'Geral',
+      horario_chegada: ''
     });
 
     toast({
@@ -226,7 +231,15 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({
                   onChange={(e) => setNewFunction({ ...newFunction, valor: parseFloat(e.target.value) || 0 })}
                 />
               </div>
-              <div className="space-y-2 col-span-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Horário de Chegada *</label>
+                <Input
+                  type="time"
+                  value={newFunction.horario_chegada}
+                  onChange={(e) => setNewFunction({ ...newFunction, horario_chegada: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
                 <label className="text-sm font-medium">Requisitos</label>
                 <Input
                   placeholder="Ex: Experiência mínima"
@@ -255,8 +268,13 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({
                     <span className="text-sm text-gray-600 ml-2">
                       ({func.quantidade}x) - R$ {func.valor}
                     </span>
+                    {func.horario_chegada && (
+                      <span className="text-sm text-green-600 ml-2 font-medium">
+                        📍 {func.horario_chegada}
+                      </span>
+                    )}
                     {func.requirements && (
-                      <p className="text-xs text-gray-500">{func.requirements}</p>
+                      <p className="text-xs text-gray-500 mt-1">{func.requirements}</p>
                     )}
                   </div>
                   <Button
