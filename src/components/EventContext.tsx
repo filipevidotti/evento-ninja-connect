@@ -67,50 +67,45 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const refreshEvents = async () => {
     try {
-      console.log('Fetching events...');
-      
-      const { data: eventsData, error: eventsError } = await supabase
+      const { data: eventsData } = await supabase
         .from('events')
         .select('*')
         .eq('status', 'open')
         .order('created_at', { ascending: false });
 
-      if (eventsError) {
-        console.error('Error fetching events:', eventsError);
-        return;
+      if (eventsData) {
+        const eventsWithFunctions = await Promise.all(
+          eventsData.map(async (event) => {
+            const { data: functionsData } = await supabase
+              .from('functions')
+              .select('*')
+              .eq('evento_id', event.id);
+
+            const { data: producerData } = await supabase
+              .from('user_profiles')
+              .select('name')
+              .eq('id', event.produtor_id)
+              .single();
+
+            return {
+              id: event.id,
+              name: event.name,
+              descricao: event.descricao || '',
+              data: event.data,
+              local: event.local,
+              produtor_id: event.produtor_id,
+              producer_name: producerData?.name || 'Produtor',
+              functions: functionsData || [],
+              status: event.status as 'open' | 'closed' | 'completed',
+              created_at: event.created_at
+            };
+          })
+        );
+
+        setEvents(eventsWithFunctions);
       }
-
-      const eventsWithFunctions = await Promise.all(
-        (eventsData || []).map(async (event) => {
-          const { data: functionsData } = await supabase
-            .from('functions')
-            .select('*')
-            .eq('evento_id', event.id);
-
-          const { data: producerData } = await supabase
-            .from('user_profiles')
-            .select('name')
-            .eq('id', event.produtor_id)
-            .single();
-
-          return {
-            id: event.id,
-            name: event.name,
-            descricao: event.descricao || '',
-            data: event.data,
-            local: event.local,
-            produtor_id: event.produtor_id,
-            producer_name: producerData?.name || 'Produtor',
-            functions: functionsData || [],
-            status: event.status as 'open' | 'closed' | 'completed',
-            created_at: event.created_at
-          };
-        })
-      );
-
-      setEvents(eventsWithFunctions);
     } catch (error) {
-      console.error('Error in refreshEvents:', error);
+      console.error('Error fetching events:', error);
     }
   };
 
@@ -124,56 +119,52 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         .eq('user_id', user.id)
         .order('applied_at', { ascending: false });
 
-      const enrichedApplications = await Promise.all(
-        (userApplicationsData || []).map(async (app) => {
-          const { data: userProfileData } = await supabase
-            .from('user_profiles')
-            .select('name')
-            .eq('id', app.user_id)
-            .single();
+      if (userApplicationsData) {
+        const enrichedApplications = await Promise.all(
+          userApplicationsData.map(async (app) => {
+            const { data: functionData } = await supabase
+              .from('functions')
+              .select(`
+                cargo,
+                events(name)
+              `)
+              .eq('id', app.function_id)
+              .single();
 
-          const { data: functionData } = await supabase
-            .from('functions')
-            .select(`
-              cargo,
-              events(name)
-            `)
-            .eq('id', app.function_id)
-            .single();
+            return {
+              id: app.id,
+              user_id: app.user_id,
+              function_id: app.function_id,
+              status: app.status as 'pendente' | 'aprovado' | 'recusado',
+              applied_at: app.applied_at,
+              user_name: user.name,
+              user_email: user.email,
+              event_name: functionData?.events?.name,
+              function_cargo: functionData?.cargo
+            };
+          })
+        );
 
-          return {
-            id: app.id,
-            user_id: app.user_id,
-            function_id: app.function_id,
-            status: app.status as 'pendente' | 'aprovado' | 'recusado',
-            applied_at: app.applied_at,
-            user_name: userProfileData?.name,
-            user_email: userProfileData?.name,
-            event_name: functionData?.events?.name,
-            function_cargo: functionData?.cargo
-          };
-        })
-      );
-
-      setApplications(enrichedApplications);
+        setApplications(enrichedApplications);
+      }
     } catch (error) {
-      console.error('Error in refreshApplications:', error);
+      console.error('Error fetching applications:', error);
     }
   };
 
-  // Simple initialization - only load events once
+  // Load events once on mount
   useEffect(() => {
     refreshEvents();
   }, []);
 
-  // Load user applications when user is available
+  // Load applications when user changes
   useEffect(() => {
     if (user) {
       refreshApplications();
     } else {
       setApplications([]);
     }
-  }, [user?.id]);
+  }, [user]);
 
   const createEvent = async (eventData: Omit<Event, 'id' | 'created_at' | 'producer_name' | 'functions'> & { functions: Omit<EventFunction, 'id'>[] }): Promise<boolean> => {
     if (!user) return false;

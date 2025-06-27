@@ -44,175 +44,127 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserProfile = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('id', userId)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching user profile:', error);
-        return null;
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      return null;
-    }
-  };
-
-  const refreshUser = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user) {
-        const profile = await fetchUserProfile(session.user.id);
-        if (profile) {
-          setUser({
-            id: profile.id,
-            name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
-            email: session.user.email || '',
-            type: profile.user_type as 'freelancer' | 'producer',
-            city: profile.city || '',
-            phone: profile.phone || '',
-            rating: profile.rating || 0,
-            avatar: profile.avatar_url || '',
-            skills: profile.skills || [],
-            description: profile.description || '',
-            courses: profile.courses || [],
-            otherKnowledge: profile.other_knowledge || ''
-          });
-        } else {
-          setUser(null);
-        }
-        setSession(session);
-      } else {
-        setUser(null);
-        setSession(null);
-      }
-    } catch (error) {
-      console.error('Error refreshing user:', error);
-      setUser(null);
-      setSession(null);
-    }
-  };
-
-  // Simplified initialization - run only once
   useEffect(() => {
-    let mounted = true;
-
+    // Simple initialization
     const initAuth = async () => {
       try {
-        // Get current session
         const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
         
-        if (mounted) {
-          setSession(session);
+        if (session?.user) {
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
           
-          if (session?.user) {
-            const profile = await fetchUserProfile(session.user.id);
-            if (profile && mounted) {
-              setUser({
-                id: profile.id,
-                name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
-                email: session.user.email || '',
-                type: profile.user_type as 'freelancer' | 'producer',
-                city: profile.city || '',
-                phone: profile.phone || '',
-                rating: profile.rating || 0,
-                avatar: profile.avatar_url || '',
-                skills: profile.skills || [],
-                description: profile.description || '',
-                courses: profile.courses || [],
-                otherKnowledge: profile.other_knowledge || ''
-              });
-            }
+          if (profile) {
+            setUser({
+              id: profile.id,
+              name: profile.name || 'Usuário',
+              email: session.user.email || '',
+              type: profile.user_type as 'freelancer' | 'producer',
+              city: profile.city || '',
+              phone: profile.phone || '',
+              rating: profile.rating || 0,
+              avatar: profile.avatar_url || '',
+              skills: profile.skills || [],
+              description: profile.description || '',
+              courses: profile.courses || [],
+              otherKnowledge: profile.other_knowledge || ''
+            });
           }
-          
-          setLoading(false);
         }
-
-        // Set up auth state listener
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-          async (event, session) => {
-            if (!mounted) return;
-            
-            console.log('Auth state changed:', event);
-            
-            setSession(session);
-            
-            if (session?.user) {
-              const profile = await fetchUserProfile(session.user.id);
-              if (profile && mounted) {
-                setUser({
-                  id: profile.id,
-                  name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
-                  email: session.user.email || '',
-                  type: profile.user_type as 'freelancer' | 'producer',
-                  city: profile.city || '',
-                  phone: profile.phone || '',
-                  rating: profile.rating || 0,
-                  avatar: profile.avatar_url || '',
-                  skills: profile.skills || [],
-                  description: profile.description || '',
-                  courses: profile.courses || [],
-                  otherKnowledge: profile.other_knowledge || ''
-                });
-              } else if (mounted) {
-                setUser(null);
-              }
-            } else if (mounted) {
-              setUser(null);
-            }
-          }
-        );
-
-        return () => {
-          subscription.unsubscribe();
-        };
       } catch (error) {
         console.error('Error initializing auth:', error);
-        if (mounted) {
-          setLoading(false);
-        }
+      } finally {
+        setLoading(false);
       }
     };
 
     initAuth();
 
-    return () => {
-      mounted = false;
-    };
-  }, []); // No dependencies to prevent loops
+    // Auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        
+        if (session?.user) {
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+          
+          if (profile) {
+            setUser({
+              id: profile.id,
+              name: profile.name || 'Usuário',
+              email: session.user.email || '',
+              type: profile.user_type as 'freelancer' | 'producer',
+              city: profile.city || '',
+              phone: profile.phone || '',
+              rating: profile.rating || 0,
+              avatar: profile.avatar_url || '',
+              skills: profile.skills || [],
+              description: profile.description || '',
+              courses: profile.courses || [],
+              otherKnowledge: profile.other_knowledge || ''
+            });
+          }
+        } else {
+          setUser(null);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const refreshUser = async () => {
+    if (!session?.user) return;
+    
+    try {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+      
+      if (profile) {
+        setUser({
+          id: profile.id,
+          name: profile.name || 'Usuário',
+          email: session.user.email || '',
+          type: profile.user_type as 'freelancer' | 'producer',
+          city: profile.city || '',
+          phone: profile.phone || '',
+          rating: profile.rating || 0,
+          avatar: profile.avatar_url || '',
+          skills: profile.skills || [],
+          description: profile.description || '',
+          courses: profile.courses || [],
+          otherKnowledge: profile.other_knowledge || ''
+        });
+      }
+    } catch (error) {
+      console.error('Error refreshing user:', error);
+    }
+  };
 
   const login = async (email: string, password: string, type: 'freelancer' | 'producer'): Promise<boolean> => {
     try {
-      setLoading(true);
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        console.error('Login error:', error);
-        return false;
-      }
-      return true;
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      return !error;
     } catch (error) {
       console.error('Login error:', error);
       return false;
-    } finally {
-      setLoading(false);
     }
   };
 
   const register = async (userData: Omit<User, 'id'> & { password: string }): Promise<boolean> => {
     try {
-      setLoading(true);
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: userData.email,
         password: userData.password,
         options: {
@@ -229,26 +181,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         }
       });
-
-      if (error) {
-        console.error('Register error:', error);
-        return false;
-      }
-      return true;
+      return !error;
     } catch (error) {
       console.error('Register error:', error);
       return false;
-    } finally {
-      setLoading(false);
     }
   };
 
   const logout = async () => {
-    setLoading(true);
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
-    setLoading(false);
   };
 
   const updateUser = async (userData: Partial<User>): Promise<boolean> => {
@@ -270,13 +213,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         })
         .eq('id', user.id);
 
-      if (error) {
-        console.error('Update user error:', error);
-        return false;
+      if (!error) {
+        setUser(prev => prev ? { ...prev, ...userData } : null);
+        return true;
       }
-
-      setUser(prev => prev ? { ...prev, ...userData } : null);
-      return true;
+      return false;
     } catch (error) {
       console.error('Update user error:', error);
       return false;
@@ -284,7 +225,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, login, register, logout, updateUser, refreshUser }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      loading, 
+      login, 
+      register, 
+      logout, 
+      updateUser, 
+      refreshUser 
+    }}>
       {children}
     </AuthContext.Provider>
   );
