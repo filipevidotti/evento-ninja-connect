@@ -4,7 +4,7 @@ import { useAuth } from '@/components/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Star, Settings, Menu, CalendarDays, MapPin, Heart, CreditCard, ClipboardCheck } from 'lucide-react';
+import { Star, Settings, Menu, CalendarDays, MapPin, Heart, CreditCard, ClipboardCheck, Search } from 'lucide-react';
 import VerificationBadge from './VerificationBadge';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -36,6 +36,15 @@ const FreelancerHeader = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
             <VerificationBadge />
+            
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/freelancer/search-events')}
+              className="text-sm"
+            >
+              <Search className="w-4 h-4 mr-1" />
+              Buscar
+            </Button>
             
             <Button 
               variant="ghost" 
@@ -119,6 +128,10 @@ const FreelancerHeader = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => navigate('/freelancer/search-events')}>
+                  <Search className="w-4 h-4 mr-2" />
+                  Buscar Eventos
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate('/freelancer/calendar')}>
                   <CalendarDays className="w-4 h-4 mr-2" />
                   Calendário
