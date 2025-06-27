@@ -13,6 +13,8 @@ import FreelancerCalendar from "./pages/FreelancerCalendar";
 import FreelancerFinance from "./pages/FreelancerFinance";
 import FreelancerFavorites from "./pages/FreelancerFavorites";
 import FreelancerReputation from "./pages/FreelancerReputation";
+import FreelancerSearchEvents from "./pages/FreelancerSearchEvents";
+import FreelancerCheckIn from "./pages/FreelancerCheckIn";
 import ProducerDashboard from "./pages/ProducerDashboard";
 import ProducerSearchFreelancers from "./pages/ProducerSearchFreelancers";
 import ProducerTeamManagement from "./pages/ProducerTeamManagement";
@@ -53,6 +55,8 @@ function App() {
                 <Route path="/freelancer/finance" element={<FreelancerFinance />} />
                 <Route path="/freelancer/favorites" element={<FreelancerFavorites />} />
                 <Route path="/freelancer/reputation" element={<FreelancerReputation />} />
+                <Route path="/freelancer/search-events" element={<FreelancerSearchEvents />} />
+                <Route path="/freelancer/checkin" element={<FreelancerCheckIn />} />
                 
                 {/* Producer Routes */}
                 <Route path="/producer/dashboard" element={<ProducerDashboard />} />

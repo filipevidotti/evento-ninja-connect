@@ -2,32 +2,26 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, CheckCircle, Clock, User, Wallet, Heart } from 'lucide-react';
+import { Calendar, CheckCircle, Clock, User, Wallet, Heart, Search } from 'lucide-react';
 import { useAuth } from '@/components/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import FreelancerHeader from '@/components/FreelancerHeader';
 import EventCard from '@/components/EventCard';
-import EventFilters from '@/components/EventFilters';
 import ApplicationsList from '@/components/ApplicationsList';
 import FreelancerProfile from '@/components/FreelancerProfile';
 import { useEvents } from '@/components/EventContext';
 
 const FreelancerDashboard = () => {
   const { user } = useAuth();
-  const { events } = useEvents();
+  const { events, getApplicationsByUser } = useEvents();
   const navigate = useNavigate();
 
-  // State for filters
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterRole, setFilterRole] = useState('all');
-  const [filterCity, setFilterCity] = useState('all');
-
-  // Mock user applications for now - this should come from a context or API
-  const [userApplications] = useState([]);
+  // Get user applications
+  const userApplications = user ? getApplicationsByUser(user.id) : [];
 
   const stats = [
-    { label: 'Eventos Aplicados', value: 12, trend: '+2 desde a última semana' },
-    { label: 'Eventos Confirmados', value: 5, trend: '+1 desde ontem' },
+    { label: 'Eventos Aplicados', value: userApplications.length, trend: '+2 desde a última semana' },
+    { label: 'Eventos Confirmados', value: userApplications.filter(app => app.status === 'aprovado').length, trend: '+1 desde ontem' },
     { label: 'Próximos Eventos', value: 3, trend: 'Nos próximos 7 dias' },
     { label: 'Ganhos Este Mês', value: 'R$ 2.850', trend: '+15% vs mês anterior' },
   ];
@@ -40,12 +34,14 @@ const FreelancerDashboard = () => {
 
   // Function to get application status
   const getApplicationStatus = (eventId: string, functionId: string) => {
-    // This would check the user's applications for this event/function
     const application = userApplications.find(
-      app => app.eventId === eventId && app.functionId === functionId
+      app => app.function_id === functionId
     );
     return application?.status;
   };
+
+  // Get recent events (first 3)
+  const recentEvents = events.slice(0, 3);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -57,130 +53,113 @@ const FreelancerDashboard = () => {
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard</h1>
             <p className="text-gray-600 text-sm sm:text-base">Bem-vindo de volta, {user?.name}!</p>
           </div>
-          <div className="flex flex-wrap gap-2 sm:space-x-4 sm:gap-0">
-            <Button onClick={() => navigate('/freelancer/profile')} variant="outline" size="sm">
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => navigate('/freelancer/profile')} variant="outline" size="sm" className="flex-1 sm:flex-none">
               <User className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Meu Perfil</span>
-              <span className="sm:hidden">Perfil</span>
+              Perfil
             </Button>
-            <Button onClick={() => navigate('/freelancer/calendar')} variant="outline" size="sm">
+            <Button onClick={() => navigate('/freelancer/calendar')} variant="outline" size="sm" className="flex-1 sm:flex-none">
               <Calendar className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Calendário</span>
-              <span className="sm:hidden">Agenda</span>
+              Agenda
             </Button>
-            <Button onClick={() => navigate('/freelancer/finance')} variant="outline" size="sm">
+            <Button onClick={() => navigate('/freelancer/finance')} variant="outline" size="sm" className="flex-1 sm:flex-none">
               <Wallet className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Financeiro</span>
-              <span className="sm:hidden">Grana</span>
+              Grana
             </Button>
           </div>
         </div>
 
         {/* Cards de Resumo */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Eventos Aplicados</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+          <Card className="p-3 sm:p-6">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0 sm:p-6 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Aplicados</CardTitle>
+              <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">12</div>
-              <p className="text-xs text-muted-foreground">+2 desde a última semana</p>
+            <CardContent className="p-0 sm:p-6 sm:pt-0">
+              <div className="text-lg sm:text-2xl font-bold">{stats[0].value}</div>
+              <p className="text-xs text-muted-foreground hidden sm:block">{stats[0].trend}</p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Eventos Confirmados</CardTitle>
-              <CheckCircle className="h-4 w-4 text-muted-foreground" />
+          <Card className="p-3 sm:p-6">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0 sm:p-6 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Confirmados</CardTitle>
+              <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">5</div>
-              <p className="text-xs text-muted-foreground">+1 desde ontem</p>
+            <CardContent className="p-0 sm:p-6 sm:pt-0">
+              <div className="text-lg sm:text-2xl font-bold">{stats[1].value}</div>
+              <p className="text-xs text-muted-foreground hidden sm:block">{stats[1].trend}</p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Próximos Eventos</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
+          <Card className="p-3 sm:p-6">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0 sm:p-6 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Próximos</CardTitle>
+              <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">3</div>
-              <p className="text-xs text-muted-foreground">Nos próximos 7 dias</p>
+            <CardContent className="p-0 sm:p-6 sm:pt-0">
+              <div className="text-lg sm:text-2xl font-bold">{stats[2].value}</div>
+              <p className="text-xs text-muted-foreground hidden sm:block">{stats[2].trend}</p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Ganhos Este Mês</CardTitle>
-              <Wallet className="h-4 w-4 text-muted-foreground" />
+          <Card className="p-3 sm:p-6">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0 sm:p-6 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Ganhos</CardTitle>
+              <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">R$ 2.850</div>
-              <p className="text-xs text-muted-foreground">+15% vs mês anterior</p>
+            <CardContent className="p-0 sm:p-6 sm:pt-0">
+              <div className="text-lg sm:text-2xl font-bold">{stats[3].value}</div>
+              <p className="text-xs text-muted-foreground hidden sm:block">{stats[3].trend}</p>
             </CardContent>
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
-          {/* Eventos Disponíveis */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-                <div>
-                  <CardTitle className="text-lg sm:text-xl">Eventos Disponíveis</CardTitle>
-                  <CardDescription className="text-sm">Novos eventos em sua área</CardDescription>
-                </div>
-                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => navigate('/freelancer/favorites')}
-                    className="w-full sm:w-auto"
-                  >
-                    <Heart className="w-4 h-4 mr-1" />
-                    Favoritos
-                  </Button>
-                  <div className="w-full sm:w-auto">
-                    <EventFilters 
-                      searchTerm={searchTerm}
-                      setSearchTerm={setSearchTerm}
-                      filterRole={filterRole}
-                      setFilterRole={setFilterRole}
-                      filterCity={filterCity}
-                      setFilterCity={setFilterCity}
-                    />
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {events.slice(0, 5).map((event) => (
-                    <EventCard 
-                      key={event.id} 
-                      event={event} 
-                      onApply={handleApply}
-                      getApplicationStatus={getApplicationStatus}
-                    />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+        <div className="space-y-6">
+          {/* Eventos Recentes */}
+          <Card>
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+              <div>
+                <CardTitle className="text-lg sm:text-xl">Eventos Recentes</CardTitle>
+                <CardDescription className="text-sm">Últimos eventos disponíveis</CardDescription>
+              </div>
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigate('/freelancer/favorites')}
+                  className="w-full sm:w-auto"
+                >
+                  <Heart className="w-4 h-4 mr-1" />
+                  Favoritos
+                </Button>
+                <Button 
+                  size="sm"
+                  onClick={() => navigate('/freelancer/search-events')}
+                  className="w-full sm:w-auto"
+                >
+                  <Search className="w-4 h-4 mr-1" />
+                  Buscar Eventos
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentEvents.map((event) => (
+                  <EventCard 
+                    key={event.id} 
+                    event={event} 
+                    onApply={handleApply}
+                    getApplicationStatus={getApplicationStatus}
+                  />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Perfil Rápido */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Meu Perfil</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <FreelancerProfile />
-              </CardContent>
-            </Card>
-
+          {/* Grid para Desktop, Stack para Mobile */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Próximos Eventos */}
             <Card>
               <CardHeader>
@@ -188,12 +167,17 @@ const FreelancerDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {[1, 2, 3].map((event) => (
-                    <div key={event} className="flex items-center space-x-3 p-3 border rounded-lg">
+                  {[
+                    { name: 'Festival de Música 2024', date: '2024-12-31', time: '20:00', role: 'Fotógrafo' },
+                    { name: 'Casamento Maria & Pedro', date: '2024-07-15', time: '16:00', role: 'Garçom' },
+                    { name: 'Evento Corporativo XYZ', date: '2024-08-20', time: '08:00', role: 'Recepcionista' }
+                  ].map((event, index) => (
+                    <div key={index} className="flex items-center space-x-3 p-3 border rounded-lg">
                       <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">Evento {event}</p>
-                        <p className="text-xs text-gray-600">25 Jan, 14:00</p>
+                        <p className="font-medium text-sm truncate">{event.name}</p>
+                        <p className="text-xs text-gray-600">{event.date} - {event.time}</p>
+                        <p className="text-xs text-blue-600">{event.role}</p>
                       </div>
                     </div>
                   ))}

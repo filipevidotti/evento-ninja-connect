@@ -58,14 +58,14 @@ export const useEvents = () => {
   return context;
 };
 
-// Dados mockados expandidos
+// Dados mockados expandidos com mais eventos
 const mockEvents: Event[] = [
   {
     id: '1',
     name: 'Festival de Música 2024',
-    descricao: 'Grande festival de música com artistas nacionais e internacionais',
+    descricao: 'Grande festival de música com artistas nacionais e internacionais. Esperamos mais de 50.000 pessoas durante os 3 dias de evento.',
     data: '2024-12-31',
-    local: 'São Paulo - SP',
+    local: 'Parque Ibirapuera, São Paulo - SP',
     produtor_id: '2',
     producer_name: 'João Silva',
     status: 'open',
@@ -74,104 +74,180 @@ const mockEvents: Event[] = [
       {
         id: '1',
         cargo: 'Fotógrafo',
-        quantidade: 2,
+        quantidade: 3,
         valor: 500,
-        requirements: 'Experiência em eventos musicais'
+        requirements: 'Experiência em eventos musicais, equipamento profissional'
       },
       {
         id: '2',
         cargo: 'Cinegrafista',
-        quantidade: 1,
+        quantidade: 2,
         valor: 800,
-        requirements: 'Equipamento próprio'
+        requirements: 'Equipamento próprio, drone preferencial'
+      },
+      {
+        id: '3',
+        cargo: 'Segurança',
+        quantidade: 15,
+        valor: 300,
+        requirements: 'Curso de vigilante, experiência em eventos'
       }
     ]
   },
   {
     id: '2',
     name: 'Casamento Maria & Pedro',
-    descricao: 'Cerimônia e festa de casamento',
+    descricao: 'Cerimônia e festa de casamento elegante para 200 convidados',
     data: '2024-07-15',
-    local: 'Rio de Janeiro - RJ',
+    local: 'Salão de Festas Premium, Rio de Janeiro - RJ',
     produtor_id: '2',
     producer_name: 'João Silva',
     status: 'open',
     created_at: '2024-06-25',
     functions: [
       {
-        id: '3',
+        id: '4',
         cargo: 'Fotógrafo',
         quantidade: 1,
         valor: 1200,
-        requirements: 'Portfolio de casamentos'
+        requirements: 'Portfolio de casamentos, equipamento completo'
       },
       {
-        id: '4',
+        id: '5',
         cargo: 'Garçom',
         quantidade: 8,
         valor: 250,
-        requirements: 'Experiência em eventos sociais'
+        requirements: 'Experiência em eventos sociais, uniforme próprio'
+      },
+      {
+        id: '6',
+        cargo: 'Bartender',
+        quantidade: 2,
+        valor: 400,
+        requirements: 'Conhecimento em drinks clássicos'
       }
     ]
   },
   {
     id: '3',
     name: 'Evento Corporativo XYZ',
-    descricao: 'Conferência anual da empresa XYZ',
+    descricao: 'Conferência anual da empresa XYZ com palestras e networking',
     data: '2024-08-20',
-    local: 'Belo Horizonte - MG',
+    local: 'Centro de Convenções, Belo Horizonte - MG',
     produtor_id: '2',
     producer_name: 'João Silva',
     status: 'open',
     created_at: '2024-06-20',
     functions: [
       {
-        id: '5',
+        id: '7',
         cargo: 'Recepcionista',
         quantidade: 4,
         valor: 200,
-        requirements: 'Boa comunicação'
+        requirements: 'Boa comunicação, inglês básico'
       },
       {
-        id: '6',
+        id: '8',
         cargo: 'Técnico de Som',
         quantidade: 2,
         valor: 600,
-        requirements: 'Conhecimento em equipamentos de áudio'
+        requirements: 'Conhecimento em equipamentos de áudio profissional'
       }
     ]
   },
   {
     id: '4',
     name: 'Festa de Aniversário 50 Anos',
-    descricao: 'Celebração de aniversário com 200 convidados',
+    descricao: 'Celebração de aniversário temática com 200 convidados',
     data: '2024-09-10',
-    local: 'Brasília - DF',
+    local: 'Clube Recreativo, Brasília - DF',
     produtor_id: '2',
     producer_name: 'João Silva',
     status: 'closed',
     created_at: '2024-06-15',
     functions: [
       {
-        id: '7',
+        id: '9',
         cargo: 'DJ',
         quantidade: 1,
         valor: 800,
-        requirements: 'Playlist variada'
+        requirements: 'Playlist variada, equipamento próprio'
       },
       {
-        id: '8',
+        id: '10',
         cargo: 'Bartender',
         quantidade: 2,
         valor: 350,
-        requirements: 'Conhecimento em drinks'
+        requirements: 'Conhecimento em drinks, apresentação impecável'
+      }
+    ]
+  },
+  {
+    id: '5',
+    name: 'Workshop de Fotografia',
+    descricao: 'Workshop intensivo de fotografia profissional',
+    data: '2024-07-25',
+    local: 'Estúdio Central, São Paulo - SP',
+    produtor_id: '2',
+    producer_name: 'João Silva',
+    status: 'open',
+    created_at: '2024-06-22',
+    functions: [
+      {
+        id: '11',
+        cargo: 'Assistente de Fotografia',
+        quantidade: 2,
+        valor: 300,
+        requirements: 'Conhecimento básico de fotografia'
+      },
+      {
+        id: '12',
+        cargo: 'Organizador de Evento',
+        quantidade: 1,
+        valor: 400,
+        requirements: 'Experiência em coordenação de eventos'
+      }
+    ]
+  },
+  {
+    id: '6',
+    name: 'Feira Gastronômica',
+    descricao: 'Grande feira de gastronomia com food trucks e shows',
+    data: '2024-08-15',
+    local: 'Parque da Cidade, Fortaleza - CE',
+    produtor_id: '2',
+    producer_name: 'João Silva',
+    status: 'open',
+    created_at: '2024-06-18',
+    functions: [
+      {
+        id: '13',
+        cargo: 'Garçom',
+        quantidade: 20,
+        valor: 280,
+        requirements: 'Experiência em atendimento, agilidade'
+      },
+      {
+        id: '14',
+        cargo: 'Limpeza',
+        quantidade: 8,
+        valor: 180,
+        requirements: 'Disponibilidade para trabalhar em equipe'
+      },
+      {
+        id: '15',
+        cargo: 'Caixa',
+        quantidade: 10,
+        valor: 220,
+        requirements: 'Experiência com vendas, matemática básica'
       }
     ]
   }
 ];
 
-// Candidaturas fictícias
+// Candidaturas fictícias expandidas
 const mockApplications: Application[] = [
+  // Aplicações do usuário freelancer1 (logado)
   {
     id: '1',
     user_id: 'freelancer1',
@@ -185,6 +261,29 @@ const mockApplications: Application[] = [
   },
   {
     id: '2',
+    user_id: 'freelancer1',
+    function_id: '4',
+    status: 'aprovado',
+    applied_at: '2024-06-27T15:20:00Z',
+    user_name: 'Carlos Fotografo',
+    user_email: 'carlos@email.com',
+    event_name: 'Casamento Maria & Pedro',
+    function_cargo: 'Fotógrafo'
+  },
+  {
+    id: '3',
+    user_id: 'freelancer1',
+    function_id: '7',
+    status: 'recusado',
+    applied_at: '2024-06-26T09:15:00Z',
+    user_name: 'Carlos Fotografo',
+    user_email: 'carlos@email.com',
+    event_name: 'Evento Corporativo XYZ',
+    function_cargo: 'Recepcionista'
+  },
+  // Outras aplicações
+  {
+    id: '4',
     user_id: 'freelancer2',
     function_id: '1',
     status: 'aprovado',
@@ -195,7 +294,7 @@ const mockApplications: Application[] = [
     function_cargo: 'Fotógrafo'
   },
   {
-    id: '3',
+    id: '5',
     user_id: 'freelancer3',
     function_id: '2',
     status: 'pendente',
@@ -206,20 +305,20 @@ const mockApplications: Application[] = [
     function_cargo: 'Cinegrafista'
   },
   {
-    id: '4',
+    id: '6',
     user_id: 'freelancer4',
-    function_id: '3',
+    function_id: '5',
     status: 'aprovado',
     applied_at: '2024-06-26T14:45:00Z',
     user_name: 'Maria Silva',
     user_email: 'maria@email.com',
     event_name: 'Casamento Maria & Pedro',
-    function_cargo: 'Fotógrafo'
+    function_cargo: 'Garçom'
   },
   {
-    id: '5',
+    id: '7',
     user_id: 'freelancer5',
-    function_id: '4',
+    function_id: '5',
     status: 'pendente',
     applied_at: '2024-06-28T11:30:00Z',
     user_name: 'João Garçom',
@@ -228,9 +327,9 @@ const mockApplications: Application[] = [
     function_cargo: 'Garçom'
   },
   {
-    id: '6',
+    id: '8',
     user_id: 'freelancer6',
-    function_id: '4',
+    function_id: '5',
     status: 'pendente',
     applied_at: '2024-06-28T12:00:00Z',
     user_name: 'Lucas Costa',
@@ -239,9 +338,9 @@ const mockApplications: Application[] = [
     function_cargo: 'Garçom'
   },
   {
-    id: '7',
+    id: '9',
     user_id: 'freelancer7',
-    function_id: '5',
+    function_id: '7',
     status: 'recusado',
     applied_at: '2024-06-25T16:20:00Z',
     user_name: 'Fernanda Lima',
@@ -250,9 +349,9 @@ const mockApplications: Application[] = [
     function_cargo: 'Recepcionista'
   },
   {
-    id: '8',
+    id: '10',
     user_id: 'freelancer8',
-    function_id: '5',
+    function_id: '7',
     status: 'aprovado',
     applied_at: '2024-06-26T08:30:00Z',
     user_name: 'Roberto Santos',
@@ -261,9 +360,9 @@ const mockApplications: Application[] = [
     function_cargo: 'Recepcionista'
   },
   {
-    id: '9',
+    id: '11',
     user_id: 'freelancer9',
-    function_id: '6',
+    function_id: '8',
     status: 'pendente',
     applied_at: '2024-06-28T13:45:00Z',
     user_name: 'Diego Técnico',
@@ -272,9 +371,9 @@ const mockApplications: Application[] = [
     function_cargo: 'Técnico de Som'
   },
   {
-    id: '10',
+    id: '12',
     user_id: 'freelancer10',
-    function_id: '7',
+    function_id: '9',
     status: 'aprovado',
     applied_at: '2024-06-24T19:15:00Z',
     user_name: 'Rafael DJ',
