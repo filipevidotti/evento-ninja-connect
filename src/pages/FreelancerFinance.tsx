@@ -8,9 +8,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
-import { Wallet, TrendingUp, Calendar, Download, CreditCard, DollarSign, Clock } from 'lucide-react';
+import { Wallet, TrendingUp, Calendar, Download, CreditCard, DollarSign, Clock, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const FreelancerFinance = () => {
+  const navigate = useNavigate();
   const [selectedPeriod, setSelectedPeriod] = useState('this-month');
 
   const earningsData = [
@@ -23,10 +25,10 @@ const FreelancerFinance = () => {
   ];
 
   const transactions = [
-    { id: 1, event: 'Evento Corporativo XYZ', date: '2024-01-20', amount: 250, status: 'completed' },
-    { id: 2, event: 'Festa de Casamento', date: '2024-01-18', amount: 300, status: 'pending' },
-    { id: 3, event: 'Evento Social ABC', date: '2024-01-15', amount: 180, status: 'completed' },
-    { id: 4, event: 'Conferência Tech', date: '2024-01-12', amount: 400, status: 'completed' },
+    { id: 1, event: 'Rock in Rio 2024', date: '2024-06-20', amount: 1200, status: 'completed' },
+    { id: 2, event: 'Casamento Fernanda & Ricardo', date: '2024-06-18', amount: 2500, status: 'pending' },
+    { id: 3, event: 'Summit Tech Brasil 2024', date: '2024-06-15', amount: 320, status: 'completed' },
+    { id: 4, event: 'Fashion Week São Paulo', date: '2024-06-12', amount: 1500, status: 'completed' },
   ];
 
   const getStatusBadge = (status: string) => {
@@ -49,8 +51,17 @@ const FreelancerFinance = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex items-center gap-4 mb-6">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => navigate('/freelancer/dashboard')}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Voltar
+        </Button>
+        <div className="flex-1">
           <h1 className="text-3xl font-bold">Financeiro</h1>
           <p className="text-gray-600">Gerencie seus ganhos e pagamentos</p>
         </div>
