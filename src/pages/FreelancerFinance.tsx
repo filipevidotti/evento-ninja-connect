@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,9 +9,12 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { Wallet, TrendingUp, Calendar, Download, CreditCard, DollarSign, Clock, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/components/AuthContext';
+import FreelancerHeader from '@/components/FreelancerHeader';
 
 const FreelancerFinance = () => {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [selectedPeriod, setSelectedPeriod] = useState('this-month');
 
   const earningsData = [
@@ -50,238 +52,242 @@ const FreelancerFinance = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
-      <div className="flex items-center gap-4 mb-6">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={() => navigate('/freelancer/dashboard')}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Voltar
-        </Button>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold">Financeiro</h1>
-          <p className="text-gray-600">Gerencie seus ganhos e pagamentos</p>
+    <div className="min-h-screen bg-gray-50">
+      <FreelancerHeader />
+      
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+        <div className="flex items-center gap-4 mb-6">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => navigate('/freelancer/dashboard')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Voltar
+          </Button>
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold">Financeiro</h1>
+            <p className="text-gray-600">Gerencie seus ganhos e pagamentos</p>
+          </div>
+          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Selecionar período" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="this-month">Este mês</SelectItem>
+              <SelectItem value="last-month">Mês passado</SelectItem>
+              <SelectItem value="last-3-months">Últimos 3 meses</SelectItem>
+              <SelectItem value="this-year">Este ano</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Selecionar período" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="this-month">Este mês</SelectItem>
-            <SelectItem value="last-month">Mês passado</SelectItem>
-            <SelectItem value="last-3-months">Últimos 3 meses</SelectItem>
-            <SelectItem value="this-year">Este ano</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
 
-      {/* Cards de Resumo */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Saldo Disponível</CardTitle>
-            <DollarSign className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">R$ 1.850</div>
-            <p className="text-xs text-muted-foreground">Pronto para saque</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aguardando Liberação</CardTitle>
-            <Clock className="h-4 w-4 text-orange-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">R$ 1.000</div>
-            <p className="text-xs text-muted-foreground">Em processamento</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ganhos Este Mês</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R$ 2.850</div>
-            <p className="text-xs text-muted-foreground">+15% em relação ao mês anterior</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pagamentos Pendentes</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R$ 750</div>
-            <p className="text-xs text-muted-foreground">2 pagamentos aguardando</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Ganhos</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R$ 18.450</div>
-            <p className="text-xs text-muted-foreground">Últimos 6 meses</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Próximos Pagamentos</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R$ 1.200</div>
-            <p className="text-xs text-muted-foreground">Previsão para próxima semana</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Botão de Solicitação de Saque */}
-      <div className="flex justify-center">
-        <Button 
-          onClick={handleWithdrawRequest}
-          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
-          size="lg"
-        >
-          <DollarSign className="w-5 h-5 mr-2" />
-          Solicitar Saque
-        </Button>
-      </div>
-
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-          <TabsTrigger value="transactions">Transações</TabsTrigger>
-          <TabsTrigger value="simulator">Simulador</TabsTrigger>
-          <TabsTrigger value="settings">Configurações</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
+        {/* Cards de Resumo */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Ganhos Mensais</CardTitle>
-              <CardDescription>Evolução dos seus ganhos nos últimos 6 meses</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Saldo Disponível</CardTitle>
+              <DollarSign className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <ChartContainer config={{}} className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={earningsData}>
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="earnings" fill="#3b82f6" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </ChartContainer>
+              <div className="text-2xl font-bold text-green-600">R$ 1.850</div>
+              <p className="text-xs text-muted-foreground">Pronto para saque</p>
             </CardContent>
           </Card>
-        </TabsContent>
 
-        <TabsContent value="transactions" className="space-y-6">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Histórico de Transações</CardTitle>
-                <CardDescription>Todas as suas transações financeiras</CardDescription>
-              </div>
-              <Button variant="outline">
-                <Download className="w-4 h-4 mr-2" />
-                Baixar Relatório
-              </Button>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Aguardando Liberação</CardTitle>
+              <Clock className="h-4 w-4 text-orange-600" />
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Evento</TableHead>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Valor</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {transactions.map((transaction) => (
-                    <TableRow key={transaction.id}>
-                      <TableCell className="font-medium">{transaction.event}</TableCell>
-                      <TableCell>{transaction.date}</TableCell>
-                      <TableCell>R$ {transaction.amount}</TableCell>
-                      <TableCell>{getStatusBadge(transaction.status)}</TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm">
-                          <Download className="w-4 h-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <div className="text-2xl font-bold text-orange-600">R$ 1.000</div>
+              <p className="text-xs text-muted-foreground">Em processamento</p>
             </CardContent>
           </Card>
-        </TabsContent>
 
-        <TabsContent value="simulator" className="space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Simulador de Ganhos</CardTitle>
-              <CardDescription>Estime seus ganhos com base em diferentes cenários</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Ganhos Este Mês</CardTitle>
+              <Wallet className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 border rounded-lg text-center">
-                  <h3 className="font-medium mb-2">Cenário Conservador</h3>
-                  <p className="text-sm text-gray-600 mb-2">2 eventos/mês</p>
-                  <p className="text-2xl font-bold text-blue-600">R$ 1.200</p>
-                </div>
-                <div className="p-4 border rounded-lg text-center">
-                  <h3 className="font-medium mb-2">Cenário Moderado</h3>
-                  <p className="text-sm text-gray-600 mb-2">4 eventos/mês</p>
-                  <p className="text-2xl font-bold text-green-600">R$ 2.400</p>
-                </div>
-                <div className="p-4 border rounded-lg text-center">
-                  <h3 className="font-medium mb-2">Cenário Otimista</h3>
-                  <p className="text-sm text-gray-600 mb-2">6 eventos/mês</p>
-                  <p className="text-2xl font-bold text-purple-600">R$ 3.600</p>
-                </div>
-              </div>
+              <div className="text-2xl font-bold">R$ 2.850</div>
+              <p className="text-xs text-muted-foreground">+15% em relação ao mês anterior</p>
             </CardContent>
           </Card>
-        </TabsContent>
 
-        <TabsContent value="settings" className="space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Dados Bancários</CardTitle>
-              <CardDescription>Configure suas informações para recebimento</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pagamentos Pendentes</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-medium mb-2">Conta Corrente</h3>
-                  <p className="text-sm text-gray-600">Banco: Banco do Brasil</p>
-                  <p className="text-sm text-gray-600">Agência: 1234-5</p>
-                  <p className="text-sm text-gray-600">Conta: 12345-6</p>
+              <div className="text-2xl font-bold">R$ 750</div>
+              <p className="text-xs text-muted-foreground">2 pagamentos aguardando</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total de Ganhos</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">R$ 18.450</div>
+              <p className="text-xs text-muted-foreground">Últimos 6 meses</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Próximos Pagamentos</CardTitle>
+              <CreditCard className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">R$ 1.200</div>
+              <p className="text-xs text-muted-foreground">Previsão para próxima semana</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Botão de Solicitação de Saque */}
+        <div className="flex justify-center">
+          <Button 
+            onClick={handleWithdrawRequest}
+            className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
+            size="lg"
+          >
+            <DollarSign className="w-5 h-5 mr-2" />
+            Solicitar Saque
+          </Button>
+        </div>
+
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+            <TabsTrigger value="transactions">Transações</TabsTrigger>
+            <TabsTrigger value="simulator">Simulador</TabsTrigger>
+            <TabsTrigger value="settings">Configurações</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Ganhos Mensais</CardTitle>
+                <CardDescription>Evolução dos seus ganhos nos últimos 6 meses</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={{}} className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={earningsData}>
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="earnings" fill="#3b82f6" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="transactions" className="space-y-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Histórico de Transações</CardTitle>
+                  <CardDescription>Todas as suas transações financeiras</CardDescription>
                 </div>
                 <Button variant="outline">
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  Atualizar Dados Bancários
+                  <Download className="w-4 h-4 mr-2" />
+                  Baixar Relatório
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Evento</TableHead>
+                      <TableHead>Data</TableHead>
+                      <TableHead>Valor</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {transactions.map((transaction) => (
+                      <TableRow key={transaction.id}>
+                        <TableCell className="font-medium">{transaction.event}</TableCell>
+                        <TableCell>{transaction.date}</TableCell>
+                        <TableCell>R$ {transaction.amount}</TableCell>
+                        <TableCell>{getStatusBadge(transaction.status)}</TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="sm">
+                            <Download className="w-4 h-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="simulator" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Simulador de Ganhos</CardTitle>
+                <CardDescription>Estime seus ganhos com base em diferentes cenários</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="p-4 border rounded-lg text-center">
+                    <h3 className="font-medium mb-2">Cenário Conservador</h3>
+                    <p className="text-sm text-gray-600 mb-2">2 eventos/mês</p>
+                    <p className="text-2xl font-bold text-blue-600">R$ 1.200</p>
+                  </div>
+                  <div className="p-4 border rounded-lg text-center">
+                    <h3 className="font-medium mb-2">Cenário Moderado</h3>
+                    <p className="text-sm text-gray-600 mb-2">4 eventos/mês</p>
+                    <p className="text-2xl font-bold text-green-600">R$ 2.400</p>
+                  </div>
+                  <div className="p-4 border rounded-lg text-center">
+                    <h3 className="font-medium mb-2">Cenário Otimista</h3>
+                    <p className="text-sm text-gray-600 mb-2">6 eventos/mês</p>
+                    <p className="text-2xl font-bold text-purple-600">R$ 3.600</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="settings" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Dados Bancários</CardTitle>
+                <CardDescription>Configure suas informações para recebimento</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="p-4 border rounded-lg">
+                    <h3 className="font-medium mb-2">Conta Corrente</h3>
+                    <p className="text-sm text-gray-600">Banco: Banco do Brasil</p>
+                    <p className="text-sm text-gray-600">Agência: 1234-5</p>
+                    <p className="text-sm text-gray-600">Conta: 12345-6</p>
+                  </div>
+                  <Button variant="outline">
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Atualizar Dados Bancários
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };
