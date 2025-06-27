@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,9 +5,12 @@ import { Calendar } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CalendarDays, Clock, MapPin, User } from 'lucide-react';
+import { CalendarDays, Clock, MapPin, User, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import FreelancerHeader from '@/components/FreelancerHeader';
 
 const FreelancerCalendar = () => {
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [availability, setAvailability] = useState<{ [key: string]: string }>({});
 
@@ -74,159 +76,173 @@ const FreelancerCalendar = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Calendário de Disponibilidade</h1>
-          <p className="text-gray-600">Gerencie sua agenda e disponibilidade</p>
-        </div>
-        <Button>
-          <CalendarDays className="w-4 h-4 mr-2" />
-          Sincronizar com Google
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Calendário Principal */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Calendário</CardTitle>
-              <CardDescription>Clique em um dia para alterar sua disponibilidade</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                className="rounded-md border"
-              />
-              
-              {/* Legenda */}
-              <div className="mt-4 space-y-2">
-                <h3 className="font-medium">Legenda:</h3>
-                <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                    <span className="text-sm">Disponível</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                    <span className="text-sm">Evento Confirmado</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
-                    <span className="text-sm">Evento Pendente</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-                    <span className="text-sm">Indisponível</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal de Disponibilidade */}
-              {selectedDate && (
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button className="mt-4 w-full" variant="outline">
-                      Alterar Disponibilidade - {selectedDate.toLocaleDateString()}
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>
-                        Disponibilidade para {selectedDate.toLocaleDateString()}
-                      </DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <Select
-                        value={availability[selectedDate.toISOString().split('T')[0]] || 'available'}
-                        onValueChange={(value) => 
-                          handleAvailabilityChange(selectedDate.toISOString().split('T')[0], value)
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecionar status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="available">Disponível</SelectItem>
-                          <SelectItem value="unavailable">Indisponível</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Button className="w-full">Salvar</Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              )}
-            </CardContent>
-          </Card>
+    <div className="min-h-screen bg-gray-50">
+      <FreelancerHeader />
+      
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/freelancer/dashboard')}
+              className="flex items-center space-x-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Voltar</span>
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold">Calendário de Disponibilidade</h1>
+              <p className="text-gray-600">Gerencie sua agenda e disponibilidade</p>
+            </div>
+          </div>
+          <Button>
+            <CalendarDays className="w-4 h-4 mr-2" />
+            Sincronizar com Google
+          </Button>
         </div>
 
-        {/* Sidebar - Eventos Próximos */}
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Eventos Próximos</CardTitle>
-              <CardDescription>Seus próximos compromissos</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {upcomingEvents.map((event) => (
-                  <div key={event.id} className="p-4 border rounded-lg">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-medium">{event.title}</h3>
-                      {getStatusBadge(event.status)}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Calendário Principal */}
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Calendário</CardTitle>
+                <CardDescription>Clique em um dia para alterar sua disponibilidade</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={setSelectedDate}
+                  className="rounded-md border"
+                />
+                
+                {/* Legenda */}
+                <div className="mt-4 space-y-2">
+                  <h3 className="font-medium">Legenda:</h3>
+                  <div className="flex flex-wrap gap-4">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                      <span className="text-sm">Disponível</span>
                     </div>
-                    <div className="space-y-1 text-sm text-gray-600">
-                      <div className="flex items-center space-x-2">
-                        <CalendarDays className="w-4 h-4" />
-                        <span>{event.date}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Clock className="w-4 h-4" />
-                        <span>{event.time}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <MapPin className="w-4 h-4" />
-                        <span>{event.location}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <User className="w-4 h-4" />
-                        <span>{event.producer}</span>
-                      </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                      <span className="text-sm">Evento Confirmado</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
+                      <span className="text-sm">Evento Pendente</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                      <span className="text-sm">Indisponível</span>
                     </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Estatísticas do Mês</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm">Dias Disponíveis:</span>
-                  <span className="font-medium">18</span>
+                {/* Modal de Disponibilidade */}
+                {selectedDate && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button className="mt-4 w-full" variant="outline">
+                        Alterar Disponibilidade - {selectedDate.toLocaleDateString()}
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>
+                          Disponibilidade para {selectedDate.toLocaleDateString()}
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <Select
+                          value={availability[selectedDate.toISOString().split('T')[0]] || 'available'}
+                          onValueChange={(value) => 
+                            handleAvailabilityChange(selectedDate.toISOString().split('T')[0], value)
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecionar status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="available">Disponível</SelectItem>
+                            <SelectItem value="unavailable">Indisponível</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button className="w-full">Salvar</Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar - Eventos Próximos */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Eventos Próximos</CardTitle>
+                <CardDescription>Seus próximos compromissos</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {upcomingEvents.map((event) => (
+                    <div key={event.id} className="p-4 border rounded-lg">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-medium">{event.title}</h3>
+                        {getStatusBadge(event.status)}
+                      </div>
+                      <div className="space-y-1 text-sm text-gray-600">
+                        <div className="flex items-center space-x-2">
+                          <CalendarDays className="w-4 h-4" />
+                          <span>{event.date}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Clock className="w-4 h-4" />
+                          <span>{event.time}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <MapPin className="w-4 h-4" />
+                          <span>{event.location}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <User className="w-4 h-4" />
+                          <span>{event.producer}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Eventos Confirmados:</span>
-                  <span className="font-medium">5</span>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Estatísticas do Mês</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm">Dias Disponíveis:</span>
+                    <span className="font-medium">18</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm">Eventos Confirmados:</span>
+                    <span className="font-medium">5</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm">Eventos Pendentes:</span>
+                    <span className="font-medium">2</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm">Taxa de Ocupação:</span>
+                    <span className="font-medium">38%</span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Eventos Pendentes:</span>
-                  <span className="font-medium">2</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Taxa de Ocupação:</span>
-                  <span className="font-medium">38%</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

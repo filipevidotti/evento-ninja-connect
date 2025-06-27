@@ -4,7 +4,7 @@ import { useAuth } from '@/components/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Star, Settings, Menu } from 'lucide-react';
+import { Star, Settings, Menu, CalendarDays, MapPin, Heart, CreditCard, ClipboardCheck } from 'lucide-react';
 import VerificationBadge from './VerificationBadge';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -12,6 +12,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 
 const FreelancerHeader = () => {
@@ -23,7 +24,10 @@ const FreelancerHeader = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 
+              className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent cursor-pointer"
+              onClick={() => navigate('/freelancer/dashboard')}
+            >
               EventConnect
             </h1>
             <Badge variant="secondary" className="text-xs sm:text-sm">Freelancer</Badge>
@@ -32,6 +36,42 @@ const FreelancerHeader = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
             <VerificationBadge />
+            
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/freelancer/calendar')}
+              className="text-sm"
+            >
+              <CalendarDays className="w-4 h-4 mr-1" />
+              Calendário
+            </Button>
+            
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/freelancer/checkin')}
+              className="text-sm"
+            >
+              <ClipboardCheck className="w-4 h-4 mr-1" />
+              Check-in
+            </Button>
+            
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/freelancer/favorites')}
+              className="text-sm"
+            >
+              <Heart className="w-4 h-4 mr-1" />
+              Favoritos
+            </Button>
+            
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/freelancer/finance')}
+              className="text-sm"
+            >
+              <CreditCard className="w-4 h-4 mr-1" />
+              Financeiro
+            </Button>
             
             <Button 
               variant="ghost" 
@@ -79,12 +119,30 @@ const FreelancerHeader = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => navigate('/freelancer/calendar')}>
+                  <CalendarDays className="w-4 h-4 mr-2" />
+                  Calendário
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/freelancer/checkin')}>
+                  <ClipboardCheck className="w-4 h-4 mr-2" />
+                  Check-in
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/freelancer/favorites')}>
+                  <Heart className="w-4 h-4 mr-2" />
+                  Favoritos
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/freelancer/finance')}>
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Financeiro
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate('/freelancer/reputation')}>
                   Reputação
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate('/admin/dashboard')}>
                   Admin
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout}>
                   Sair
                 </DropdownMenuItem>
