@@ -43,6 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   const fetchUserProfile = async (userId: string) => {
     try {
@@ -67,7 +68,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const refreshUser = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
       
       if (session?.user) {
         const profile = await fetchUserProfile(session.user.id);
@@ -89,28 +89,70 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } else {
           setUser(null);
         }
+        setSession(session);
       } else {
         setUser(null);
+        setSession(null);
       }
     } catch (error) {
       console.error('Error refreshing user:', error);
       setUser(null);
       setSession(null);
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
     let mounted = true;
 
+    const initializeAuth = async () => {
+      if (initialized) return;
+      
+      try {
+        // Get initial session
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (mounted) {
+          setSession(session);
+          
+          if (session?.user) {
+            const profile = await fetchUserProfile(session.user.id);
+            if (profile && mounted) {
+              setUser({
+                id: profile.id,
+                name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
+                email: session.user.email || '',
+                type: profile.user_type as 'freelancer' | 'producer',
+                city: profile.city || '',
+                phone: profile.phone || '',
+                rating: profile.rating || 0,
+                avatar: profile.avatar_url || '',
+                skills: profile.skills || [],
+                description: profile.description || '',
+                courses: profile.courses || [],
+                otherKnowledge: profile.other_knowledge || ''
+              });
+            }
+          }
+          
+          setLoading(false);
+          setInitialized(true);
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        if (mounted) {
+          setLoading(false);
+          setInitialized(true);
+        }
+      }
+    };
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (!mounted || !initialized) return;
+        
         console.log('Auth state changed:', event, session?.user?.email);
         
-        if (!mounted) return;
-
         setSession(session);
         
         if (session?.user) {
@@ -136,15 +178,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } else if (mounted) {
           setUser(null);
         }
-        
-        if (mounted) {
-          setLoading(false);
-        }
       }
     );
 
-    // Initial session check
-    refreshUser();
+    initializeAuth();
 
     return () => {
       mounted = false;
