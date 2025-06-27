@@ -4,10 +4,13 @@ import { useAuth } from '@/components/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Star } from 'lucide-react';
+import { Star, Settings } from 'lucide-react';
+import VerificationBadge from './VerificationBadge';
+import { useNavigate } from 'react-router-dom';
 
 const FreelancerHeader = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <header className="bg-white shadow-sm border-b">
@@ -20,6 +23,17 @@ const FreelancerHeader = () => {
             <Badge variant="secondary">Freelancer</Badge>
           </div>
           <div className="flex items-center space-x-4">
+            <VerificationBadge />
+            
+            {/* Navigation Buttons */}
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/admin/dashboard')}
+              className="text-sm"
+            >
+              Admin
+            </Button>
+            
             <div className="flex items-center space-x-2">
               <Avatar>
                 <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
@@ -32,6 +46,7 @@ const FreelancerHeader = () => {
                 </div>
               </div>
             </div>
+            
             <Button variant="outline" onClick={logout}>Sair</Button>
           </div>
         </div>

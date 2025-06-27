@@ -14,11 +14,14 @@ export interface User {
   avatar?: string;
   skills?: string[];
   description?: string;
+  courses?: string[];
+  otherKnowledge?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
+  loading: boolean;
   login: (email: string, password: string, type: 'freelancer' | 'producer') => Promise<boolean>;
   register: (userData: Omit<User, 'id'> & { password: string }) => Promise<boolean>;
   logout: () => void;
@@ -39,7 +42,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchUserProfile = async (userId: string) => {
     try {
@@ -62,42 +65,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const refreshUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) {
-      const profile = await fetchUserProfile(session.user.id);
-      if (profile) {
-        setUser({
-          id: profile.id,
-          name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
-          email: session.user.email || '',
-          type: profile.user_type as 'freelancer' | 'producer',
-          city: profile.city || '',
-          phone: profile.phone || '',
-          rating: profile.rating || 0,
-          avatar: profile.avatar_url || '',
-          skills: profile.skills || [],
-          description: profile.description || ''
-        });
+    setLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const profile = await fetchUserProfile(session.user.id);
+        if (profile) {
+          setUser({
+            id: profile.id,
+            name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
+            email: session.user.email || '',
+            type: profile.user_type as 'freelancer' | 'producer',
+            city: profile.city || '',
+            phone: profile.phone || '',
+            rating: profile.rating || 0,
+            avatar: profile.avatar_url || '',
+            skills: profile.skills || [],
+            description: profile.description || '',
+            courses: profile.courses || [],
+            otherKnowledge: profile.other_knowledge || ''
+          });
+        }
+      } else {
+        setUser(null);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     let mounted = true;
 
-    const initializeAuth = async () => {
-      try {
-        console.log('Initializing auth...');
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
         
-        // Get current session first
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Error getting session:', error);
-        }
+        if (!mounted) return;
 
-        if (session?.user && mounted) {
-          console.log('User found in session:', session.user.email);
+        setSession(session);
+        
+        if (session?.user) {
           const profile = await fetchUserProfile(session.user.id);
           if (profile && mounted) {
             setUser({
@@ -110,92 +118,60 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               rating: profile.rating || 0,
               avatar: profile.avatar_url || '',
               skills: profile.skills || [],
-              description: profile.description || ''
+              description: profile.description || '',
+              courses: profile.courses || [],
+              otherKnowledge: profile.other_knowledge || ''
             });
           }
-          setSession(session);
+        } else if (mounted) {
+          setUser(null);
         }
-
-        // Set up auth state listener
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-          async (event, session) => {
-            if (!mounted) return;
-            
-            console.log('Auth state changed:', event, session?.user?.email);
-            setSession(session);
-            
-            if (session?.user) {
-              const profile = await fetchUserProfile(session.user.id);
-              if (profile && mounted) {
-                setUser({
-                  id: profile.id,
-                  name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
-                  email: session.user.email || '',
-                  type: profile.user_type as 'freelancer' | 'producer',
-                  city: profile.city || '',
-                  phone: profile.phone || '',
-                  rating: profile.rating || 0,
-                  avatar: profile.avatar_url || '',
-                  skills: profile.skills || [],
-                  description: profile.description || ''
-                });
-              }
-            } else {
-              if (mounted) {
-                setUser(null);
-              }
-            }
-          }
-        );
-
+        
         if (mounted) {
-          setIsInitialized(true);
-        }
-
-        return () => {
-          subscription.unsubscribe();
-        };
-      } catch (error) {
-        console.error('Error initializing auth:', error);
-        if (mounted) {
-          setIsInitialized(true);
+          setLoading(false);
         }
       }
-    };
+    );
 
-    initializeAuth();
+    // Initial session check
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (mounted) {
+        setSession(session);
+        if (session?.user) {
+          refreshUser();
+        } else {
+          setLoading(false);
+        }
+      }
+    });
 
     return () => {
       mounted = false;
+      subscription.unsubscribe();
     };
-  }, []); // Empty dependency array to run only once
+  }, []);
 
   const login = async (email: string, password: string, type: 'freelancer' | 'producer'): Promise<boolean> => {
     try {
-      console.log('Attempting login for:', email);
-      
+      setLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) {
-        console.error('Login error:', error);
-        throw error;
-      }
-
-      console.log('Login successful');
+      if (error) throw error;
       return true;
     } catch (error) {
       console.error('Login error:', error);
-      throw error;
+      return false;
+    } finally {
+      setLoading(false);
     }
   };
 
   const register = async (userData: Omit<User, 'id'> & { password: string }): Promise<boolean> => {
     try {
-      console.log('Attempting registration for:', userData.email);
-      
+      setLoading(true);
       const { data, error } = await supabase.auth.signUp({
         email: userData.email,
         password: userData.password,
@@ -205,34 +181,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             name: userData.name,
             type: userData.type,
             city: userData.city,
-            phone: userData.phone || '',
-            skills: userData.skills || [],
-            description: userData.description || ''
+            phone: userData.phone,
+            skills: userData.skills,
+            description: userData.description,
+            courses: userData.courses,
+            otherKnowledge: userData.otherKnowledge
           }
         }
       });
 
-      if (error) {
-        console.error('Registration error:', error);
-        throw error;
-      }
-
-      console.log('Registration successful');
+      if (error) throw error;
       return true;
     } catch (error) {
-      console.error('Registration error:', error);
-      throw error;
+      console.error('Register error:', error);
+      return false;
+    } finally {
+      setLoading(false);
     }
   };
 
   const logout = async () => {
-    try {
-      await supabase.auth.signOut();
-      setUser(null);
-      setSession(null);
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
+    setLoading(true);
+    await supabase.auth.signOut();
+    setUser(null);
+    setSession(null);
+    setLoading(false);
   };
 
   const updateUser = async (userData: Partial<User>): Promise<boolean> => {
@@ -248,6 +221,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           skills: userData.skills,
           description: userData.description,
           avatar_url: userData.avatar,
+          courses: userData.courses,
+          other_knowledge: userData.otherKnowledge,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
@@ -262,16 +237,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  if (!isInitialized) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
   return (
-    <AuthContext.Provider value={{ user, session, login, register, logout, updateUser, refreshUser }}>
+    <AuthContext.Provider value={{ user, session, loading, login, register, logout, updateUser, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
