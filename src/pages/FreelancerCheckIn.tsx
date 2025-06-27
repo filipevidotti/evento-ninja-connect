@@ -1,8 +1,8 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Clock, 
@@ -13,16 +13,18 @@ import {
   Users, 
   ArrowLeft,
   AlertCircle,
-  PlayCircle,
-  StopCircle 
+  Key,
+  Shield
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import FreelancerHeader from '@/components/FreelancerHeader';
+import CheckinPinDialog from '@/components/CheckinPinDialog';
+import { useCheckin } from '@/hooks/useCheckin';
 
 const FreelancerCheckIn = () => {
   const navigate = useNavigate();
-  const [checkedInEvents, setCheckedInEvents] = useState<string[]>([]);
-  const [checkedOutEvents, setCheckedOutEvents] = useState<string[]>([]);
+  const [selectedEventForCheckin, setSelectedEventForCheckin] = useState<string | null>(null);
+  const { hasCheckedIn, getCheckinTime } = useCheckin();
 
   // Mock data for events the freelancer is confirmed for
   const confirmedEvents = [
@@ -37,7 +39,7 @@ const FreelancerCheckIn = () => {
       role: 'Fotógrafo',
       payment: 500,
       status: 'confirmed',
-      checkinRequired: true,
+      pinCode: '1234', // Visível para demonstração
       coordinates: { lat: -23.5505, lng: -46.6433 }
     },
     {
@@ -51,7 +53,7 @@ const FreelancerCheckIn = () => {
       role: 'Garçom',
       payment: 250,
       status: 'confirmed',
-      checkinRequired: true,
+      pinCode: '5678',
       coordinates: { lat: -22.9068, lng: -43.1729 }
     },
     {
@@ -65,38 +67,27 @@ const FreelancerCheckIn = () => {
       role: 'Recepcionista',
       payment: 200,
       status: 'confirmed',
-      checkinRequired: true,
+      pinCode: '9012',
       coordinates: { lat: -19.9191, lng: -43.9386 }
     }
   ];
 
-  const handleCheckIn = (eventId: string) => {
-    setCheckedInEvents(prev => [...prev, eventId]);
-    console.log('Check-in realizado para evento:', eventId);
+  const handleCheckinClick = (eventId: string) => {
+    setSelectedEventForCheckin(eventId);
   };
 
-  const handleCheckOut = (eventId: string) => {
-    setCheckedOutEvents(prev => [...prev, eventId]);
-    console.log('Check-out realizado para evento:', eventId);
-  };
-
-  const isCheckedIn = (eventId: string) => checkedInEvents.includes(eventId);
-  const isCheckedOut = (eventId: string) => checkedOutEvents.includes(eventId);
-
-  const getEventStatus = (event: any) => {
-    if (isCheckedOut(event.id)) return 'completed';
-    if (isCheckedIn(event.id)) return 'in-progress';
+  const getEventStatus = (eventId: string) => {
+    if (hasCheckedIn(eventId)) return 'checked-in';
     return 'pending';
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (eventId: string) => {
+    const status = getEventStatus(eventId);
     switch (status) {
-      case 'completed':
-        return <Badge className="bg-green-500">Concluído</Badge>;
-      case 'in-progress':
-        return <Badge className="bg-blue-500">Em Andamento</Badge>;
+      case 'checked-in':
+        return <Badge className="bg-green-500">Check-in Realizado</Badge>;
       case 'pending':
-        return <Badge className="bg-gray-500">Pendente</Badge>;
+        return <Badge className="bg-gray-500">Aguardando Check-in</Badge>;
       default:
         return <Badge variant="outline">Desconhecido</Badge>;
     }
@@ -112,6 +103,8 @@ const FreelancerCheckIn = () => {
   const getCurrentDate = () => {
     return new Date().toLocaleDateString('pt-BR');
   };
+
+  const selectedEvent = confirmedEvents.find(e => e.id === selectedEventForCheckin);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -131,8 +124,8 @@ const FreelancerCheckIn = () => {
           
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">Check-in / Check-out</h1>
-              <p className="text-gray-600">Registre sua presença nos eventos</p>
+              <h1 className="text-2xl sm:text-3xl font-bold">Check-in nos Eventos</h1>
+              <p className="text-gray-600">Registre sua presença usando o PIN do evento</p>
             </div>
             <div className="text-left sm:text-right">
               <p className="text-sm text-gray-600">Hoje: {getCurrentDate()}</p>
@@ -142,18 +135,17 @@ const FreelancerCheckIn = () => {
         </div>
 
         <Alert>
-          <AlertCircle className="h-4 w-4" />
+          <Shield className="h-4 w-4" />
           <AlertDescription>
-            Faça check-in ao chegar no local do evento e check-out ao finalizar suas atividades. 
-            Isso garante o controle de presença e o pagamento correto.
+            Para fazer check-in, você precisará do PIN único fornecido pelo organizador do evento. 
+            Este PIN garante que apenas pessoas autorizadas possam registrar presença.
           </AlertDescription>
         </Alert>
 
         <div className="space-y-6">
           {confirmedEvents.map((event) => {
-            const status = getEventStatus(event);
-            const checkedIn = isCheckedIn(event.id);
-            const checkedOut = isCheckedOut(event.id);
+            const checkedIn = hasCheckedIn(event.id);
+            const checkinTime = getCheckinTime(event.id);
 
             return (
               <Card key={event.id} className="relative">
@@ -166,13 +158,13 @@ const FreelancerCheckIn = () => {
                       </CardDescription>
                     </div>
                     <div className="flex items-center space-x-2">
-                      {getStatusBadge(status)}
+                      {getStatusBadge(event.id)}
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {/* Event Details - Mobile responsive grid */}
+                    {/* Event Details */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                       <div className="flex items-center space-x-2">
                         <Calendar className="w-4 h-4 text-gray-400" />
@@ -199,60 +191,73 @@ const FreelancerCheckIn = () => {
                       </div>
                     </div>
 
-                    {/* Check-in/Check-out Actions - Mobile responsive */}
+                    {/* PIN Code Display (for demo purposes) */}
+                    <div className="bg-blue-50 rounded-lg p-4">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Key className="w-4 h-4 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-900">PIN do Evento (Demo)</span>
+                      </div>
+                      <div className="font-mono text-2xl font-bold text-blue-700 tracking-widest">
+                        {event.pinCode}
+                      </div>
+                      <p className="text-xs text-blue-600 mt-1">
+                        Use este PIN para fazer check-in
+                      </p>
+                    </div>
+
+                    {/* Check-in Status */}
+                    {checkedIn && checkinTime && (
+                      <div className="bg-green-50 rounded-lg p-4">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <CheckCircle className="w-4 h-4 text-green-600" />
+                          <span className="text-sm font-medium text-green-900">Check-in Realizado</span>
+                        </div>
+                        <p className="text-sm text-green-700">
+                          Horário: {new Date(checkinTime).toLocaleString('pt-BR')}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Check-in Action */}
                     <div className="border-t pt-4">
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                          {checkedIn && (
+                        <div className="flex items-center space-x-2">
+                          {checkedIn ? (
                             <div className="flex items-center space-x-2 text-sm text-green-600">
                               <CheckCircle className="w-4 h-4" />
-                              <span>Check-in realizado</span>
+                              <span>Presença registrada</span>
                             </div>
-                          )}
-                          {checkedOut && (
-                            <div className="flex items-center space-x-2 text-sm text-blue-600">
-                              <CheckCircle className="w-4 h-4" />
-                              <span>Check-out realizado</span>
+                          ) : (
+                            <div className="flex items-center space-x-2 text-sm text-gray-500">
+                              <Clock className="w-4 h-4" />
+                              <span>Aguardando check-in</span>
                             </div>
                           )}
                         </div>
 
                         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                          {!checkedIn && !checkedOut && (
+                          {!checkedIn ? (
                             <Button
-                              onClick={() => handleCheckIn(event.id)}
-                              className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
+                              onClick={() => handleCheckinClick(event.id)}
+                              className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
                             >
-                              <PlayCircle className="w-4 h-4 mr-2" />
+                              <Key className="w-4 h-4 mr-2" />
                               Fazer Check-in
                             </Button>
-                          )}
-
-                          {checkedIn && !checkedOut && (
-                            <Button
-                              onClick={() => handleCheckOut(event.id)}
-                              variant="outline"
-                              className="border-blue-600 text-blue-600 hover:bg-blue-50 w-full sm:w-auto"
-                            >
-                              <StopCircle className="w-4 h-4 mr-2" />
-                              Fazer Check-out
-                            </Button>
-                          )}
-
-                          {checkedOut && (
+                          ) : (
                             <Button variant="outline" disabled className="w-full sm:w-auto">
                               <CheckCircle className="w-4 h-4 mr-2" />
-                              Evento Concluído
+                              Check-in Concluído
                             </Button>
                           )}
                         </div>
                       </div>
                     </div>
 
-                    {/* Additional Actions - Mobile responsive */}
-                    {(checkedIn || checkedOut) && (
+                    {/* Additional Actions for checked-in events */}
+                    {checkedIn && (
                       <div className="bg-gray-50 rounded-lg p-4">
-                        <h4 className="font-medium mb-2">Ações Adicionais</h4>
+                        <h4 className="font-medium mb-2">Ações Disponíveis</h4>
                         <div className="flex flex-wrap gap-2">
                           <Button variant="outline" size="sm" className="flex-1 min-w-0 sm:flex-none">
                             <Camera className="w-4 h-4 mr-2" />
@@ -292,6 +297,16 @@ const FreelancerCheckIn = () => {
           </Card>
         )}
       </div>
+
+      {/* Check-in PIN Dialog */}
+      {selectedEvent && (
+        <CheckinPinDialog
+          open={!!selectedEventForCheckin}
+          onOpenChange={(open) => !open && setSelectedEventForCheckin(null)}
+          eventId={selectedEvent.id}
+          eventName={selectedEvent.title}
+        />
+      )}
     </div>
   );
 };
