@@ -8,6 +8,10 @@ import { EventProvider } from "@/components/EventContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import FreelancerDashboard from "./pages/FreelancerDashboard";
+import FreelancerProfile from "./pages/FreelancerProfile";
+import FreelancerFinance from "./pages/FreelancerFinance";
+import FreelancerCalendar from "./pages/FreelancerCalendar";
+import FreelancerFavorites from "./pages/FreelancerFavorites";
 import ProducerDashboard from "./pages/ProducerDashboard";
 import Plans from "./pages/Plans";
 import Success from "./pages/Success";
@@ -103,7 +107,7 @@ const App = () => (
               <Route path="/admin/disputes" element={<AdminRoute><AdminDisputes /></AdminRoute>} />
               <Route path="/admin/finance" element={<AdminRoute><AdminFinance /></AdminRoute>} />
               
-              {/* User Routes */}
+              {/* Freelancer Routes */}
               <Route 
                 path="/freelancer/dashboard" 
                 element={
@@ -112,6 +116,40 @@ const App = () => (
                   </ProtectedRoute>
                 } 
               />
+              <Route 
+                path="/freelancer/profile" 
+                element={
+                  <ProtectedRoute allowedType="freelancer">
+                    <FreelancerProfile />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/freelancer/finance" 
+                element={
+                  <ProtectedRoute allowedType="freelancer">
+                    <FreelancerFinance />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/freelancer/calendar" 
+                element={
+                  <ProtectedRoute allowedType="freelancer">
+                    <FreelancerCalendar />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/freelancer/favorites" 
+                element={
+                  <ProtectedRoute allowedType="freelancer">
+                    <FreelancerFavorites />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Producer Routes */}
               <Route 
                 path="/producer/dashboard" 
                 element={

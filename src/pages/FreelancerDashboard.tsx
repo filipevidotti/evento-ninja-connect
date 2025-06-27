@@ -1,121 +1,192 @@
-
-import React, { useState } from 'react';
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Calendar, CheckCircle, Clock, User, Wallet, Heart } from 'lucide-react';
 import { useAuth } from '@/components/AuthContext';
-import { useEvents } from '@/components/EventContext';
-import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
-import { Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import FreelancerHeader from '@/components/FreelancerHeader';
-import EventFilters from '@/components/EventFilters';
 import EventCard from '@/components/EventCard';
+import EventFilters from '@/components/EventFilters';
 import ApplicationsList from '@/components/ApplicationsList';
 import FreelancerProfile from '@/components/FreelancerProfile';
+import { useEvents } from '@/components/EventContext';
 
 const FreelancerDashboard = () => {
   const { user } = useAuth();
-  const { events, applyToEvent, getApplicationsByUser } = useEvents();
-  const { toast } = useToast();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterRole, setFilterRole] = useState('all');
-  const [filterCity, setFilterCity] = useState('all');
+  const { events } = useEvents();
+  const navigate = useNavigate();
 
-  const userApplications = user ? getApplicationsByUser(user.id) : [];
-  
-  const filteredEvents = events.filter(event => {
-    const matchesSearch = event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.local.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = filterRole === 'all' || 
-                       event.functions.some(func => func.cargo.toLowerCase().includes(filterRole.toLowerCase()));
-    const matchesCity = filterCity === 'all' || event.local.toLowerCase().includes(filterCity.toLowerCase());
-    const isOpen = event.status === 'open';
-    
-    return matchesSearch && matchesRole && matchesCity && isOpen;
-  });
+  const stats = [
+    { label: 'Eventos Aplicados', value: 12, trend: '+2 desde a última semana' },
+    { label: 'Eventos Confirmados', value: 5, trend: '+1 desde ontem' },
+    { label: 'Próximos Eventos', value: 3, trend: 'Nos próximos 7 dias' },
+    { label: 'Ganhos Este Mês', value: 'R$ 2.850', trend: '+15% vs mês anterior' },
+  ];
 
-  const handleApply = async (functionId: string) => {
-    if (!user) return;
-    
-    const hasApplied = userApplications.some(app => 
-      app.function_id === functionId
-    );
-    
-    if (hasApplied) {
-      toast({
-        title: "Já candidatado",
-        description: "Você já se candidatou para esta função.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    const success = await applyToEvent(functionId);
-    if (success) {
-      toast({
-        title: "Candidatura enviada!",
-        description: "Sua candidatura foi enviada com sucesso."
-      });
-    }
-  };
-
-  const getApplicationStatus = (functionId: string) => {
-    return userApplications.find(app => 
-      app.function_id === functionId
-    )?.status;
-  };
+  const data = [
+    { name: 'Jan', uv: 4000, pv: 2400, amt: 2400 },
+    { name: 'Fev', uv: 3000, pv: 1398, amt: 2210 },
+    { name: 'Mar', uv: 2000, pv: 9800, amt: 2290 },
+    { name: 'Abr', uv: 2780, pv: 3908, amt: 2000 },
+    { name: 'Mai', uv: 1890, pv: 4800, amt: 2181 },
+    { name: 'Jun', uv: 2390, pv: 3800, amt: 2500 },
+    { name: 'Jul', uv: 3490, pv: 4300, amt: 2100 },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gray-50">
       <FreelancerHeader />
-
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="events" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-md">
-            <TabsTrigger value="events">Eventos</TabsTrigger>
-            <TabsTrigger value="applications">Candidaturas</TabsTrigger>
-            <TabsTrigger value="profile">Perfil</TabsTrigger>
-          </TabsList>
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-gray-600">Bem-vindo de volta, {user?.name}!</p>
+          </div>
+          <div className="flex space-x-4">
+            <Button onClick={() => navigate('/freelancer/profile')} variant="outline">
+              <User className="w-4 h-4 mr-2" />
+              Meu Perfil
+            </Button>
+            <Button onClick={() => navigate('/freelancer/calendar')} variant="outline">
+              <Calendar className="w-4 h-4 mr-2" />
+              Calendário
+            </Button>
+            <Button onClick={() => navigate('/freelancer/finance')} variant="outline">
+              <Wallet className="w-4 h-4 mr-2" />
+              Financeiro
+            </Button>
+          </div>
+        </div>
 
-          <TabsContent value="events" className="space-y-6">
-            <EventFilters
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              filterRole={filterRole}
-              setFilterRole={setFilterRole}
-              filterCity={filterCity}
-              setFilterCity={setFilterCity}
-            />
+        {/* Cards de Resumo */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Eventos Aplicados</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">12</div>
+              <p className="text-xs text-muted-foreground">+2 desde a última semana</p>
+            </CardContent>
+          </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredEvents.map(event => (
-                <EventCard
-                  key={event.id}
-                  event={event}
-                  onApply={handleApply}
-                  getApplicationStatus={getApplicationStatus}
-                />
-              ))}
-            </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Eventos Confirmados</CardTitle>
+              <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">5</div>
+              <p className="text-xs text-muted-foreground">+1 desde ontem</p>
+            </CardContent>
+          </Card>
 
-            {filteredEvents.length === 0 && (
-              <Card>
-                <CardContent className="text-center py-12">
-                  <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum evento encontrado</h3>
-                  <p className="text-gray-500">Tente ajustar os filtros de busca.</p>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Próximos Eventos</CardTitle>
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">3</div>
+              <p className="text-xs text-muted-foreground">Nos próximos 7 dias</p>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="applications" className="space-y-6">
-            <ApplicationsList userApplications={userApplications} events={events} />
-          </TabsContent>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Ganhos Este Mês</CardTitle>
+              <Wallet className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">R$ 2.850</div>
+              <p className="text-xs text-muted-foreground">+15% vs mês anterior</p>
+            </CardContent>
+          </Card>
+        </div>
 
-          <TabsContent value="profile" className="space-y-6">
-            <FreelancerProfile />
-          </TabsContent>
-        </Tabs>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Eventos Disponíveis */}
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Eventos Disponíveis</CardTitle>
+                  <CardDescription>Novos eventos em sua área</CardDescription>
+                </div>
+                <div className="flex space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => navigate('/freelancer/favorites')}
+                  >
+                    <Heart className="w-4 h-4 mr-1" />
+                    Favoritos
+                  </Button>
+                  <EventFilters />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {events.slice(0, 5).map((event) => (
+                    <EventCard key={event.id} event={event} />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Perfil Rápido */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Meu Perfil</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <FreelancerProfile />
+              </CardContent>
+            </Card>
+
+            {/* Próximos Eventos */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Próximos Eventos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {[1, 2, 3].map((event) => (
+                    <div key={event} className="flex items-center space-x-3 p-3 border rounded-lg">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">Evento {event}</p>
+                        <p className="text-xs text-gray-600">25 Jan, 14:00</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-4"
+                  onClick={() => navigate('/freelancer/calendar')}
+                >
+                  Ver Calendário Completo
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Minhas Aplicações */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Minhas Aplicações</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ApplicationsList />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
