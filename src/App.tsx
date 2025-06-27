@@ -7,6 +7,7 @@ import { AuthProvider } from "./components/AuthContext";
 import { EventProvider } from "./components/EventContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
+import PublicEvents from "./pages/PublicEvents";
 import FreelancerDashboard from "./pages/FreelancerDashboard";
 import FreelancerProfile from "./pages/FreelancerProfile";
 import FreelancerCalendar from "./pages/FreelancerCalendar";
@@ -47,6 +48,11 @@ function App() {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
+                
+                {/* Public Events Routes - SEO friendly */}
+                <Route path="/eventos" element={<PublicEvents />} />
+                <Route path="/eventos/:city" element={<PublicEvents />} />
+                <Route path="/eventos/:city/:role" element={<PublicEvents />} />
                 
                 {/* Freelancer Routes */}
                 <Route path="/freelancer/dashboard" element={<FreelancerDashboard />} />

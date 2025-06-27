@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -288,7 +287,7 @@ const Index = () => {
             <Button 
               size="lg"
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/eventos')}
             >
               Ver Todos os Eventos
               <ArrowRight className="w-5 h-5 ml-2" />
@@ -332,13 +331,136 @@ const Index = () => {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              EventConnect
-            </h3>
-            <p className="text-gray-400 mb-6">
-              Conectando talentos aos melhores eventos do Brasil
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            {/* Logo and Description */}
+            <div className="md:col-span-1">
+              <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                EventConnect
+              </h3>
+              <p className="text-gray-400 mb-4">
+                Conectando talentos aos melhores eventos do Brasil
+              </p>
+            </div>
+
+            {/* Eventos por Cidade */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Eventos por Cidade</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>
+                  <button 
+                    onClick={() => navigate('/eventos/sao-paulo')}
+                    className="hover:text-white transition-colors"
+                  >
+                    Eventos São Paulo
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => navigate('/eventos/belo-horizonte')}
+                    className="hover:text-white transition-colors"
+                  >
+                    Eventos Belo Horizonte
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => navigate('/eventos/rio-de-janeiro')}
+                    className="hover:text-white transition-colors"
+                  >
+                    Eventos Rio de Janeiro
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => navigate('/eventos/brasilia')}
+                    className="hover:text-white transition-colors"
+                  >
+                    Eventos Brasília
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Vagas por Função */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Vagas por Função</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>
+                  <button 
+                    onClick={() => navigate('/eventos/sao-paulo/garcom')}
+                    className="hover:text-white transition-colors"
+                  >
+                    Vagas Garçom São Paulo
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => navigate('/eventos/belo-horizonte/churrasqueiro')}
+                    className="hover:text-white transition-colors"
+                  >
+                    Vagas Churrasqueiro BH
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => navigate('/eventos/sao-paulo/seguranca')}
+                    className="hover:text-white transition-colors"
+                  >
+                    Vagas Segurança São Paulo
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => navigate('/eventos/rio-de-janeiro/operador-de-caixa')}
+                    className="hover:text-white transition-colors"
+                  >
+                    Vagas Caixa Rio de Janeiro
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Links Úteis */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Links Úteis</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>
+                  <button 
+                    onClick={() => navigate('/eventos')}
+                    className="hover:text-white transition-colors"
+                  >
+                    Todos os Eventos
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => navigate('/login')}
+                    className="hover:text-white transition-colors"
+                  >
+                    Cadastro Freelancer
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => navigate('/login')}
+                    className="hover:text-white transition-colors"
+                  >
+                    Cadastro Produtor
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => navigate('/plans')}
+                    className="hover:text-white transition-colors"
+                  >
+                    Planos
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-800 pt-8 text-center">
             <div className="flex justify-center space-x-6 text-gray-400">
               <span>© 2025 EventConnect</span>
               <span>•</span>
