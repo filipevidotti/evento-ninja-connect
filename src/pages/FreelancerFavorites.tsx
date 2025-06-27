@@ -130,25 +130,27 @@ const FreelancerFavorites = () => {
       <FreelancerHeader />
       
       <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/freelancer/dashboard')}
-              className="flex items-center space-x-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Voltar</span>
-            </Button>
+        {/* Mobile-friendly header */}
+        <div className="space-y-4">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/freelancer/dashboard')}
+            className="flex items-center space-x-2 w-fit"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Voltar</span>
+          </Button>
+          
+          <div className="flex flex-col gap-4">
             <div>
-              <h1 className="text-3xl font-bold">Favoritos e Histórico</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold">Favoritos e Histórico</h1>
               <p className="text-gray-600">Gerencie seus produtores favoritos e eventos salvos</p>
             </div>
+            <Button onClick={() => navigate('/freelancer/search-events')} className="w-full sm:w-auto">
+              <Search className="w-4 h-4 mr-2" />
+              Buscar Eventos
+            </Button>
           </div>
-          <Button onClick={() => navigate('/freelancer/search-events')}>
-            <Search className="w-4 h-4 mr-2" />
-            Buscar Eventos
-          </Button>
         </div>
 
         <Tabs defaultValue="producers" className="w-full">
@@ -177,11 +179,11 @@ const FreelancerFavorites = () => {
                                 {producer.name.split(' ').map(n => n[0]).join('')}
                               </AvatarFallback>
                             </Avatar>
-                            <div>
-                              <h3 className="font-medium">{producer.name}</h3>
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-medium truncate">{producer.name}</h3>
                               <p className="text-sm text-gray-600 flex items-center">
-                                <Building className="w-3 h-3 mr-1" />
-                                {producer.company}
+                                <Building className="w-3 h-3 mr-1 flex-shrink-0" />
+                                <span className="truncate">{producer.company}</span>
                               </p>
                             </div>
                           </div>
@@ -189,6 +191,7 @@ const FreelancerFavorites = () => {
                             variant="ghost"
                             size="sm"
                             onClick={() => toggleFavorite(producer.id)}
+                            className="flex-shrink-0"
                           >
                             <Heart className="w-4 h-4 fill-red-500 text-red-500" />
                           </Button>
@@ -230,23 +233,21 @@ const FreelancerFavorites = () => {
           </TabsContent>
 
           <TabsContent value="events" className="space-y-6">
-            {/* Filtros */}
+            {/* Filtros - Mobile responsive */}
             <Card>
               <CardContent className="p-4">
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                      <Input
-                        placeholder="Buscar eventos..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
+                <div className="flex flex-col gap-4">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                      placeholder="Buscar eventos..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
                   </div>
                   <Select value={eventFilter} onValueChange={setEventFilter}>
-                    <SelectTrigger className="w-48">
+                    <SelectTrigger className="w-full">
                       <Filter className="w-4 h-4 mr-2" />
                       <SelectValue placeholder="Filtrar por status" />
                     </SelectTrigger>
@@ -273,12 +274,12 @@ const FreelancerFavorites = () => {
                 <div className="space-y-4">
                   {filteredEvents.map((event) => (
                     <Card key={event.id} className="p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h3 className="font-medium text-lg">{event.title}</h3>
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-medium text-lg break-words">{event.title}</h3>
                           <p className="text-gray-600 text-sm">{event.producer}</p>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 sm:flex-shrink-0">
                           {getEventStatusBadge(event.status)}
                           <Button variant="ghost" size="sm">
                             <Heart className="w-4 h-4 text-gray-400" />
@@ -286,14 +287,14 @@ const FreelancerFavorites = () => {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 text-sm">
                         <div className="flex items-center space-x-2">
-                          <Calendar className="w-4 h-4 text-gray-400" />
+                          <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
                           <span>{event.date}</span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <MapPin className="w-4 h-4 text-gray-400" />
-                          <span>{event.location}</span>
+                          <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                          <span className="break-words">{event.location}</span>
                         </div>
                         <div>
                           <span className="text-gray-600">Função: </span>
@@ -305,18 +306,19 @@ const FreelancerFavorites = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="text-sm text-gray-600">
                           <span>Candidatos: {event.applicants}/{event.maxApplicants}</span>
                         </div>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm">
+                        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                          <Button variant="outline" size="sm" className="w-full sm:w-auto">
                             Ver Detalhes
                           </Button>
                           {event.status !== 'closed' && (
                             <Button 
                               size="sm"
                               onClick={() => applyToEvent(event.id)}
+                              className="w-full sm:w-auto"
                             >
                               Aplicar Agora
                             </Button>

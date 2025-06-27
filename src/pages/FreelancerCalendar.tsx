@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -80,25 +81,27 @@ const FreelancerCalendar = () => {
       <FreelancerHeader />
       
       <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/freelancer/dashboard')}
-              className="flex items-center space-x-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Voltar</span>
-            </Button>
+        {/* Mobile-friendly header */}
+        <div className="space-y-4">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/freelancer/dashboard')}
+            className="flex items-center space-x-2 w-fit"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Voltar</span>
+          </Button>
+          
+          <div className="flex flex-col gap-4">
             <div>
-              <h1 className="text-3xl font-bold">Calendário de Disponibilidade</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold">Calendário de Disponibilidade</h1>
               <p className="text-gray-600">Gerencie sua agenda e disponibilidade</p>
             </div>
+            <Button className="w-full sm:w-auto">
+              <CalendarDays className="w-4 h-4 mr-2" />
+              Sincronizar com Google
+            </Button>
           </div>
-          <Button>
-            <CalendarDays className="w-4 h-4 mr-2" />
-            Sincronizar com Google
-          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -120,7 +123,7 @@ const FreelancerCalendar = () => {
                 {/* Legenda */}
                 <div className="mt-4 space-y-2">
                   <h3 className="font-medium">Legenda:</h3>
-                  <div className="flex flex-wrap gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div className="flex items-center space-x-2">
                       <div className="w-3 h-3 bg-green-400 rounded-full"></div>
                       <span className="text-sm">Disponível</span>
@@ -190,7 +193,7 @@ const FreelancerCalendar = () => {
                   {upcomingEvents.map((event) => (
                     <div key={event.id} className="p-4 border rounded-lg">
                       <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-medium">{event.title}</h3>
+                        <h3 className="font-medium text-sm sm:text-base">{event.title}</h3>
                         {getStatusBadge(event.status)}
                       </div>
                       <div className="space-y-1 text-sm text-gray-600">
@@ -204,7 +207,7 @@ const FreelancerCalendar = () => {
                         </div>
                         <div className="flex items-center space-x-2">
                           <MapPin className="w-4 h-4" />
-                          <span>{event.location}</span>
+                          <span className="break-words">{event.location}</span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <User className="w-4 h-4" />
