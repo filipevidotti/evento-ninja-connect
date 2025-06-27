@@ -6,13 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Minus, Users, Save, Calendar, MapPin, Clock, DollarSign } from 'lucide-react';
+import { Plus, Minus, Users, Save } from 'lucide-react';
 import { useAuth } from '@/components/AuthContext';
+import { useTeams } from '@/hooks/useTeams';
 import ProducerHeader from '@/components/ProducerHeader';
 import BreadcrumbNav from '@/components/BreadcrumbNav';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 interface TeamFunction {
   id: string;
@@ -25,14 +26,12 @@ interface TeamFunction {
 
 const ProducerCreateTeam = () => {
   const { user, logout } = useAuth();
+  const { createTeam } = useTeams();
+  const { toast } = useToast();
   const navigate = useNavigate();
   
-  const [eventName, setEventName] = useState('');
-  const [eventDate, setEventDate] = useState('');
-  const [eventTime, setEventTime] = useState('');
-  const [eventLocation, setEventLocation] = useState('');
-  const [eventDescription, setEventDescription] = useState('');
-  const [eventDuration, setEventDuration] = useState('');
+  const [teamName, setTeamName] = useState('');
+  const [teamDescription, setTeamDescription] = useState('');
   
   const [teamFunctions, setTeamFunctions] = useState<TeamFunction[]>([
     {
@@ -87,20 +86,53 @@ const ProducerCreateTeam = () => {
     ));
   };
 
-  const calculateTotalCost = () => {
-    const duration = parseFloat(eventDuration) || 0;
-    return teamFunctions.reduce((total, func) => {
-      return total + (func.quantity * func.hourlyRate * duration);
-    }, 0);
-  };
-
   const handleSave = () => {
-    console.log('Salvando equipe:', {
-      event: { eventName, eventDate, eventTime, eventLocation, eventDescription, eventDuration },
-      team: teamFunctions
+    if (!teamName.trim()) {
+      toast({
+        title: "Erro",
+        description: "Nome da equipe é obrigatório.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!user) {
+      toast({
+        title: "Erro",
+        description: "Usuário não encontrado.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate that at least one function has role and hourly rate
+    const validFunctions = teamFunctions.filter(func => func.role && func.hourlyRate > 0);
+    if (validFunctions.length === 0) {
+      toast({
+        title: "Erro",
+        description: "Adicione pelo menos uma função com cargo e valor por hora.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const newTeam = createTeam({
+      name: teamName,
+      description: teamDescription,
+      producerId: user.id
     });
-    // Aqui você implementaria a lógica de salvamento
-    navigate('/producer/team-management');
+
+    console.log('Equipe criada:', {
+      team: newTeam,
+      functions: validFunctions
+    });
+
+    toast({
+      title: "Equipe criada!",
+      description: `A equipe "${teamName}" foi criada com sucesso.`
+    });
+
+    navigate('/producer/dashboard');
   };
 
   return (
@@ -109,73 +141,34 @@ const ProducerCreateTeam = () => {
       <BreadcrumbNav items={breadcrumbItems} />
       
       <div className="max-w-4xl mx-auto p-6 space-y-6">
-        {/* Event Information */}
+        {/* Team Information */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Calendar className="w-5 h-5" />
-              <span>Informações do Evento</span>
+              <Users className="w-5 h-5" />
+              <span>Informações da Equipe</span>
             </CardTitle>
             <CardDescription>
-              Defina os detalhes básicos do seu evento
+              Defina o nome e descrição da sua equipe
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="eventName">Nome do Evento</Label>
-                <Input
-                  id="eventName"
-                  value={eventName}
-                  onChange={(e) => setEventName(e.target.value)}
-                  placeholder="Ex: Casamento Silva"
-                />
-              </div>
-              <div>
-                <Label htmlFor="eventDate">Data</Label>
-                <Input
-                  id="eventDate"
-                  type="date"
-                  value={eventDate}
-                  onChange={(e) => setEventDate(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="eventTime">Horário</Label>
-                <Input
-                  id="eventTime"
-                  type="time"
-                  value={eventTime}
-                  onChange={(e) => setEventTime(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="eventDuration">Duração (horas)</Label>
-                <Input
-                  id="eventDuration"
-                  type="number"
-                  value={eventDuration}
-                  onChange={(e) => setEventDuration(e.target.value)}
-                  placeholder="Ex: 8"
-                />
-              </div>
-            </div>
             <div>
-              <Label htmlFor="eventLocation">Local</Label>
+              <Label htmlFor="teamName">Nome da Equipe *</Label>
               <Input
-                id="eventLocation"
-                value={eventLocation}
-                onChange={(e) => setEventLocation(e.target.value)}
-                placeholder="Endereço completo do evento"
+                id="teamName"
+                value={teamName}
+                onChange={(e) => setTeamName(e.target.value)}
+                placeholder="Ex: Equipe Premium, Bartenders Especializados"
               />
             </div>
             <div>
-              <Label htmlFor="eventDescription">Descrição</Label>
+              <Label htmlFor="teamDescription">Descrição</Label>
               <Textarea
-                id="eventDescription"
-                value={eventDescription}
-                onChange={(e) => setEventDescription(e.target.value)}
-                placeholder="Descreva o tipo de evento, estilo, expectativas..."
+                id="teamDescription"
+                value={teamDescription}
+                onChange={(e) => setTeamDescription(e.target.value)}
+                placeholder="Descreva a especialidade da equipe, experiência, diferenciais..."
                 rows={3}
               />
             </div>
@@ -192,7 +185,7 @@ const ProducerCreateTeam = () => {
                   <span>Funções da Equipe</span>
                 </CardTitle>
                 <CardDescription>
-                  Defina as funções necessárias e seus requisitos
+                  Defina as funções disponíveis e seus requisitos
                 </CardDescription>
               </div>
               <Button onClick={addFunction} className="flex items-center space-x-2">
@@ -219,9 +212,9 @@ const ProducerCreateTeam = () => {
                     )}
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                     <div>
-                      <Label>Função</Label>
+                      <Label>Função *</Label>
                       <Select
                         value={func.role}
                         onValueChange={(value) => updateFunction(func.id, 'role', value)}
@@ -251,7 +244,7 @@ const ProducerCreateTeam = () => {
                     </div>
                     
                     <div>
-                      <Label>Valor/Hora (R$)</Label>
+                      <Label>Valor/Hora (R$) *</Label>
                       <Input
                         type="number"
                         min="0"
@@ -259,13 +252,6 @@ const ProducerCreateTeam = () => {
                         value={func.hourlyRate}
                         onChange={(e) => updateFunction(func.id, 'hourlyRate', parseFloat(e.target.value) || 0)}
                       />
-                    </div>
-                    
-                    <div>
-                      <Label>Total</Label>
-                      <div className="h-10 flex items-center px-3 bg-gray-50 border rounded-md">
-                        R$ {(func.quantity * func.hourlyRate * (parseFloat(eventDuration) || 0)).toFixed(2)}
-                      </div>
                     </div>
                   </div>
                   
@@ -299,12 +285,12 @@ const ProducerCreateTeam = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <DollarSign className="w-5 h-5" />
-              <span>Resumo do Orçamento</span>
+              <Users className="w-5 h-5" />
+              <span>Resumo da Equipe</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
                 <div className="text-2xl font-bold text-blue-600">
                   {teamFunctions.reduce((total, func) => total + func.quantity, 0)}
@@ -314,30 +300,23 @@ const ProducerCreateTeam = () => {
               
               <div className="text-center p-4 bg-green-50 rounded-lg">
                 <div className="text-2xl font-bold text-green-600">
-                  {eventDuration || 0}h
+                  {teamFunctions.filter(func => func.role && func.hourlyRate > 0).length}
                 </div>
-                <div className="text-sm text-gray-600">Duração do Evento</div>
-              </div>
-              
-              <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <div className="text-2xl font-bold text-purple-600">
-                  R$ {calculateTotalCost().toFixed(2)}
-                </div>
-                <div className="text-sm text-gray-600">Custo Total Estimado</div>
+                <div className="text-sm text-gray-600">Funções Definidas</div>
               </div>
             </div>
             
             <Separator className="my-4" />
             
             <div className="space-y-2">
-              <h4 className="font-medium">Detalhamento por Função:</h4>
-              {teamFunctions.map((func, index) => (
+              <h4 className="font-medium">Funções da Equipe:</h4>
+              {teamFunctions.filter(func => func.role).map((func, index) => (
                 <div key={func.id} className="flex justify-between items-center text-sm">
                   <span>
-                    {func.role || `Função ${index + 1}`} ({func.quantity}x)
+                    {func.role} ({func.quantity}x)
                   </span>
                   <span className="font-medium">
-                    R$ {(func.quantity * func.hourlyRate * (parseFloat(eventDuration) || 0)).toFixed(2)}
+                    R$ {func.hourlyRate.toFixed(2)}/hora
                   </span>
                 </div>
               ))}
@@ -352,7 +331,7 @@ const ProducerCreateTeam = () => {
           </Button>
           <Button onClick={handleSave} className="flex items-center space-x-2">
             <Save className="w-4 h-4" />
-            <span>Salvar e Publicar</span>
+            <span>Criar Equipe</span>
           </Button>
         </div>
       </div>

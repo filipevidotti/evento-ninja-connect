@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,7 +38,7 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({
     descricao: '',
     data: '',
     local: '',
-    functions: [] as Omit<EventFunction, 'id'>[]
+    functions: [] as (Omit<EventFunction, 'id'> & { team?: string })[]
   });
   const [newFunction, setNewFunction] = useState({
     cargo: '',
@@ -64,7 +63,14 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({
       return;
     }
 
-    onCreateEvent(newEvent);
+    // Remove team property before sending to onCreateEvent
+    const functionsForEvent = newEvent.functions.map(({ team, ...func }) => func);
+    
+    onCreateEvent({
+      ...newEvent,
+      functions: functionsForEvent
+    });
+
     setNewEvent({
       name: '',
       descricao: '',
