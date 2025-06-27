@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, Shield, AlertTriangle, DollarSign, BarChart3, Settings } from 'lucide-react';
+import { Users, Shield, AlertTriangle, DollarSign, BarChart3, Settings, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 
 interface DashboardStats {
@@ -31,48 +30,14 @@ const AdminDashboard = () => {
     try {
       setLoading(true);
 
-      // Fetch total users
-      const { data: usersData, error: usersError } = await supabase
-        .from('user_profiles')
-        .select('count', { count: 'exact' });
-
-      if (usersError) throw usersError;
-
-      // Fetch pending verifications
-      const { data: verificationsData, error: verificationsError } = await supabase
-        .from('verifications')
-        .select('count', { count: 'exact' })
-        .eq('status', 'pending');
-
-      if (verificationsError) throw verificationsError;
-
-      // Fetch active disputes
-      const { data: disputesData, error: disputesError } = await supabase
-        .from('disputes')
-        .select('count', { count: 'exact' })
-        .neq('status', 'resolved')
-        .neq('status', 'closed');
-
-      if (disputesError) throw disputesError;
-
-      // Fetch monthly revenue (example: sum of transactions in the last 30 days)
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-      const { data: revenueData, error: revenueError } = await supabase
-        .from('transactions')
-        .select('amount')
-        .gte('created_at', thirtyDaysAgo.toISOString());
-
-      if (revenueError) throw revenueError;
-
-      const monthlyRevenue = revenueData?.reduce((sum, transaction) => sum + transaction.amount, 0) || 0;
+      // Mock data - no database dependencies
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       setStats({
-        totalUsers: usersData ? usersData[0]?.count || 0 : 0,
-        pendingVerifications: verificationsData ? verificationsData[0]?.count || 0 : 0,
-        activeDisputes: disputesData ? disputesData[0]?.count || 0 : 0,
-        monthlyRevenue: monthlyRevenue,
+        totalUsers: 150,
+        pendingVerifications: 8,
+        activeDisputes: 3,
+        monthlyRevenue: 25000,
       });
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
@@ -156,7 +121,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Navigation Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
