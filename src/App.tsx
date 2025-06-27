@@ -15,11 +15,21 @@ import Success from "./pages/Success";
 import NotFound from "./pages/NotFound";
 import Verification from "./pages/Verification";
 import AdminVerifications from "./pages/AdminVerifications";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminUsers from "./pages/AdminUsers";
 
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children, allowedType }: { children: React.ReactNode, allowedType?: 'freelancer' | 'producer' }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
   
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -33,7 +43,15 @@ const ProtectedRoute = ({ children, allowedType }: { children: React.ReactNode, 
 };
 
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
   
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -45,7 +63,15 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
   
   if (user) {
     return <Navigate to={user.type === 'freelancer' ? '/freelancer/dashboard' : '/producer/dashboard'} replace />;
@@ -68,7 +94,13 @@ const App = () => (
               <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
               <Route path="/success" element={<Success />} />
               <Route path="/verification" element={<ProtectedRoute><Verification /></ProtectedRoute>} />
+              
+              {/* Admin Routes */}
+              <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+              <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
               <Route path="/admin/verifications" element={<AdminRoute><AdminVerifications /></AdminRoute>} />
+              
+              {/* User Routes */}
               <Route 
                 path="/freelancer/dashboard" 
                 element={

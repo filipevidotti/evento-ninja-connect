@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { User } from '@/components/AuthContext';
 import VerificationBadge from './VerificationBadge';
+import { useNavigate } from 'react-router-dom';
 
 interface ProducerHeaderProps {
   user: User | null;
@@ -13,6 +14,8 @@ interface ProducerHeaderProps {
 }
 
 const ProducerHeader: React.FC<ProducerHeaderProps> = ({ user, onLogout, onCreateEvent }) => {
+  const navigate = useNavigate();
+
   return (
     <header className="bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -25,6 +28,16 @@ const ProducerHeader: React.FC<ProducerHeaderProps> = ({ user, onLogout, onCreat
           </div>
           <div className="flex items-center space-x-4">
             <VerificationBadge />
+            
+            {/* Navigation Buttons */}
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/admin/dashboard')}
+              className="text-sm"
+            >
+              Admin
+            </Button>
+            
             <div className="flex items-center space-x-2">
               <Avatar>
                 <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
