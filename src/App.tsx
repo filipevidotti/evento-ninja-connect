@@ -13,6 +13,8 @@ import ProducerDashboard from "./pages/ProducerDashboard";
 import Plans from "./pages/Plans";
 import Success from "./pages/Success";
 import NotFound from "./pages/NotFound";
+import Verification from "./pages/Verification";
+import AdminVerifications from "./pages/AdminVerifications";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +29,18 @@ const ProtectedRoute = ({ children, allowedType }: { children: React.ReactNode, 
     return <Navigate to={user.type === 'freelancer' ? '/freelancer/dashboard' : '/producer/dashboard'} replace />;
   }
   
+  return <>{children}</>;
+};
+
+const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user } = useAuth();
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  // Por enquanto, vamos permitir acesso admin para todos os usuários logados
+  // Depois você pode implementar uma verificação de role específica
   return <>{children}</>;
 };
 
@@ -53,6 +67,8 @@ const App = () => (
               <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
               <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
               <Route path="/success" element={<Success />} />
+              <Route path="/verification" element={<ProtectedRoute><Verification /></ProtectedRoute>} />
+              <Route path="/admin/verifications" element={<AdminRoute><AdminVerifications /></AdminRoute>} />
               <Route 
                 path="/freelancer/dashboard" 
                 element={

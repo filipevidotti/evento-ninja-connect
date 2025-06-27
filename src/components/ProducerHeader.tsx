@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { User } from '@/components/AuthContext';
+import VerificationBadge from './VerificationBadge';
 
 interface ProducerHeaderProps {
   user: User | null;
@@ -23,6 +24,7 @@ const ProducerHeader: React.FC<ProducerHeaderProps> = ({ user, onLogout, onCreat
             <Badge variant="secondary" className="bg-purple-100 text-purple-800">Produtor</Badge>
           </div>
           <div className="flex items-center space-x-4">
+            <VerificationBadge />
             <div className="flex items-center space-x-2">
               <Avatar>
                 <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>

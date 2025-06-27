@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Star } from 'lucide-react';
+import VerificationBadge from './VerificationBadge';
 
 const FreelancerHeader = () => {
   const { user, logout } = useAuth();
@@ -20,6 +21,7 @@ const FreelancerHeader = () => {
             <Badge variant="secondary">Freelancer</Badge>
           </div>
           <div className="flex items-center space-x-4">
+            <VerificationBadge />
             <div className="flex items-center space-x-2">
               <Avatar>
                 <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
