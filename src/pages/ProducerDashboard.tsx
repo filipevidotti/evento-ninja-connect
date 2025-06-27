@@ -36,6 +36,8 @@ const ProducerDashboard = () => {
       descricao: 'Cerimônia de casamento com 200 convidados. Evento elegante com decoração clássica.',
       status: 'open' as const,
       checkin_pin: '1234',
+      producer_name: 'Test Producer',
+      created_at: '2024-01-01T00:00:00Z',
       functions: [
         { id: 'f1', cargo: 'Garçom', quantidade: 8, valor: '150.00', requirements: 'Experiência mínima de 1 ano' },
         { id: 'f2', cargo: 'Recepcionista', quantidade: 2, valor: '120.00', requirements: 'Boa comunicação' },
@@ -51,6 +53,8 @@ const ProducerDashboard = () => {
       descricao: 'Convenção anual da empresa com palestrantes e networking.',
       status: 'open' as const,
       checkin_pin: '5678',
+      producer_name: 'Test Producer',
+      created_at: '2024-01-01T00:00:00Z',
       functions: [
         { id: 'f4', cargo: 'Hostess', quantidade: 4, valor: '130.00', requirements: 'Inglês fluente' },
         { id: 'f5', cargo: 'Técnico de Som', quantidade: 2, valor: '200.00', requirements: 'Experiência com equipamentos' },
@@ -66,6 +70,8 @@ const ProducerDashboard = () => {
       descricao: 'Festa de debutante com tema princesa. 150 convidados.',
       status: 'open' as const,
       checkin_pin: '9012',
+      producer_name: 'Test Producer',
+      created_at: '2024-01-01T00:00:00Z',
       functions: [
         { id: 'f7', cargo: 'Garçom', quantidade: 6, valor: '140.00', requirements: 'Experiência em festas' },
         { id: 'f8', cargo: 'DJ', quantidade: 1, valor: '300.00', requirements: 'Equipamento próprio' },

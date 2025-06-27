@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -39,7 +38,6 @@ const FreelancerCheckIn = () => {
       role: 'Fotógrafo',
       payment: 500,
       status: 'confirmed',
-      pinCode: '1234', // Visível para demonstração
       coordinates: { lat: -23.5505, lng: -46.6433 }
     },
     {
@@ -53,7 +51,6 @@ const FreelancerCheckIn = () => {
       role: 'Garçom',
       payment: 250,
       status: 'confirmed',
-      pinCode: '5678',
       coordinates: { lat: -22.9068, lng: -43.1729 }
     },
     {
@@ -67,7 +64,6 @@ const FreelancerCheckIn = () => {
       role: 'Recepcionista',
       payment: 200,
       status: 'confirmed',
-      pinCode: '9012',
       coordinates: { lat: -19.9191, lng: -43.9386 }
     }
   ];
@@ -189,20 +185,6 @@ const FreelancerCheckIn = () => {
                         <span className="text-gray-600">Pagamento: </span>
                         <span className="font-medium text-green-600">R$ {event.payment}</span>
                       </div>
-                    </div>
-
-                    {/* PIN Code Display (for demo purposes) */}
-                    <div className="bg-blue-50 rounded-lg p-4">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Key className="w-4 h-4 text-blue-600" />
-                        <span className="text-sm font-medium text-blue-900">PIN do Evento (Demo)</span>
-                      </div>
-                      <div className="font-mono text-2xl font-bold text-blue-700 tracking-widest">
-                        {event.pinCode}
-                      </div>
-                      <p className="text-xs text-blue-600 mt-1">
-                        Use este PIN para fazer check-in
-                      </p>
                     </div>
 
                     {/* Check-in Status */}

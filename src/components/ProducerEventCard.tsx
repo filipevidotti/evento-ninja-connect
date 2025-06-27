@@ -8,8 +8,12 @@ import { Calendar, MapPin, Users, Key, Eye, EyeOff } from 'lucide-react';
 import { Event } from '@/components/EventContext';
 import { toast } from '@/hooks/use-toast';
 
+interface ExtendedEvent extends Event {
+  checkin_pin?: string;
+}
+
 interface ProducerEventCardProps {
-  event: Event;
+  event: ExtendedEvent;
   totalApplications: number;
   approvedApplications: number;
 }
