@@ -25,13 +25,6 @@ const FreelancerDashboard = () => {
   // Mock user applications for now - this should come from a context or API
   const [userApplications] = useState([]);
 
-  const stats = [
-    { label: 'Eventos Aplicados', value: 12, trend: '+2 desde a última semana' },
-    { label: 'Eventos Confirmados', value: 5, trend: '+1 desde ontem' },
-    { label: 'Próximos Eventos', value: 3, trend: 'Nos próximos 7 dias' },
-    { label: 'Ganhos Este Mês', value: 'R$ 2.850', trend: '+15% vs mês anterior' },
-  ];
-
   // Function to handle event applications
   const handleApply = (eventId: string, functionId: string) => {
     console.log('Applying to event:', eventId, 'function:', functionId);
@@ -42,7 +35,7 @@ const FreelancerDashboard = () => {
   const getApplicationStatus = (eventId: string, functionId: string) => {
     // This would check the user's applications for this event/function
     const application = userApplications.find(
-      app => app.eventId === eventId && app.functionId === functionId
+      (app: any) => app.eventId === eventId && app.functionId === functionId
     );
     return application?.status;
   };
