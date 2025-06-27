@@ -1,174 +1,161 @@
 
-import React from 'react';
-import { useAuth } from '@/components/AuthContext';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Star, Settings, Menu, CalendarDays, MapPin, Heart, CreditCard, ClipboardCheck, Search } from 'lucide-react';
-import VerificationBadge from './VerificationBadge';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { 
+  Menu, 
+  User, 
+  Calendar, 
+  Wallet, 
+  Heart, 
+  Search, 
+  Bell,
+  BookOpen,
+  LogOut,
+  X
+} from 'lucide-react';
+import { useAuth } from './AuthContext';
 import { useNavigate } from 'react-router-dom';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
+import VerificationBadge from './VerificationBadge';
 
 const FreelancerHeader = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const menuItems = [
+    { icon: User, label: 'Meu Perfil', path: '/freelancer/profile' },
+    { icon: Search, label: 'Buscar Eventos', path: '/freelancer/search-events' },
+    { icon: Heart, label: 'Favoritos', path: '/freelancer/favorites' },
+    { icon: Calendar, label: 'Minha Agenda', path: '/freelancer/calendar' },
+    { icon: BookOpen, label: 'Cursos', path: '/freelancer/courses' },
+    { icon: Wallet, label: 'Financeiro', path: '/freelancer/finance' },
+  ];
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setIsMenuOpen(false);
+  };
 
   return (
-    <header className="bg-white shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2 sm:space-x-4">
-            <h1 
-              className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent cursor-pointer"
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <div className="flex items-center">
+            <button 
               onClick={() => navigate('/freelancer/dashboard')}
+              className="text-xl font-bold text-blue-600 hover:text-blue-700"
             >
-              EventConnect
-            </h1>
-            <Badge variant="secondary" className="text-xs sm:text-sm">Freelancer</Badge>
-          </div>
-          
-          {/* Desktop Navigation - Melhorado para não quebrar */}
-          <div className="hidden lg:flex items-center space-x-2">
-            <VerificationBadge />
-            
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => navigate('/freelancer/search-events')}
-              className="text-xs px-2"
-            >
-              <Search className="w-4 h-4 mr-1" />
-              Buscar
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => navigate('/freelancer/calendar')}
-              className="text-xs px-2"
-            >
-              <CalendarDays className="w-4 h-4 mr-1" />
-              Calendário
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => navigate('/freelancer/checkin')}
-              className="text-xs px-2"
-            >
-              <ClipboardCheck className="w-4 h-4 mr-1" />
-              Check-in
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => navigate('/freelancer/favorites')}
-              className="text-xs px-2"
-            >
-              <Heart className="w-4 h-4 mr-1" />
-              Favoritos
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => navigate('/freelancer/finance')}
-              className="text-xs px-2"
-            >
-              <CreditCard className="w-4 h-4 mr-1" />
-              Financeiro
-            </Button>
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-xs px-2">
-                  <Menu className="w-4 h-4 mr-1" />
-                  Mais
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => navigate('/freelancer/reputation')}>
-                  <Star className="w-4 h-4 mr-2" />
-                  Reputação
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/admin/dashboard')}>
-                  <Settings className="w-4 h-4 mr-2" />
-                  Admin
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            
-            <div className="flex items-center space-x-2">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="text-sm">{user?.name?.charAt(0) || 'U'}</AvatarFallback>
-              </Avatar>
-              <div className="hidden xl:block">
-                <p className="font-medium text-sm">{user?.name}</p>
-                <div className="flex items-center space-x-1">
-                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                  <span className="text-xs text-gray-600">{user?.rating || 'Novo'}</span>
-                </div>
-              </div>
-            </div>
-            
-            <Button variant="outline" onClick={logout} size="sm">Sair</Button>
+              FreelanceEvents
+            </button>
           </div>
 
-          {/* Mobile Navigation */}
-          <div className="lg:hidden flex items-center space-x-2">
-            <VerificationBadge />
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="text-sm">{user?.name?.charAt(0) || 'U'}</AvatarFallback>
-            </Avatar>
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <Menu className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => navigate('/freelancer/search-events')}>
-                  <Search className="w-4 h-4 mr-2" />
-                  Buscar Eventos
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/freelancer/calendar')}>
-                  <CalendarDays className="w-4 h-4 mr-2" />
-                  Calendário
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/freelancer/checkin')}>
-                  <ClipboardCheck className="w-4 h-4 mr-2" />
-                  Check-in
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/freelancer/favorites')}>
-                  <Heart className="w-4 h-4 mr-2" />
-                  Favoritos
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/freelancer/finance')}>
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  Financeiro
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate('/freelancer/reputation')}>
-                  Reputação
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/admin/dashboard')}>
-                  Admin
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout}>
-                  Sair
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-1">
+            {menuItems.map((item) => (
+              <Button
+                key={item.path}
+                variant="ghost"
+                size="sm"
+                onClick={() => handleNavigation(item.path)}
+                className="flex items-center space-x-2 px-3 py-2"
+              >
+                <item.icon className="w-4 h-4" />
+                <span className="text-sm">{item.label}</span>
+              </Button>
+            ))}
+          </nav>
+
+          {/* User Info & Mobile Menu */}
+          <div className="flex items-center space-x-4">
+            <Button variant="ghost" size="sm" className="hidden sm:flex">
+              <Bell className="w-4 h-4" />
+            </Button>
+
+            <div className="hidden sm:flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
+                <Avatar className="w-8 h-8">
+                  <AvatarFallback className="text-xs">
+                    {user?.name?.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="hidden md:block">
+                  <p className="text-sm font-medium">{user?.name}</p>
+                  <VerificationBadge />
+                </div>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={logout}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <LogOut className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Mobile Menu */}
+            <div className="lg:hidden">
+              <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <Menu className="w-5 h-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-80">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-lg font-semibold">Menu</h2>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center space-x-3 mb-6 p-3 bg-gray-50 rounded-lg">
+                    <Avatar className="w-12 h-12">
+                      <AvatarFallback>
+                        {user?.name?.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium">{user?.name}</p>
+                      <VerificationBadge />
+                    </div>
+                  </div>
+
+                  <nav className="space-y-2">
+                    {menuItems.map((item) => (
+                      <Button
+                        key={item.path}
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={() => handleNavigation(item.path)}
+                      >
+                        <item.icon className="w-4 h-4 mr-3" />
+                        {item.label}
+                      </Button>
+                    ))}
+                    
+                    <div className="pt-4 border-t">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onClick={logout}
+                      >
+                        <LogOut className="w-4 h-4 mr-3" />
+                        Sair
+                      </Button>
+                    </div>
+                  </nav>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
       </div>
