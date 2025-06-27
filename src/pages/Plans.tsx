@@ -4,25 +4,13 @@ import { useAuth } from '@/components/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
 import PlanCard from '@/components/PlanCard';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Plans: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { subscription, createCheckout, loading } = useSubscription();
-
-  // Show loading state while checking auth
-  if (!user && loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex items-center space-x-2">
-          <Loader2 className="h-6 w-6 animate-spin" />
-          <span>Carregando...</span>
-        </div>
-      </div>
-    );
-  }
+  const { subscription, createCheckout } = useSubscription();
 
   if (!user) {
     return (

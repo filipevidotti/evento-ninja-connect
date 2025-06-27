@@ -44,103 +44,6 @@ export type Database = {
           },
         ]
       }
-      dispute_messages: {
-        Row: {
-          attachments: string[] | null
-          created_at: string
-          dispute_id: string | null
-          id: string
-          message: string
-          message_type: string
-          sender_id: string
-          sender_type: string
-        }
-        Insert: {
-          attachments?: string[] | null
-          created_at?: string
-          dispute_id?: string | null
-          id?: string
-          message: string
-          message_type?: string
-          sender_id: string
-          sender_type: string
-        }
-        Update: {
-          attachments?: string[] | null
-          created_at?: string
-          dispute_id?: string | null
-          id?: string
-          message?: string
-          message_type?: string
-          sender_id?: string
-          sender_type?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dispute_messages_dispute_id_fkey"
-            columns: ["dispute_id"]
-            isOneToOne: false
-            referencedRelation: "disputes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      disputes: {
-        Row: {
-          admin_id: string | null
-          complainant_id: string
-          created_at: string
-          defendant_id: string
-          description: string
-          event_id: string | null
-          id: string
-          priority: string
-          resolution: string | null
-          resolution_date: string | null
-          status: string
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          admin_id?: string | null
-          complainant_id: string
-          created_at?: string
-          defendant_id: string
-          description: string
-          event_id?: string | null
-          id?: string
-          priority?: string
-          resolution?: string | null
-          resolution_date?: string | null
-          status?: string
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          admin_id?: string | null
-          complainant_id?: string
-          created_at?: string
-          defendant_id?: string
-          description?: string
-          event_id?: string | null
-          id?: string
-          priority?: string
-          resolution?: string | null
-          resolution_date?: string | null
-          status?: string
-          title?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "disputes_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       events: {
         Row: {
           created_at: string
@@ -214,36 +117,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      platform_settings: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          setting_key: string
-          setting_value: string
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          setting_key: string
-          setting_value: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          setting_key?: string
-          setting_value?: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: []
       }
       reviews: {
         Row: {
@@ -367,164 +240,48 @@ export type Database = {
         }
         Relationships: []
       }
-      transactions: {
-        Row: {
-          amount: number
-          commission_amount: number | null
-          commission_rate: number | null
-          created_at: string
-          description: string | null
-          event_id: string | null
-          id: string
-          net_amount: number | null
-          payment_method: string | null
-          processed_at: string | null
-          status: string
-          stripe_payment_id: string | null
-          type: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          amount: number
-          commission_amount?: number | null
-          commission_rate?: number | null
-          created_at?: string
-          description?: string | null
-          event_id?: string | null
-          id?: string
-          net_amount?: number | null
-          payment_method?: string | null
-          processed_at?: string | null
-          status?: string
-          stripe_payment_id?: string | null
-          type: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          amount?: number
-          commission_amount?: number | null
-          commission_rate?: number | null
-          created_at?: string
-          description?: string | null
-          event_id?: string | null
-          id?: string
-          net_amount?: number | null
-          payment_method?: string | null
-          processed_at?: string | null
-          status?: string
-          stripe_payment_id?: string | null
-          type?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "transactions_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_profiles: {
         Row: {
           avatar_url: string | null
           city: string | null
-          courses: string[] | null
           created_at: string
           description: string | null
           id: string
           name: string | null
-          other_knowledge: string | null
           phone: string | null
           rating: number | null
           skills: string[] | null
           total_reviews: number | null
           updated_at: string
           user_type: string
-          verificado: boolean | null
         }
         Insert: {
           avatar_url?: string | null
           city?: string | null
-          courses?: string[] | null
           created_at?: string
           description?: string | null
           id: string
           name?: string | null
-          other_knowledge?: string | null
           phone?: string | null
           rating?: number | null
           skills?: string[] | null
           total_reviews?: number | null
           updated_at?: string
           user_type: string
-          verificado?: boolean | null
         }
         Update: {
           avatar_url?: string | null
           city?: string | null
-          courses?: string[] | null
           created_at?: string
           description?: string | null
           id?: string
           name?: string | null
-          other_knowledge?: string | null
           phone?: string | null
           rating?: number | null
           skills?: string[] | null
           total_reviews?: number | null
           updated_at?: string
           user_type?: string
-          verificado?: boolean | null
-        }
-        Relationships: []
-      }
-      verifications: {
-        Row: {
-          admin_id: string | null
-          created_at: string
-          data_verificacao: string | null
-          foto_documento_url: string | null
-          id: string
-          motivo_rejeicao: string | null
-          numero_documento: string
-          selfie_url: string | null
-          status: string
-          tipo_documento: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          admin_id?: string | null
-          created_at?: string
-          data_verificacao?: string | null
-          foto_documento_url?: string | null
-          id?: string
-          motivo_rejeicao?: string | null
-          numero_documento: string
-          selfie_url?: string | null
-          status?: string
-          tipo_documento: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          admin_id?: string | null
-          created_at?: string
-          data_verificacao?: string | null
-          foto_documento_url?: string | null
-          id?: string
-          motivo_rejeicao?: string | null
-          numero_documento?: string
-          selfie_url?: string | null
-          status?: string
-          tipo_documento?: string
-          updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }

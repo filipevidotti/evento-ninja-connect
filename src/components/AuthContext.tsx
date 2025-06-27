@@ -14,14 +14,11 @@ export interface User {
   avatar?: string;
   skills?: string[];
   description?: string;
-  courses?: string[];
-  otherKnowledge?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  loading: boolean;
   login: (email: string, password: string, type: 'freelancer' | 'producer') => Promise<boolean>;
   register: (userData: Omit<User, 'id'> & { password: string }) => Promise<boolean>;
   logout: () => void;
@@ -42,7 +39,6 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
 
   const fetchUserProfile = async (userId: string) => {
     try {
@@ -65,49 +61,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const refreshUser = async () => {
-    setLoading(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const profile = await fetchUserProfile(session.user.id);
-        if (profile) {
-          setUser({
-            id: profile.id,
-            name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
-            email: session.user.email || '',
-            type: profile.user_type as 'freelancer' | 'producer',
-            city: profile.city || '',
-            phone: profile.phone || '',
-            rating: profile.rating || 0,
-            avatar: profile.avatar_url || '',
-            skills: profile.skills || [],
-            description: profile.description || '',
-            courses: profile.courses || [],
-            otherKnowledge: profile.other_knowledge || ''
-          });
-        }
-      } else {
-        setUser(null);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      const profile = await fetchUserProfile(session.user.id);
+      if (profile) {
+        setUser({
+          id: profile.id,
+          name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
+          email: session.user.email || '',
+          type: profile.user_type as 'freelancer' | 'producer',
+          city: profile.city || '',
+          phone: profile.phone || '',
+          rating: profile.rating || 0,
+          avatar: profile.avatar_url || '',
+          skills: profile.skills || [],
+          description: profile.description || ''
+        });
       }
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    let mounted = true;
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.email);
-        
-        if (!mounted) return;
-
         setSession(session);
         
         if (session?.user) {
           const profile = await fetchUserProfile(session.user.id);
-          if (profile && mounted) {
+          if (profile) {
             setUser({
               id: profile.id,
               name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
@@ -118,42 +100,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               rating: profile.rating || 0,
               avatar: profile.avatar_url || '',
               skills: profile.skills || [],
-              description: profile.description || '',
-              courses: profile.courses || [],
-              otherKnowledge: profile.other_knowledge || ''
+              description: profile.description || ''
             });
           }
-        } else if (mounted) {
+        } else {
           setUser(null);
-        }
-        
-        if (mounted) {
-          setLoading(false);
         }
       }
     );
 
-    // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (mounted) {
-        setSession(session);
-        if (session?.user) {
-          refreshUser();
-        } else {
-          setLoading(false);
-        }
+      setSession(session);
+      if (session?.user) {
+        refreshUser();
       }
     });
 
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
   const login = async (email: string, password: string, type: 'freelancer' | 'producer'): Promise<boolean> => {
     try {
-      setLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -164,14 +131,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Login error:', error);
       return false;
-    } finally {
-      setLoading(false);
     }
   };
 
   const register = async (userData: Omit<User, 'id'> & { password: string }): Promise<boolean> => {
     try {
-      setLoading(true);
       const { data, error } = await supabase.auth.signUp({
         email: userData.email,
         password: userData.password,
@@ -183,9 +147,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             city: userData.city,
             phone: userData.phone,
             skills: userData.skills,
-            description: userData.description,
-            courses: userData.courses,
-            otherKnowledge: userData.otherKnowledge
+            description: userData.description
           }
         }
       });
@@ -195,17 +157,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Register error:', error);
       return false;
-    } finally {
-      setLoading(false);
     }
   };
 
   const logout = async () => {
-    setLoading(true);
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
-    setLoading(false);
   };
 
   const updateUser = async (userData: Partial<User>): Promise<boolean> => {
@@ -221,8 +179,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           skills: userData.skills,
           description: userData.description,
           avatar_url: userData.avatar,
-          courses: userData.courses,
-          other_knowledge: userData.otherKnowledge,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
@@ -238,7 +194,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, login, register, logout, updateUser, refreshUser }}>
+    <AuthContext.Provider value={{ user, session, login, register, logout, updateUser, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
