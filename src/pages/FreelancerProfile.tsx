@@ -36,7 +36,7 @@ const FreelancerProfile = () => {
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-6">
               <Avatar className="w-24 h-24">
-                <AvatarImage src={user?.avatar_url} />
+                <AvatarImage src={user?.avatar} />
                 <AvatarFallback className="text-2xl">
                   {user?.name?.charAt(0)}
                 </AvatarFallback>
