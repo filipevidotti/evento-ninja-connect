@@ -162,7 +162,7 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  // Load data only once when user changes
+  // Load data only once when the component mounts
   useEffect(() => {
     let isMounted = true;
     
@@ -184,7 +184,16 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => {
       isMounted = false;
     };
-  }, [user?.id]); // Only depend on user ID to avoid infinite loops
+  }, []); // Remove user dependency to prevent loops
+
+  // Separate effect for handling user changes
+  useEffect(() => {
+    if (user) {
+      refreshApplications();
+    } else {
+      setApplications([]);
+    }
+  }, [user?.id]);
 
   const createEvent = async (eventData: Omit<Event, 'id' | 'created_at' | 'producer_name' | 'functions'> & { functions: Omit<EventFunction, 'id'>[] }): Promise<boolean> => {
     if (!user) return false;
