@@ -254,6 +254,7 @@ export type Database = {
           total_reviews: number | null
           updated_at: string
           user_type: string
+          verificado: boolean | null
         }
         Insert: {
           avatar_url?: string | null
@@ -268,6 +269,7 @@ export type Database = {
           total_reviews?: number | null
           updated_at?: string
           user_type: string
+          verificado?: boolean | null
         }
         Update: {
           avatar_url?: string | null
@@ -282,6 +284,52 @@ export type Database = {
           total_reviews?: number | null
           updated_at?: string
           user_type?: string
+          verificado?: boolean | null
+        }
+        Relationships: []
+      }
+      verifications: {
+        Row: {
+          admin_id: string | null
+          created_at: string
+          data_verificacao: string | null
+          foto_documento_url: string | null
+          id: string
+          motivo_rejeicao: string | null
+          numero_documento: string
+          selfie_url: string | null
+          status: string
+          tipo_documento: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_id?: string | null
+          created_at?: string
+          data_verificacao?: string | null
+          foto_documento_url?: string | null
+          id?: string
+          motivo_rejeicao?: string | null
+          numero_documento: string
+          selfie_url?: string | null
+          status?: string
+          tipo_documento: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_id?: string | null
+          created_at?: string
+          data_verificacao?: string | null
+          foto_documento_url?: string | null
+          id?: string
+          motivo_rejeicao?: string | null
+          numero_documento?: string
+          selfie_url?: string | null
+          status?: string
+          tipo_documento?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
