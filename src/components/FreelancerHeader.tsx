@@ -14,7 +14,8 @@ import {
   Bell,
   BookOpen,
   LogOut,
-  X
+  X,
+  MapPin
 } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -30,6 +31,7 @@ const FreelancerHeader = () => {
     { icon: Search, label: 'Buscar Eventos', path: '/freelancer/search-events' },
     { icon: Heart, label: 'Favoritos', path: '/freelancer/favorites' },
     { icon: Calendar, label: 'Minha Agenda', path: '/freelancer/calendar' },
+    { icon: MapPin, label: 'Check-in', path: '/freelancer/checkin' },
     { icon: BookOpen, label: 'Cursos', path: '/freelancer/courses' },
     { icon: Wallet, label: 'Financeiro', path: '/freelancer/finance' },
   ];
@@ -53,37 +55,37 @@ const FreelancerHeader = () => {
             </button>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1">
+          {/* Desktop Navigation - Mais compacto */}
+          <nav className="hidden xl:flex items-center space-x-1">
             {menuItems.map((item) => (
               <Button
                 key={item.path}
                 variant="ghost"
                 size="sm"
                 onClick={() => handleNavigation(item.path)}
-                className="flex items-center space-x-2 px-3 py-2"
+                className="flex items-center space-x-1 px-2 py-1 text-xs"
               >
-                <item.icon className="w-4 h-4" />
-                <span className="text-sm">{item.label}</span>
+                <item.icon className="w-3 h-3" />
+                <span>{item.label}</span>
               </Button>
             ))}
           </nav>
 
           {/* User Info & Mobile Menu */}
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" className="hidden sm:flex">
+          <div className="flex items-center space-x-2">
+            <Button variant="ghost" size="sm" className="hidden sm:flex p-2">
               <Bell className="w-4 h-4" />
             </Button>
 
-            <div className="hidden sm:flex items-center space-x-3">
+            <div className="hidden lg:flex items-center space-x-2">
               <div className="flex items-center space-x-2">
-                <Avatar className="w-8 h-8">
+                <Avatar className="w-7 h-7">
                   <AvatarFallback className="text-xs">
                     {user?.name?.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
-                <div className="hidden md:block">
-                  <p className="text-sm font-medium">{user?.name}</p>
+                <div className="hidden xl:block">
+                  <p className="text-xs font-medium">{user?.name}</p>
                   <VerificationBadge />
                 </div>
               </div>
@@ -91,40 +93,41 @@ const FreelancerHeader = () => {
                 variant="ghost" 
                 size="sm" 
                 onClick={logout}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-gray-700 p-2"
               >
                 <LogOut className="w-4 h-4" />
               </Button>
             </div>
 
             {/* Mobile Menu */}
-            <div className="lg:hidden">
+            <div className="xl:hidden">
               <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="p-2">
                     <Menu className="w-5 h-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-72 p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-semibold">Menu</h2>
+                <SheetContent side="right" className="w-64 p-3">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-base font-semibold">Menu</h2>
                     <Button 
                       variant="ghost" 
                       size="sm" 
                       onClick={() => setIsMenuOpen(false)}
+                      className="p-1"
                     >
                       <X className="w-4 h-4" />
                     </Button>
                   </div>
 
-                  <div className="flex items-center space-x-3 mb-4 p-3 bg-gray-50 rounded-lg">
-                    <Avatar className="w-10 h-10">
-                      <AvatarFallback>
+                  <div className="flex items-center space-x-2 mb-3 p-2 bg-gray-50 rounded-lg">
+                    <Avatar className="w-8 h-8">
+                      <AvatarFallback className="text-xs">
                         {user?.name?.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium text-sm">{user?.name}</p>
+                      <p className="font-medium text-xs">{user?.name}</p>
                       <VerificationBadge />
                     </div>
                   </div>
@@ -135,23 +138,23 @@ const FreelancerHeader = () => {
                         key={item.path}
                         variant="ghost"
                         size="sm"
-                        className="w-full justify-start h-10"
+                        className="w-full justify-start h-8 px-2"
                         onClick={() => handleNavigation(item.path)}
                       >
-                        <item.icon className="w-4 h-4 mr-3" />
-                        <span className="text-sm">{item.label}</span>
+                        <item.icon className="w-3 h-3 mr-2" />
+                        <span className="text-xs">{item.label}</span>
                       </Button>
                     ))}
                     
-                    <div className="pt-2 border-t">
+                    <div className="pt-1 border-t">
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 h-10"
+                        className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 h-8 px-2"
                         onClick={logout}
                       >
-                        <LogOut className="w-4 h-4 mr-3" />
-                        <span className="text-sm">Sair</span>
+                        <LogOut className="w-3 h-3 mr-2" />
+                        <span className="text-xs">Sair</span>
                       </Button>
                     </div>
                   </nav>
