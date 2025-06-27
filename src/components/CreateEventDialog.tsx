@@ -3,10 +3,16 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EventFunction } from '@/components/EventContext';
 import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+
+interface Team {
+  id: string;
+  name: string;
+}
 
 interface CreateEventDialogProps {
   open: boolean;
@@ -18,9 +24,15 @@ interface CreateEventDialogProps {
     local: string;
     functions: Omit<EventFunction, 'id'>[];
   }) => void;
+  availableTeams?: Team[];
 }
 
-const CreateEventDialog: React.FC<CreateEventDialogProps> = ({ open, onOpenChange, onCreateEvent }) => {
+const CreateEventDialog: React.FC<CreateEventDialogProps> = ({ 
+  open, 
+  onOpenChange, 
+  onCreateEvent,
+  availableTeams = [] 
+}) => {
   const { toast } = useToast();
   const [newEvent, setNewEvent] = useState({
     name: '',
@@ -33,8 +45,14 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({ open, onOpenChang
     cargo: '',
     quantidade: 1,
     valor: 0,
-    requirements: ''
+    requirements: '',
+    team: 'Geral'
   });
+
+  // Default teams including "Geral"
+  const teams = availableTeams.length > 0 
+    ? [{ id: 'geral', name: 'Geral' }, ...availableTeams]
+    : [{ id: 'geral', name: 'Geral' }];
 
   const handleCreateEvent = () => {
     if (!newEvent.name || !newEvent.data || !newEvent.local || newEvent.functions.length === 0) {
@@ -54,6 +72,13 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({ open, onOpenChang
       local: '',
       functions: []
     });
+    setNewFunction({
+      cargo: '',
+      quantidade: 1,
+      valor: 0,
+      requirements: '',
+      team: 'Geral'
+    });
     onOpenChange(false);
   };
 
@@ -69,14 +94,21 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({ open, onOpenChang
 
     setNewEvent({
       ...newEvent,
-      functions: [...newEvent.functions, newFunction]
+      functions: [...newEvent.functions, { 
+        cargo: newFunction.cargo,
+        quantidade: newFunction.quantidade,
+        valor: newFunction.valor,
+        requirements: newFunction.requirements,
+        team: newFunction.team
+      }]
     });
 
     setNewFunction({
       cargo: '',
       quantidade: 1,
       valor: 0,
-      requirements: ''
+      requirements: '',
+      team: 'Geral'
     });
 
     toast({
@@ -153,6 +185,24 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({ open, onOpenChang
                 />
               </div>
               <div className="space-y-2">
+                <label className="text-sm font-medium">Equipe *</label>
+                <Select
+                  value={newFunction.team}
+                  onValueChange={(value) => setNewFunction({ ...newFunction, team: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecionar equipe" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teams.map((team) => (
+                      <SelectItem key={team.id} value={team.name}>
+                        {team.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
                 <label className="text-sm font-medium">Quantidade *</label>
                 <Input
                   type="number"
@@ -170,7 +220,7 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({ open, onOpenChang
                   onChange={(e) => setNewFunction({ ...newFunction, valor: parseFloat(e.target.value) || 0 })}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 col-span-2">
                 <label className="text-sm font-medium">Requisitos</label>
                 <Input
                   placeholder="Ex: Experiência mínima"
@@ -193,6 +243,9 @@ const CreateEventDialog: React.FC<CreateEventDialogProps> = ({ open, onOpenChang
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div>
                     <span className="font-medium">{func.cargo}</span>
+                    <span className="text-sm text-blue-600 ml-2">
+                      [{func.team || 'Geral'}]
+                    </span>
                     <span className="text-sm text-gray-600 ml-2">
                       ({func.quantidade}x) - R$ {func.valor}
                     </span>

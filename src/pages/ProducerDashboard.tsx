@@ -2,10 +2,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/components/AuthContext';
 import { useEvents } from '@/components/EventContext';
+import { useTeams } from '@/hooks/useTeams';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Briefcase } from 'lucide-react';
 
@@ -18,11 +18,13 @@ import ProducerProfile from '@/components/ProducerProfile';
 const ProducerDashboard = () => {
   const { user, logout } = useAuth();
   const { events, createEvent, updateApplicationStatus, getEventsByProducer, getApplicationsByEvent } = useEvents();
+  const { getTeamsByProducer } = useTeams();
   const { toast } = useToast();
   
   const [showCreateEvent, setShowCreateEvent] = useState(false);
 
   const userEvents = user ? getEventsByProducer(user.id) : [];
+  const userTeams = user ? getTeamsByProducer(user.id) : [];
 
   const handleCreateEvent = async (eventData: any) => {
     if (!user) return;
@@ -133,6 +135,7 @@ const ProducerDashboard = () => {
         open={showCreateEvent}
         onOpenChange={setShowCreateEvent}
         onCreateEvent={handleCreateEvent}
+        availableTeams={userTeams}
       />
     </div>
   );
