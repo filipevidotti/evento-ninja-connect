@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
@@ -65,7 +66,22 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const refreshEvents = async () => {
+  // Load events only once on mount
+  useEffect(() => {
+    loadEvents();
+  }, []);
+
+  // Load applications only when user changes
+  useEffect(() => {
+    if (user) {
+      loadApplications();
+    } else {
+      setApplications([]);
+    }
+  }, [user?.id]);
+
+  const loadEvents = async () => {
+    console.log('Loading events...');
     try {
       const { data: eventsData } = await supabase
         .from('events')
@@ -74,42 +90,42 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         .order('created_at', { ascending: false });
 
       if (eventsData) {
-        const eventsWithFunctions = await Promise.all(
-          eventsData.map(async (event) => {
-            const { data: functionsData } = await supabase
-              .from('functions')
-              .select('*')
-              .eq('evento_id', event.id);
+        const eventsWithDetails = [];
+        
+        for (const event of eventsData) {
+          const { data: functionsData } = await supabase
+            .from('functions')
+            .select('*')
+            .eq('evento_id', event.id);
 
-            const { data: producerData } = await supabase
-              .from('user_profiles')
-              .select('name')
-              .eq('id', event.produtor_id)
-              .single();
+          const { data: producerData } = await supabase
+            .from('user_profiles')
+            .select('name')
+            .eq('id', event.produtor_id)
+            .single();
 
-            return {
-              id: event.id,
-              name: event.name,
-              descricao: event.descricao || '',
-              data: event.data,
-              local: event.local,
-              produtor_id: event.produtor_id,
-              producer_name: producerData?.name || 'Produtor',
-              functions: functionsData || [],
-              status: event.status as 'open' | 'closed' | 'completed',
-              created_at: event.created_at
-            };
-          })
-        );
+          eventsWithDetails.push({
+            id: event.id,
+            name: event.name,
+            descricao: event.descricao || '',
+            data: event.data,
+            local: event.local,
+            produtor_id: event.produtor_id,
+            producer_name: producerData?.name || 'Produtor',
+            functions: functionsData || [],
+            status: event.status as 'open' | 'closed' | 'completed',
+            created_at: event.created_at
+          });
+        }
 
-        setEvents(eventsWithFunctions);
+        setEvents(eventsWithDetails);
       }
     } catch (error) {
-      console.error('Error fetching events:', error);
+      console.error('Error loading events:', error);
     }
   };
 
-  const refreshApplications = async () => {
+  const loadApplications = async () => {
     if (!user) return;
 
     try {
@@ -120,51 +136,47 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         .order('applied_at', { ascending: false });
 
       if (userApplicationsData) {
-        const enrichedApplications = await Promise.all(
-          userApplicationsData.map(async (app) => {
-            const { data: functionData } = await supabase
-              .from('functions')
-              .select(`
-                cargo,
-                events(name)
-              `)
-              .eq('id', app.function_id)
-              .single();
+        const enrichedApplications = [];
+        
+        for (const app of userApplicationsData) {
+          const { data: functionData } = await supabase
+            .from('functions')
+            .select(`
+              cargo,
+              events(name)
+            `)
+            .eq('id', app.function_id)
+            .single();
 
-            return {
-              id: app.id,
-              user_id: app.user_id,
-              function_id: app.function_id,
-              status: app.status as 'pendente' | 'aprovado' | 'recusado',
-              applied_at: app.applied_at,
-              user_name: user.name,
-              user_email: user.email,
-              event_name: functionData?.events?.name,
-              function_cargo: functionData?.cargo
-            };
-          })
-        );
+          enrichedApplications.push({
+            id: app.id,
+            user_id: app.user_id,
+            function_id: app.function_id,
+            status: app.status as 'pendente' | 'aprovado' | 'recusado',
+            applied_at: app.applied_at,
+            user_name: user.name,
+            user_email: user.email,
+            event_name: functionData?.events?.name,
+            function_cargo: functionData?.cargo
+          });
+        }
 
         setApplications(enrichedApplications);
       }
     } catch (error) {
-      console.error('Error fetching applications:', error);
+      console.error('Error loading applications:', error);
     }
   };
 
-  // Load events once on mount
-  useEffect(() => {
-    refreshEvents();
-  }, []);
+  const refreshEvents = async () => {
+    await loadEvents();
+  };
 
-  // Load applications when user changes
-  useEffect(() => {
+  const refreshApplications = async () => {
     if (user) {
-      refreshApplications();
-    } else {
-      setApplications([]);
+      await loadApplications();
     }
-  }, [user]);
+  };
 
   const createEvent = async (eventData: Omit<Event, 'id' | 'created_at' | 'producer_name' | 'functions'> & { functions: Omit<EventFunction, 'id'>[] }): Promise<boolean> => {
     if (!user) return false;
