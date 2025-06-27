@@ -10,6 +10,8 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import FreelancerDashboard from "./pages/FreelancerDashboard";
 import ProducerDashboard from "./pages/ProducerDashboard";
+import Plans from "./pages/Plans";
+import Success from "./pages/Success";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +51,8 @@ const App = () => (
             <Routes>
               <Route path="/" element={<PublicRoute><Index /></PublicRoute>} />
               <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+              <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
+              <Route path="/success" element={<Success />} />
               <Route 
                 path="/freelancer/dashboard" 
                 element={

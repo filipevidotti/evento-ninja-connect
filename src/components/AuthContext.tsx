@@ -1,5 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 
 export interface User {
   id: string;
@@ -16,6 +18,7 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   login: (email: string, password: string, type: 'freelancer' | 'producer') => Promise<boolean>;
   register: (userData: Omit<User, 'id'> & { password: string }) => Promise<boolean>;
   logout: () => void;
@@ -34,63 +37,112 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('event-platform-user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
+    // Set up auth state listener first
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
+        setSession(session);
+        
+        if (session?.user) {
+          const mockUser: User = {
+            id: session.user.id,
+            name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Usuário',
+            email: session.user.email || '',
+            type: session.user.user_metadata?.type || 'freelancer',
+            city: session.user.user_metadata?.city || 'São Paulo',
+            rating: session.user.user_metadata?.type === 'freelancer' ? 4.5 : undefined,
+            skills: session.user.user_metadata?.type === 'freelancer' ? ['Garçom', 'Operador de Caixa'] : undefined,
+            description: session.user.user_metadata?.type === 'freelancer' ? 'Profissional experiente em eventos' : 'Produtor de eventos corporativos'
+          };
+          setUser(mockUser);
+        } else {
+          setUser(null);
+        }
+      }
+    );
+
+    // Then check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user) {
+        const mockUser: User = {
+          id: session.user.id,
+          name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Usuário',
+          email: session.user.email || '',
+          type: session.user.user_metadata?.type || 'freelancer',
+          city: session.user.user_metadata?.city || 'São Paulo',
+          rating: session.user.user_metadata?.type === 'freelancer' ? 4.5 : undefined,
+          skills: session.user.user_metadata?.type === 'freelancer' ? ['Garçom', 'Operador de Caixa'] : undefined,
+          description: session.user.user_metadata?.type === 'freelancer' ? 'Profissional experiente em eventos' : 'Produtor de eventos corporativos'
+        };
+        setUser(mockUser);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const login = async (email: string, password: string, type: 'freelancer' | 'producer'): Promise<boolean> => {
-    // Simulação de login - em produção seria uma chamada real para API
-    console.log('Login attempt:', { email, password, type });
-    
-    // Mock user data
-    const mockUser: User = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: email.split('@')[0],
-      email,
-      type,
-      city: 'São Paulo',
-      rating: type === 'freelancer' ? 4.5 : undefined,
-      skills: type === 'freelancer' ? ['Garçom', 'Operador de Caixa'] : undefined,
-      description: type === 'freelancer' ? 'Profissional experiente em eventos' : 'Produtor de eventos corporativos'
-    };
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    setUser(mockUser);
-    localStorage.setItem('event-platform-user', JSON.stringify(mockUser));
-    return true;
+      if (error) throw error;
+
+      return true;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
+    }
   };
 
   const register = async (userData: Omit<User, 'id'> & { password: string }): Promise<boolean> => {
-    console.log('Register attempt:', userData);
-    
-    const newUser: User = {
-      ...userData,
-      id: Math.random().toString(36).substr(2, 9)
-    };
-    
-    setUser(newUser);
-    localStorage.setItem('event-platform-user', JSON.stringify(newUser));
-    return true;
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: userData.email,
+        password: userData.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            name: userData.name,
+            type: userData.type,
+            city: userData.city,
+            phone: userData.phone,
+            skills: userData.skills,
+            description: userData.description
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      return true;
+    } catch (error) {
+      console.error('Register error:', error);
+      return false;
+    }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await supabase.auth.signOut();
     setUser(null);
-    localStorage.removeItem('event-platform-user');
+    setSession(null);
   };
 
   const updateUser = (userData: Partial<User>) => {
     if (user) {
       const updatedUser = { ...user, ...userData };
       setUser(updatedUser);
-      localStorage.setItem('event-platform-user', JSON.stringify(updatedUser));
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, session, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
