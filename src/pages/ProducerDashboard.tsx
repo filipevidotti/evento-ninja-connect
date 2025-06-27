@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/components/AuthContext';
 import { useEvents } from '@/components/EventContext';
@@ -6,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Briefcase } from 'lucide-react';
 
 import ProducerHeader from '@/components/ProducerHeader';
@@ -19,6 +21,7 @@ const ProducerDashboard = () => {
   const { events, createEvent, updateApplicationStatus, getEventsByProducer, getApplicationsByEvent } = useEvents();
   const { getTeamsByProducer } = useTeams();
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   const [showCreateEvent, setShowCreateEvent] = useState(false);
 
@@ -130,10 +133,8 @@ const ProducerDashboard = () => {
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">Área Financeira</h3>
                   <p className="text-gray-500 mb-6">Gerencie seu saldo e aprove pagamentos de freelancers</p>
-                  <Button asChild>
-                    <a href="/producer/finance">
-                      Acessar Área Financeira
-                    </a>
+                  <Button onClick={() => navigate('/producer/finance')}>
+                    Acessar Área Financeira
                   </Button>
                 </div>
               </CardContent>
