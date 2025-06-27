@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/components/AuthContext';
 import { useEvents } from '@/components/EventContext';
@@ -65,9 +64,10 @@ const ProducerDashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="events" className="space-y-6">
           <div className="flex items-center justify-between">
-            <TabsList className="grid grid-cols-3 max-w-md">
+            <TabsList className="grid grid-cols-4 max-w-lg">
               <TabsTrigger value="events">Meus Eventos</TabsTrigger>
               <TabsTrigger value="applications">Candidaturas</TabsTrigger>
+              <TabsTrigger value="finance">Financeiro</TabsTrigger>
               <TabsTrigger value="profile">Perfil</TabsTrigger>
             </TabsList>
             
@@ -119,6 +119,25 @@ const ProducerDashboard = () => {
               getApplicationsByEvent={getApplicationsByEvent}
               onApplicationAction={handleApplicationAction}
             />
+          </TabsContent>
+
+          <TabsContent value="finance" className="space-y-6">
+            <Card>
+              <CardContent className="text-center py-12">
+                <div className="mb-4">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Briefcase className="w-8 h-8 text-green-600" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Área Financeira</h3>
+                  <p className="text-gray-500 mb-6">Gerencie seu saldo e aprove pagamentos de freelancers</p>
+                  <Button asChild>
+                    <a href="/producer/finance">
+                      Acessar Área Financeira
+                    </a>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-6">
