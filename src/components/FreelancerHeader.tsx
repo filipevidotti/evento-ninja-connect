@@ -33,14 +33,15 @@ const FreelancerHeader = () => {
             <Badge variant="secondary" className="text-xs sm:text-sm">Freelancer</Badge>
           </div>
           
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-4">
+          {/* Desktop Navigation - Melhorado para não quebrar */}
+          <div className="hidden lg:flex items-center space-x-2">
             <VerificationBadge />
             
             <Button 
               variant="ghost" 
+              size="sm"
               onClick={() => navigate('/freelancer/search-events')}
-              className="text-sm"
+              className="text-xs px-2"
             >
               <Search className="w-4 h-4 mr-1" />
               Buscar
@@ -48,8 +49,9 @@ const FreelancerHeader = () => {
             
             <Button 
               variant="ghost" 
+              size="sm"
               onClick={() => navigate('/freelancer/calendar')}
-              className="text-sm"
+              className="text-xs px-2"
             >
               <CalendarDays className="w-4 h-4 mr-1" />
               Calendário
@@ -57,8 +59,9 @@ const FreelancerHeader = () => {
             
             <Button 
               variant="ghost" 
+              size="sm"
               onClick={() => navigate('/freelancer/checkin')}
-              className="text-sm"
+              className="text-xs px-2"
             >
               <ClipboardCheck className="w-4 h-4 mr-1" />
               Check-in
@@ -66,8 +69,9 @@ const FreelancerHeader = () => {
             
             <Button 
               variant="ghost" 
+              size="sm"
               onClick={() => navigate('/freelancer/favorites')}
-              className="text-sm"
+              className="text-xs px-2"
             >
               <Heart className="w-4 h-4 mr-1" />
               Favoritos
@@ -75,34 +79,38 @@ const FreelancerHeader = () => {
             
             <Button 
               variant="ghost" 
+              size="sm"
               onClick={() => navigate('/freelancer/finance')}
-              className="text-sm"
+              className="text-xs px-2"
             >
               <CreditCard className="w-4 h-4 mr-1" />
               Financeiro
             </Button>
             
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/freelancer/reputation')}
-              className="text-sm"
-            >
-              Reputação
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/admin/dashboard')}
-              className="text-sm"
-            >
-              Admin
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-xs px-2">
+                  <Menu className="w-4 h-4 mr-1" />
+                  Mais
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => navigate('/freelancer/reputation')}>
+                  <Star className="w-4 h-4 mr-2" />
+                  Reputação
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/admin/dashboard')}>
+                  <Settings className="w-4 h-4 mr-2" />
+                  Admin
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             
             <div className="flex items-center space-x-2">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="text-sm">{user?.name?.charAt(0) || 'U'}</AvatarFallback>
               </Avatar>
-              <div className="hidden lg:block">
+              <div className="hidden xl:block">
                 <p className="font-medium text-sm">{user?.name}</p>
                 <div className="flex items-center space-x-1">
                   <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
@@ -115,7 +123,7 @@ const FreelancerHeader = () => {
           </div>
 
           {/* Mobile Navigation */}
-          <div className="md:hidden flex items-center space-x-2">
+          <div className="lg:hidden flex items-center space-x-2">
             <VerificationBadge />
             <Avatar className="h-8 w-8">
               <AvatarFallback className="text-sm">{user?.name?.charAt(0) || 'U'}</AvatarFallback>

@@ -3,11 +3,11 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, Clock, XCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle2, Clock, XCircle, AlertCircle, Shield } from 'lucide-react';
 
 interface Verification {
   id: string;
-  status: 'pendente' | 'aprovado' | 'rejeitado';
+  status: 'pendente' | 'aprovado' | 'rejeitado' | 'nao_verificado';
   tipo_documento: string;
   numero_documento: string;
   created_at: string;
@@ -26,6 +26,8 @@ export const VerificationStatus: React.FC<VerificationStatusProps> = ({ verifica
         return <CheckCircle2 className="w-8 h-8 text-green-500" />;
       case 'rejeitado':
         return <XCircle className="w-8 h-8 text-red-500" />;
+      case 'nao_verificado':
+        return <Shield className="w-8 h-8 text-gray-500" />;
       default:
         return <Clock className="w-8 h-8 text-yellow-500" />;
     }
@@ -37,6 +39,8 @@ export const VerificationStatus: React.FC<VerificationStatusProps> = ({ verifica
         return <Badge className="bg-green-100 text-green-800">Aprovado</Badge>;
       case 'rejeitado':
         return <Badge className="bg-red-100 text-red-800">Rejeitado</Badge>;
+      case 'nao_verificado':
+        return <Badge className="bg-gray-100 text-gray-800">Não Verificado</Badge>;
       default:
         return <Badge className="bg-yellow-100 text-yellow-800">Pendente</Badge>;
     }
@@ -53,6 +57,11 @@ export const VerificationStatus: React.FC<VerificationStatusProps> = ({ verifica
         return {
           title: 'Verificação rejeitada',
           description: 'Infelizmente não foi possível verificar sua identidade com os documentos enviados.'
+        };
+      case 'nao_verificado':
+        return {
+          title: 'Verificação necessária',
+          description: 'Você ainda não iniciou o processo de verificação de identidade.'
         };
       default:
         return {
@@ -91,36 +100,38 @@ export const VerificationStatus: React.FC<VerificationStatusProps> = ({ verifica
         </CardHeader>
         
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="font-medium text-gray-700">Tipo de documento:</span>
-              <p className="text-gray-900">
-                {verification.tipo_documento.toUpperCase()}
-              </p>
-            </div>
-            <div>
-              <span className="font-medium text-gray-700">Número:</span>
-              <p className="text-gray-900">
-                {verification.numero_documento}
-              </p>
-            </div>
-            <div>
-              <span className="font-medium text-gray-700">Enviado em:</span>
-              <p className="text-gray-900">
-                {formatDate(verification.created_at)}
-              </p>
-            </div>
-            {verification.data_verificacao && (
+          {verification.status !== 'nao_verificado' && (
+            <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="font-medium text-gray-700">
-                  {verification.status === 'aprovado' ? 'Aprovado em:' : 'Rejeitado em:'}
-                </span>
+                <span className="font-medium text-gray-700">Tipo de documento:</span>
                 <p className="text-gray-900">
-                  {formatDate(verification.data_verificacao)}
+                  {verification.tipo_documento.toUpperCase()}
                 </p>
               </div>
-            )}
-          </div>
+              <div>
+                <span className="font-medium text-gray-700">Número:</span>
+                <p className="text-gray-900">
+                  {verification.numero_documento}
+                </p>
+              </div>
+              <div>
+                <span className="font-medium text-gray-700">Enviado em:</span>
+                <p className="text-gray-900">
+                  {formatDate(verification.created_at)}
+                </p>
+              </div>
+              {verification.data_verificacao && (
+                <div>
+                  <span className="font-medium text-gray-700">
+                    {verification.status === 'aprovado' ? 'Aprovado em:' : 'Rejeitado em:'}
+                  </span>
+                  <p className="text-gray-900">
+                    {formatDate(verification.data_verificacao)}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           {verification.status === 'rejeitado' && verification.motivo_rejeicao && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -134,9 +145,9 @@ export const VerificationStatus: React.FC<VerificationStatusProps> = ({ verifica
             </div>
           )}
 
-          {verification.status === 'rejeitado' && (
+          {(verification.status === 'rejeitado' || verification.status === 'nao_verificado') && (
             <Button className="w-full" onClick={() => window.location.reload()}>
-              Tentar nova verificação
+              {verification.status === 'nao_verificado' ? 'Iniciar verificação' : 'Tentar nova verificação'}
             </Button>
           )}
         </CardContent>

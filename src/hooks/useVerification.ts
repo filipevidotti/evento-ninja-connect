@@ -10,7 +10,7 @@ interface VerificationData {
 
 interface Verification {
   id: string;
-  status: 'pendente' | 'aprovado' | 'rejeitado';
+  status: 'pendente' | 'aprovado' | 'rejeitado' | 'nao_verificado';
   tipo_documento: string;
   numero_documento: string;
   created_at: string;
@@ -19,14 +19,8 @@ interface Verification {
 }
 
 export const useVerification = () => {
-  const [verification, setVerification] = useState<Verification>({
-    id: '1',
-    status: 'aprovado',
-    tipo_documento: 'rg',
-    numero_documento: '123456789',
-    created_at: '2024-06-20',
-    data_verificacao: '2024-06-21'
-  });
+  // Simulando usuário não verificado por padrão
+  const [verification, setVerification] = useState<Verification | null>(null);
   const [loading, setLoading] = useState(false);
 
   const submitVerification = useCallback(async (data: VerificationData) => {
@@ -45,8 +39,17 @@ export const useVerification = () => {
   }, []);
 
   const checkVerificationStatus = useCallback(async () => {
-    // Mock - não faz nada
-  }, []);
+    // Mock - simula usuário não verificado
+    if (!verification) {
+      setVerification({
+        id: '0',
+        status: 'nao_verificado',
+        tipo_documento: '',
+        numero_documento: '',
+        created_at: new Date().toISOString()
+      });
+    }
+  }, [verification]);
 
   return {
     verification,

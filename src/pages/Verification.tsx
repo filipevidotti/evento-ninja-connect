@@ -76,8 +76,8 @@ const Verification = () => {
     );
   }
 
-  // Se já tem verificação, mostrar o status
-  if (verification) {
+  // Se já tem verificação aprovada ou pendente, mostrar o status
+  if (verification && verification.status !== 'nao_verificado') {
     return (
       <div className="min-h-screen bg-gray-50 p-4">
         <div className="max-w-2xl mx-auto">
@@ -100,7 +100,7 @@ const Verification = () => {
     { number: 1, title: "Tipo de Documento", completed: currentStep > 1 },
     { number: 2, title: "Foto do Documento", completed: currentStep > 2 },
     { number: 3, title: "Selfie", completed: currentStep > 3 },
-    { number: 4, title: "Confirmação", completed: currentStep > 4 }
+    { number: 4, title: "Envio para Aprovação", completed: currentStep > 4 }
   ];
 
   return (
@@ -136,13 +136,13 @@ const Verification = () => {
               `}>
                 {step.completed ? <CheckCircle2 className="w-5 h-5" /> : step.number}
               </div>
-              <span className={`ml-2 text-sm ${
+              <span className={`ml-2 text-sm hidden sm:block ${
                 step.completed || currentStep === step.number ? 'text-gray-900' : 'text-gray-500'
               }`}>
                 {step.title}
               </span>
               {index < steps.length - 1 && (
-                <div className={`ml-4 w-16 h-0.5 ${
+                <div className={`ml-4 w-8 sm:w-16 h-0.5 ${
                   step.completed ? 'bg-green-500' : 'bg-gray-300'
                 }`} />
               )}
@@ -153,10 +153,10 @@ const Verification = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              {currentStep === 1 && "Selecione o tipo de documento"}
-              {currentStep === 2 && "Envie a foto do documento"}
-              {currentStep === 3 && "Tire uma selfie"}
-              {currentStep === 4 && "Verificação enviada"}
+              {currentStep === 1 && "Etapa 1: Selecione o tipo de documento"}
+              {currentStep === 2 && "Etapa 2: Envie a foto do documento"}
+              {currentStep === 3 && "Etapa 3: Tire uma selfie"}
+              {currentStep === 4 && "Etapa 4: Verificação enviada"}
             </CardTitle>
             <CardDescription>
               {currentStep === 1 && "Escolha qual documento você deseja usar para verificação"}
@@ -206,7 +206,7 @@ const Verification = () => {
                   disabled={!documentNumber.trim()}
                   className="w-full"
                 >
-                  Continuar
+                  Continuar para Etapa 2
                 </Button>
               </div>
             )}

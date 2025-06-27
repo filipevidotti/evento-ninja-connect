@@ -15,7 +15,7 @@ const VerificationBadge = () => {
   }, [checkVerificationStatus]);
 
   const getVerificationStatus = () => {
-    if (!verification) {
+    if (!verification || verification.status === 'nao_verificado') {
       return {
         icon: Shield,
         text: 'Não verificado',
