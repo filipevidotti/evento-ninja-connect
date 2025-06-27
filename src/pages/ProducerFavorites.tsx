@@ -147,7 +147,7 @@ const ProducerFavorites = () => {
                             ))}
                           </div>
                           <Select onValueChange={(teamId) => handleAssignToTeam(freelancer.id, teamId)}>
-                            <SelectTrigger className="w-full mt-3" size="sm">
+                            <SelectTrigger className="w-full mt-3">
                               <SelectValue placeholder="Atribuir à equipe" />
                             </SelectTrigger>
                             <SelectContent>
