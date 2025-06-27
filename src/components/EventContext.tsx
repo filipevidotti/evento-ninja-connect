@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { useAuth } from './AuthContext';
 
@@ -59,7 +58,7 @@ export const useEvents = () => {
   return context;
 };
 
-// Dados mockados
+// Dados mockados expandidos
 const mockEvents: Event[] = [
   {
     id: '1',
@@ -94,8 +93,8 @@ const mockEvents: Event[] = [
     descricao: 'Cerimônia e festa de casamento',
     data: '2024-07-15',
     local: 'Rio de Janeiro - RJ',
-    produtor_id: '3',
-    producer_name: 'Ana Santos',
+    produtor_id: '2',
+    producer_name: 'João Silva',
     status: 'open',
     created_at: '2024-06-25',
     functions: [
@@ -105,15 +104,190 @@ const mockEvents: Event[] = [
         quantidade: 1,
         valor: 1200,
         requirements: 'Portfolio de casamentos'
+      },
+      {
+        id: '4',
+        cargo: 'Garçom',
+        quantidade: 8,
+        valor: 250,
+        requirements: 'Experiência em eventos sociais'
       }
     ]
+  },
+  {
+    id: '3',
+    name: 'Evento Corporativo XYZ',
+    descricao: 'Conferência anual da empresa XYZ',
+    data: '2024-08-20',
+    local: 'Belo Horizonte - MG',
+    produtor_id: '2',
+    producer_name: 'João Silva',
+    status: 'open',
+    created_at: '2024-06-20',
+    functions: [
+      {
+        id: '5',
+        cargo: 'Recepcionista',
+        quantidade: 4,
+        valor: 200,
+        requirements: 'Boa comunicação'
+      },
+      {
+        id: '6',
+        cargo: 'Técnico de Som',
+        quantidade: 2,
+        valor: 600,
+        requirements: 'Conhecimento em equipamentos de áudio'
+      }
+    ]
+  },
+  {
+    id: '4',
+    name: 'Festa de Aniversário 50 Anos',
+    descricao: 'Celebração de aniversário com 200 convidados',
+    data: '2024-09-10',
+    local: 'Brasília - DF',
+    produtor_id: '2',
+    producer_name: 'João Silva',
+    status: 'closed',
+    created_at: '2024-06-15',
+    functions: [
+      {
+        id: '7',
+        cargo: 'DJ',
+        quantidade: 1,
+        valor: 800,
+        requirements: 'Playlist variada'
+      },
+      {
+        id: '8',
+        cargo: 'Bartender',
+        quantidade: 2,
+        valor: 350,
+        requirements: 'Conhecimento em drinks'
+      }
+    ]
+  }
+];
+
+// Candidaturas fictícias
+const mockApplications: Application[] = [
+  {
+    id: '1',
+    user_id: 'freelancer1',
+    function_id: '1',
+    status: 'pendente',
+    applied_at: '2024-06-28T10:30:00Z',
+    user_name: 'Carlos Fotografo',
+    user_email: 'carlos@email.com',
+    event_name: 'Festival de Música 2024',
+    function_cargo: 'Fotógrafo'
+  },
+  {
+    id: '2',
+    user_id: 'freelancer2',
+    function_id: '1',
+    status: 'aprovado',
+    applied_at: '2024-06-27T15:20:00Z',
+    user_name: 'Ana Santos',
+    user_email: 'ana@email.com',
+    event_name: 'Festival de Música 2024',
+    function_cargo: 'Fotógrafo'
+  },
+  {
+    id: '3',
+    user_id: 'freelancer3',
+    function_id: '2',
+    status: 'pendente',
+    applied_at: '2024-06-28T09:15:00Z',
+    user_name: 'Pedro Oliveira',
+    user_email: 'pedro@email.com',
+    event_name: 'Festival de Música 2024',
+    function_cargo: 'Cinegrafista'
+  },
+  {
+    id: '4',
+    user_id: 'freelancer4',
+    function_id: '3',
+    status: 'aprovado',
+    applied_at: '2024-06-26T14:45:00Z',
+    user_name: 'Maria Silva',
+    user_email: 'maria@email.com',
+    event_name: 'Casamento Maria & Pedro',
+    function_cargo: 'Fotógrafo'
+  },
+  {
+    id: '5',
+    user_id: 'freelancer5',
+    function_id: '4',
+    status: 'pendente',
+    applied_at: '2024-06-28T11:30:00Z',
+    user_name: 'João Garçom',
+    user_email: 'joao@email.com',
+    event_name: 'Casamento Maria & Pedro',
+    function_cargo: 'Garçom'
+  },
+  {
+    id: '6',
+    user_id: 'freelancer6',
+    function_id: '4',
+    status: 'pendente',
+    applied_at: '2024-06-28T12:00:00Z',
+    user_name: 'Lucas Costa',
+    user_email: 'lucas@email.com',
+    event_name: 'Casamento Maria & Pedro',
+    function_cargo: 'Garçom'
+  },
+  {
+    id: '7',
+    user_id: 'freelancer7',
+    function_id: '5',
+    status: 'recusado',
+    applied_at: '2024-06-25T16:20:00Z',
+    user_name: 'Fernanda Lima',
+    user_email: 'fernanda@email.com',
+    event_name: 'Evento Corporativo XYZ',
+    function_cargo: 'Recepcionista'
+  },
+  {
+    id: '8',
+    user_id: 'freelancer8',
+    function_id: '5',
+    status: 'aprovado',
+    applied_at: '2024-06-26T08:30:00Z',
+    user_name: 'Roberto Santos',
+    user_email: 'roberto@email.com',
+    event_name: 'Evento Corporativo XYZ',
+    function_cargo: 'Recepcionista'
+  },
+  {
+    id: '9',
+    user_id: 'freelancer9',
+    function_id: '6',
+    status: 'pendente',
+    applied_at: '2024-06-28T13:45:00Z',
+    user_name: 'Diego Técnico',
+    user_email: 'diego@email.com',
+    event_name: 'Evento Corporativo XYZ',
+    function_cargo: 'Técnico de Som'
+  },
+  {
+    id: '10',
+    user_id: 'freelancer10',
+    function_id: '7',
+    status: 'aprovado',
+    applied_at: '2024-06-24T19:15:00Z',
+    user_name: 'Rafael DJ',
+    user_email: 'rafael@email.com',
+    event_name: 'Festa de Aniversário 50 Anos',
+    function_cargo: 'DJ'
   }
 ];
 
 export const EventProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const [events, setEvents] = useState<Event[]>(mockEvents);
-  const [applications, setApplications] = useState<Application[]>([]);
+  const [applications, setApplications] = useState<Application[]>(mockApplications);
   const [loading, setLoading] = useState(false);
 
   const refreshEvents = async () => {
