@@ -28,6 +28,14 @@ const FreelancerHeader = () => {
             {/* Navigation Buttons */}
             <Button 
               variant="ghost" 
+              onClick={() => navigate('/freelancer/reputation')}
+              className="text-sm"
+            >
+              Reputação
+            </Button>
+            
+            <Button 
+              variant="ghost" 
               onClick={() => navigate('/admin/dashboard')}
               className="text-sm"
             >

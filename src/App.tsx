@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,9 +12,11 @@ import FreelancerProfile from "./pages/FreelancerProfile";
 import FreelancerFinance from "./pages/FreelancerFinance";
 import FreelancerCalendar from "./pages/FreelancerCalendar";
 import FreelancerFavorites from "./pages/FreelancerFavorites";
+import FreelancerReputation from "./pages/FreelancerReputation";
 import ProducerDashboard from "./pages/ProducerDashboard";
 import ProducerSearchFreelancers from "./pages/ProducerSearchFreelancers";
 import ProducerTeamManagement from "./pages/ProducerTeamManagement";
+import ProducerComplaint from "./pages/ProducerComplaint";
 import Plans from "./pages/Plans";
 import Success from "./pages/Success";
 import NotFound from "./pages/NotFound";
@@ -25,6 +26,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminDisputes from "./pages/AdminDisputes";
 import AdminFinance from "./pages/AdminFinance";
+import AdminComplaints from "./pages/AdminComplaints";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +51,7 @@ const App = () => (
               <Route path="/admin/verifications" element={<AdminVerifications />} />
               <Route path="/admin/disputes" element={<AdminDisputes />} />
               <Route path="/admin/finance" element={<AdminFinance />} />
+              <Route path="/admin/complaints" element={<AdminComplaints />} />
               
               {/* Freelancer Routes */}
               <Route path="/freelancer/dashboard" element={<FreelancerDashboard />} />
@@ -56,11 +59,13 @@ const App = () => (
               <Route path="/freelancer/finance" element={<FreelancerFinance />} />
               <Route path="/freelancer/calendar" element={<FreelancerCalendar />} />
               <Route path="/freelancer/favorites" element={<FreelancerFavorites />} />
+              <Route path="/freelancer/reputation" element={<FreelancerReputation />} />
               
               {/* Producer Routes */}
               <Route path="/producer/dashboard" element={<ProducerDashboard />} />
               <Route path="/producer/search-freelancers" element={<ProducerSearchFreelancers />} />
               <Route path="/producer/team-management" element={<ProducerTeamManagement />} />
+              <Route path="/producer/complaint/:freelancerId" element={<ProducerComplaint />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>
