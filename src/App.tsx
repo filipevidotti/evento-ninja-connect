@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
@@ -81,8 +80,12 @@ function App() {
                 <Route path="/admin/disputes" element={<AdminDisputes />} />
                 <Route path="/admin/finance" element={<AdminFinance />} />
                 
-                {/* Public Routes */}
-                <Route path="/events" element={<PublicEvents />} />
+                {/* Public Events Routes - Dynamic routes for city and role */}
+                <Route path="/eventos" element={<PublicEvents />} />
+                <Route path="/eventos/:city" element={<PublicEvents />} />
+                <Route path="/eventos/:city/:role" element={<PublicEvents />} />
+                
+                {/* Other Public Routes */}
                 <Route path="/plans" element={<Plans />} />
                 <Route path="/success" element={<Success />} />
                 <Route path="/verification" element={<Verification />} />
