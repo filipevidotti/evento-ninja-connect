@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +16,8 @@ import Verification from "./pages/Verification";
 import AdminVerifications from "./pages/AdminVerifications";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
+import AdminDisputes from "./pages/AdminDisputes";
+import AdminFinance from "./pages/AdminFinance";
 
 const queryClient = new QueryClient();
 
@@ -99,6 +100,8 @@ const App = () => (
               <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
               <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
               <Route path="/admin/verifications" element={<AdminRoute><AdminVerifications /></AdminRoute>} />
+              <Route path="/admin/disputes" element={<AdminRoute><AdminDisputes /></AdminRoute>} />
+              <Route path="/admin/finance" element={<AdminRoute><AdminFinance /></AdminRoute>} />
               
               {/* User Routes */}
               <Route 
