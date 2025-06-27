@@ -43,7 +43,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [initialized, setInitialized] = useState(false);
 
   const fetchUserProfile = async (userId: string) => {
     try {
@@ -101,14 +100,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Simplified initialization - run only once
   useEffect(() => {
     let mounted = true;
 
-    const initializeAuth = async () => {
-      if (initialized) return;
-      
+    const initAuth = async () => {
       try {
-        // Get initial session
+        // Get current session
         const { data: { session } } = await supabase.auth.getSession();
         
         if (mounted) {
@@ -135,59 +133,60 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
           
           setLoading(false);
-          setInitialized(true);
         }
+
+        // Set up auth state listener
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (event, session) => {
+            if (!mounted) return;
+            
+            console.log('Auth state changed:', event);
+            
+            setSession(session);
+            
+            if (session?.user) {
+              const profile = await fetchUserProfile(session.user.id);
+              if (profile && mounted) {
+                setUser({
+                  id: profile.id,
+                  name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
+                  email: session.user.email || '',
+                  type: profile.user_type as 'freelancer' | 'producer',
+                  city: profile.city || '',
+                  phone: profile.phone || '',
+                  rating: profile.rating || 0,
+                  avatar: profile.avatar_url || '',
+                  skills: profile.skills || [],
+                  description: profile.description || '',
+                  courses: profile.courses || [],
+                  otherKnowledge: profile.other_knowledge || ''
+                });
+              } else if (mounted) {
+                setUser(null);
+              }
+            } else if (mounted) {
+              setUser(null);
+            }
+          }
+        );
+
+        return () => {
+          subscription.unsubscribe();
+        };
       } catch (error) {
         console.error('Error initializing auth:', error);
         if (mounted) {
           setLoading(false);
-          setInitialized(true);
         }
       }
     };
 
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!mounted || !initialized) return;
-        
-        console.log('Auth state changed:', event, session?.user?.email);
-        
-        setSession(session);
-        
-        if (session?.user) {
-          const profile = await fetchUserProfile(session.user.id);
-          if (profile && mounted) {
-            setUser({
-              id: profile.id,
-              name: profile.name || session.user.email?.split('@')[0] || 'Usuário',
-              email: session.user.email || '',
-              type: profile.user_type as 'freelancer' | 'producer',
-              city: profile.city || '',
-              phone: profile.phone || '',
-              rating: profile.rating || 0,
-              avatar: profile.avatar_url || '',
-              skills: profile.skills || [],
-              description: profile.description || '',
-              courses: profile.courses || [],
-              otherKnowledge: profile.other_knowledge || ''
-            });
-          } else if (mounted) {
-            setUser(null);
-          }
-        } else if (mounted) {
-          setUser(null);
-        }
-      }
-    );
-
-    initializeAuth();
+    initAuth();
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
     };
-  }, []);
+  }, []); // No dependencies to prevent loops
 
   const login = async (email: string, password: string, type: 'freelancer' | 'producer'): Promise<boolean> => {
     try {

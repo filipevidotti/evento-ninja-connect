@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
@@ -162,31 +161,12 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  // Load data only once when the component mounts
+  // Simple initialization - only load events once
   useEffect(() => {
-    let isMounted = true;
-    
-    const loadData = async () => {
-      if (!isMounted) return;
-      
-      setLoading(true);
-      await refreshEvents();
-      if (user) {
-        await refreshApplications();
-      }
-      if (isMounted) {
-        setLoading(false);
-      }
-    };
+    refreshEvents();
+  }, []);
 
-    loadData();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []); // Remove user dependency to prevent loops
-
-  // Separate effect for handling user changes
+  // Load user applications when user is available
   useEffect(() => {
     if (user) {
       refreshApplications();
