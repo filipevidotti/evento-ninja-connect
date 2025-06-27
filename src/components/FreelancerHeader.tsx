@@ -105,8 +105,8 @@ const FreelancerHeader = () => {
                     <Menu className="w-5 h-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-80">
-                  <div className="flex items-center justify-between mb-6">
+                <SheetContent side="right" className="w-72 p-4">
+                  <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg font-semibold">Menu</h2>
                     <Button 
                       variant="ghost" 
@@ -117,39 +117,41 @@ const FreelancerHeader = () => {
                     </Button>
                   </div>
 
-                  <div className="flex items-center space-x-3 mb-6 p-3 bg-gray-50 rounded-lg">
-                    <Avatar className="w-12 h-12">
+                  <div className="flex items-center space-x-3 mb-4 p-3 bg-gray-50 rounded-lg">
+                    <Avatar className="w-10 h-10">
                       <AvatarFallback>
                         {user?.name?.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium">{user?.name}</p>
+                      <p className="font-medium text-sm">{user?.name}</p>
                       <VerificationBadge />
                     </div>
                   </div>
 
-                  <nav className="space-y-2">
+                  <nav className="space-y-1">
                     {menuItems.map((item) => (
                       <Button
                         key={item.path}
                         variant="ghost"
-                        className="w-full justify-start"
+                        size="sm"
+                        className="w-full justify-start h-10"
                         onClick={() => handleNavigation(item.path)}
                       >
                         <item.icon className="w-4 h-4 mr-3" />
-                        {item.label}
+                        <span className="text-sm">{item.label}</span>
                       </Button>
                     ))}
                     
-                    <div className="pt-4 border-t">
+                    <div className="pt-2 border-t">
                       <Button
                         variant="ghost"
-                        className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                        size="sm"
+                        className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 h-10"
                         onClick={logout}
                       >
                         <LogOut className="w-4 h-4 mr-3" />
-                        Sair
+                        <span className="text-sm">Sair</span>
                       </Button>
                     </div>
                   </nav>
