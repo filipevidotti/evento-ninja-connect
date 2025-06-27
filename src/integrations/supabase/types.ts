@@ -9,7 +9,87 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          stripe_customer_id: string | null
+          subscribed: boolean
+          subscription_end: string | null
+          subscription_tier: string | null
+          updated_at: string
+          user_id: string | null
+          user_type: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
+          user_type: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
+          user_type?: string
+        }
+        Relationships: []
+      }
+      subscription_limits: {
+        Row: {
+          applications_made: number | null
+          created_at: string
+          events_created: number | null
+          id: string
+          monthly_limit_applications: number | null
+          monthly_limit_events: number | null
+          reset_date: string | null
+          subscription_tier: string
+          updated_at: string
+          user_id: string | null
+          user_type: string
+        }
+        Insert: {
+          applications_made?: number | null
+          created_at?: string
+          events_created?: number | null
+          id?: string
+          monthly_limit_applications?: number | null
+          monthly_limit_events?: number | null
+          reset_date?: string | null
+          subscription_tier?: string
+          updated_at?: string
+          user_id?: string | null
+          user_type: string
+        }
+        Update: {
+          applications_made?: number | null
+          created_at?: string
+          events_created?: number | null
+          id?: string
+          monthly_limit_applications?: number | null
+          monthly_limit_events?: number | null
+          reset_date?: string | null
+          subscription_tier?: string
+          updated_at?: string
+          user_id?: string | null
+          user_type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
