@@ -185,7 +185,7 @@ const ProducerSearchFreelancers = () => {
                   <Checkbox 
                     id="availability"
                     checked={availability}
-                    onCheckedChange={setAvailability}
+                    onCheckedChange={(checked) => setAvailability(checked === true)}
                   />
                   <label htmlFor="availability" className="text-sm">
                     Apenas disponíveis agora
@@ -242,7 +242,13 @@ const ProducerSearchFreelancers = () => {
                           <div className="flex items-center space-x-4">
                             <Checkbox 
                               checked={selectedFreelancers.includes(freelancer.id)}
-                              onCheckedChange={() => toggleSelection(freelancer.id)}
+                              onCheckedChange={(checked) => {
+                                if (checked === true) {
+                                  toggleSelection(freelancer.id);
+                                } else if (checked === false) {
+                                  toggleSelection(freelancer.id);
+                                }
+                              }}
                               disabled={!selectedFreelancers.includes(freelancer.id) && selectedFreelancers.length >= 3}
                             />
                             

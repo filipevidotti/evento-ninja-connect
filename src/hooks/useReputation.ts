@@ -26,7 +26,7 @@ export interface ReputationData {
   }[];
 }
 
-export const useReputation = () => {
+export const useReputation = (userId?: string) => {
   const [reputationData] = useState<ReputationData>({
     level: 'gold',
     points: 1245,
@@ -68,6 +68,44 @@ export const useReputation = () => {
       { month: 'Jan', points: 1245 }
     ]
   });
+
+  // Transform data to match expected interface
+  const reputation = {
+    level: reputationData.level,
+    points: reputationData.points
+  };
+
+  const reputationHistory = reputationData.monthlyProgress;
+
+  const metrics = {
+    completionRate: reputationData.completionRate,
+    attendanceRate: reputationData.attendanceRate,
+    averageRating: reputationData.averageRating,
+    complaints: reputationData.complaints.total,
+    validComplaints: reputationData.complaints.valid,
+    totalEvents: reputationData.totalEvents,
+    completedEvents: Math.round((reputationData.completionRate / 100) * reputationData.totalEvents),
+    attendedEvents: Math.round((reputationData.attendanceRate / 100) * reputationData.totalEvents),
+    totalReviews: Math.round(reputationData.totalEvents * 0.8) // Assuming 80% of events get reviews
+  };
+
+  const tips = [
+    {
+      title: 'Mantenha sua pontualidade',
+      description: 'Chegue sempre 15 minutos antes do evento começar',
+      points: '+5 pontos por evento'
+    },
+    {
+      title: 'Solicite avaliações',
+      description: 'Peça para os produtores te avaliarem após cada evento',
+      points: '+2-5 pontos extras'
+    },
+    {
+      title: 'Complete eventos consecutivos',
+      description: 'Complete 10 eventos seguidos sem problemas',
+      points: '+50 pontos bônus'
+    }
+  ];
 
   const getNextLevel = (currentLevel: ReputationLevel, points: number) => {
     if (currentLevel === 'bronze' && points >= 1000) return { level: 'silver', pointsNeeded: 1000 - points };
@@ -128,6 +166,10 @@ export const useReputation = () => {
   };
 
   return {
+    reputation,
+    reputationHistory,
+    metrics,
+    tips,
     reputationData,
     getNextLevel,
     getLevelRequirements
