@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -17,6 +16,8 @@ import ProducerDashboard from "./pages/ProducerDashboard";
 import ProducerSearchFreelancers from "./pages/ProducerSearchFreelancers";
 import ProducerTeamManagement from "./pages/ProducerTeamManagement";
 import ProducerCreateTeam from "./pages/ProducerCreateTeam";
+import ProducerFavorites from "./pages/ProducerFavorites";
+import ProducerEditTeam from "./pages/ProducerEditTeam";
 import ProducerComplaint from "./pages/ProducerComplaint";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
@@ -56,6 +57,8 @@ function App() {
                 <Route path="/producer/search-freelancers" element={<ProducerSearchFreelancers />} />
                 <Route path="/producer/team-management" element={<ProducerTeamManagement />} />
                 <Route path="/producer/create-team" element={<ProducerCreateTeam />} />
+                <Route path="/producer/favorites" element={<ProducerFavorites />} />
+                <Route path="/producer/edit-team/:teamId" element={<ProducerEditTeam />} />
                 <Route path="/producer/complaint/:freelancerId" element={<ProducerComplaint />} />
                 
                 {/* Admin Routes */}

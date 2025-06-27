@@ -59,6 +59,14 @@ const ProducerHeader: React.FC<ProducerHeaderProps> = ({ user, onLogout, onCreat
             
             <Button 
               variant="ghost" 
+              onClick={() => navigate('/producer/favorites')}
+              className="text-sm"
+            >
+              Favoritos
+            </Button>
+            
+            <Button 
+              variant="ghost" 
               onClick={() => navigate('/producer/create-team')}
               className="text-sm"
             >
@@ -113,6 +121,9 @@ const ProducerHeader: React.FC<ProducerHeaderProps> = ({ user, onLogout, onCreat
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate('/producer/search-freelancers')}>
                   Buscar Talentos
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/producer/favorites')}>
+                  Favoritos
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate('/producer/create-team')}>
                   Criar Equipe
