@@ -14,6 +14,8 @@ import FreelancerFinance from "./pages/FreelancerFinance";
 import FreelancerCalendar from "./pages/FreelancerCalendar";
 import FreelancerFavorites from "./pages/FreelancerFavorites";
 import ProducerDashboard from "./pages/ProducerDashboard";
+import ProducerSearchFreelancers from "./pages/ProducerSearchFreelancers";
+import ProducerTeamManagement from "./pages/ProducerTeamManagement";
 import Plans from "./pages/Plans";
 import Success from "./pages/Success";
 import NotFound from "./pages/NotFound";
@@ -57,6 +59,8 @@ const App = () => (
               
               {/* Producer Routes */}
               <Route path="/producer/dashboard" element={<ProducerDashboard />} />
+              <Route path="/producer/search-freelancers" element={<ProducerSearchFreelancers />} />
+              <Route path="/producer/team-management" element={<ProducerTeamManagement />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>

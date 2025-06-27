@@ -21,15 +21,43 @@ const ProducerHeader: React.FC<ProducerHeaderProps> = ({ user, onLogout, onCreat
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 
+              className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent cursor-pointer"
+              onClick={() => navigate('/producer/dashboard')}
+            >
               EventConnect
             </h1>
             <Badge variant="secondary" className="bg-purple-100 text-purple-800">Produtor</Badge>
           </div>
+          
           <div className="flex items-center space-x-4">
             <VerificationBadge />
             
             {/* Navigation Buttons */}
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/producer/dashboard')}
+              className="text-sm"
+            >
+              Dashboard
+            </Button>
+            
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/producer/search-freelancers')}
+              className="text-sm"
+            >
+              Buscar Talentos
+            </Button>
+            
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/producer/team-management')}
+              className="text-sm"
+            >
+              Gerenciar Equipes
+            </Button>
+            
             <Button 
               variant="ghost" 
               onClick={() => navigate('/admin/dashboard')}
