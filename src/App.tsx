@@ -67,7 +67,7 @@ function App() {
                 <Route path="/producer/search-freelancers" element={<ProducerSearchFreelancers />} />
                 <Route path="/producer/favorites" element={<ProducerFavorites />} />
                 <Route path="/producer/finance" element={<ProducerFinance />} />
-                <Route path="/producer/teams" element={<ProducerTeamManagement />} />
+                <Route path="/producer/team-management" element={<ProducerTeamManagement />} />
                 <Route path="/producer/teams/create" element={<ProducerCreateTeam />} />
                 <Route path="/producer/teams/edit/:teamId" element={<ProducerEditTeam />} />
                 <Route path="/producer/complaint" element={<ProducerComplaint />} />

@@ -104,6 +104,16 @@ const ApplicationsManager: React.FC<ApplicationsManagerProps> = ({
                 </div>
               );
             })}
+            
+            {events.every(event => getApplicationsByEvent(event.id).length === 0) && (
+              <div className="text-center py-8">
+                <Clock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">Nenhuma candidatura recebida ainda.</p>
+                <p className="text-sm text-gray-400 mt-2">
+                  Compartilhe seus eventos para receber candidaturas de freelancers.
+                </p>
+              </div>
+            )}
           </div>
         )}
       </CardContent>

@@ -39,9 +39,9 @@ const ProducerDashboard = () => {
       producer_name: 'Test Producer',
       created_at: '2024-01-01T00:00:00Z',
       functions: [
-        { id: 'f1', cargo: 'Garçom', quantidade: 8, valor: '150.00', requirements: 'Experiência mínima de 1 ano' },
-        { id: 'f2', cargo: 'Recepcionista', quantidade: 2, valor: '120.00', requirements: 'Boa comunicação' },
-        { id: 'f3', cargo: 'Segurança', quantidade: 2, valor: '180.00', requirements: 'Curso de segurança' }
+        { id: 'f1', cargo: 'Garçom', quantidade: 8, valor: 150.00, requirements: 'Experiência mínima de 1 ano' },
+        { id: 'f2', cargo: 'Recepcionista', quantidade: 2, valor: 120.00, requirements: 'Boa comunicação' },
+        { id: 'f3', cargo: 'Segurança', quantidade: 2, valor: 180.00, requirements: 'Curso de segurança' }
       ]
     },
     {
@@ -56,9 +56,9 @@ const ProducerDashboard = () => {
       producer_name: 'Test Producer',
       created_at: '2024-01-01T00:00:00Z',
       functions: [
-        { id: 'f4', cargo: 'Hostess', quantidade: 4, valor: '130.00', requirements: 'Inglês fluente' },
-        { id: 'f5', cargo: 'Técnico de Som', quantidade: 2, valor: '200.00', requirements: 'Experiência com equipamentos' },
-        { id: 'f6', cargo: 'Limpeza', quantidade: 3, valor: '100.00', requirements: 'Disponibilidade integral' }
+        { id: 'f4', cargo: 'Hostess', quantidade: 4, valor: 130.00, requirements: 'Inglês fluente' },
+        { id: 'f5', cargo: 'Técnico de Som', quantidade: 2, valor: 200.00, requirements: 'Experiência com equipamentos' },
+        { id: 'f6', cargo: 'Limpeza', quantidade: 3, valor: 100.00, requirements: 'Disponibilidade integral' }
       ]
     },
     {
@@ -73,10 +73,54 @@ const ProducerDashboard = () => {
       producer_name: 'Test Producer',
       created_at: '2024-01-01T00:00:00Z',
       functions: [
-        { id: 'f7', cargo: 'Garçom', quantidade: 6, valor: '140.00', requirements: 'Experiência em festas' },
-        { id: 'f8', cargo: 'DJ', quantidade: 1, valor: '300.00', requirements: 'Equipamento próprio' },
-        { id: 'f9', cargo: 'Decorador', quantidade: 2, valor: '250.00', requirements: 'Portfolio comprovado' }
+        { id: 'f7', cargo: 'Garçom', quantidade: 6, valor: 140.00, requirements: 'Experiência em festas' },
+        { id: 'f8', cargo: 'DJ', quantidade: 1, valor: 300.00, requirements: 'Equipamento próprio' },
+        { id: 'f9', cargo: 'Decorador', quantidade: 2, valor: 250.00, requirements: 'Portfolio comprovado' }
       ]
+    }
+  ];
+
+  // Candidaturas de teste
+  const mockApplications = [
+    {
+      id: 'app-1',
+      event_id: 'test-1',
+      user_id: 'user-1',
+      user_name: 'João Silva',
+      user_email: 'joao@email.com',
+      function_id: 'f1',
+      status: 'pendente' as const,
+      applied_at: '2024-02-10T10:00:00Z'
+    },
+    {
+      id: 'app-2',
+      event_id: 'test-1',
+      user_id: 'user-2',
+      user_name: 'Maria Santos',
+      user_email: 'maria@email.com',
+      function_id: 'f2',
+      status: 'aprovado' as const,
+      applied_at: '2024-02-09T14:30:00Z'
+    },
+    {
+      id: 'app-3',
+      event_id: 'test-2',
+      user_id: 'user-3',
+      user_name: 'Pedro Costa',
+      user_email: 'pedro@email.com',
+      function_id: 'f4',
+      status: 'pendente' as const,
+      applied_at: '2024-02-11T09:15:00Z'
+    },
+    {
+      id: 'app-4',
+      event_id: 'test-2',
+      user_id: 'user-4',
+      user_name: 'Ana Oliveira',
+      user_email: 'ana@email.com',
+      function_id: 'f5',
+      status: 'aprovado' as const,
+      applied_at: '2024-02-08T16:45:00Z'
     }
   ];
 
@@ -84,6 +128,11 @@ const ProducerDashboard = () => {
   const userEvents = user ? getEventsByProducer(user.id) : [];
   const displayEvents = userEvents.length > 0 ? userEvents : mockTestEvents;
   const userTeams = user ? getTeamsByProducer(user.id) : [];
+
+  // Mock da função getApplicationsByEvent para usar dados de teste
+  const getMockApplicationsByEvent = (eventId: string) => {
+    return mockApplications.filter(app => app.event_id === eventId);
+  };
 
   const handleCreateEvent = async (eventData: any) => {
     if (!user) return;
@@ -164,8 +213,8 @@ const ProducerDashboard = () => {
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {displayEvents.map(event => {
-                    const eventApplications = getApplicationsByEvent(event.id);
-                    const totalApplications = eventApplications.length || Math.floor(Math.random() * 15) + 5; // Mock data
+                    const eventApplications = userEvents.length > 0 ? getApplicationsByEvent(event.id) : getMockApplicationsByEvent(event.id);
+                    const totalApplications = eventApplications.length || Math.floor(Math.random() * 15) + 5;
                     const approvedApplications = eventApplications.filter(app => app.status === 'aprovado').length || Math.floor(totalApplications * 0.7);
                     
                     return (
@@ -185,7 +234,7 @@ const ProducerDashboard = () => {
           <TabsContent value="applications" className="space-y-6">
             <ApplicationsManager
               events={displayEvents}
-              getApplicationsByEvent={getApplicationsByEvent}
+              getApplicationsByEvent={userEvents.length > 0 ? getApplicationsByEvent : getMockApplicationsByEvent}
               onApplicationAction={handleApplicationAction}
             />
           </TabsContent>
@@ -211,7 +260,7 @@ const ProducerDashboard = () => {
             <ProducerProfile
               user={user}
               events={displayEvents}
-              getApplicationsByEvent={getApplicationsByEvent}
+              getApplicationsByEvent={userEvents.length > 0 ? getApplicationsByEvent : getMockApplicationsByEvent}
             />
           </TabsContent>
         </Tabs>
