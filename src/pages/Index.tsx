@@ -18,7 +18,11 @@ import {
   UtensilsCrossed,
   ShieldCheck,
   Calculator,
-  Sparkles
+  Sparkles,
+  ChefHat,
+  Camera,
+  Music,
+  Car
 } from 'lucide-react';
 
 const Index = () => {
@@ -46,38 +50,82 @@ const Index = () => {
     {
       title: "Garçom",
       description: "Serviço de mesa em eventos corporativos e sociais",
-      icon: <UtensilsCrossed className="w-8 h-8 text-blue-600" />,
+      icon: <UtensilsCrossed className="w-6 h-6" />,
       salary: "R$ 150-250",
       vacancies: "120+ vagas",
       slug: "garcom",
-      gradient: "from-blue-500 to-blue-600"
+      gradient: "from-blue-500 to-blue-600",
+      bgColor: "bg-blue-50"
     },
     {
       title: "Segurança",
       description: "Segurança patrimonial e controle de acesso",
-      icon: <ShieldCheck className="w-8 h-8 text-red-600" />,
+      icon: <ShieldCheck className="w-6 h-6" />,
       salary: "R$ 180-300",
       vacancies: "80+ vagas",
       slug: "seguranca",
-      gradient: "from-red-500 to-red-600"
+      gradient: "from-red-500 to-red-600",
+      bgColor: "bg-red-50"
     },
     {
       title: "Operador de Caixa",
       description: "Operação de caixa e atendimento ao cliente",
-      icon: <Calculator className="w-8 h-8 text-green-600" />,
+      icon: <Calculator className="w-6 h-6" />,
       salary: "R$ 160-220",
       vacancies: "45+ vagas",
       slug: "operador-de-caixa",
-      gradient: "from-green-500 to-green-600"
+      gradient: "from-green-500 to-green-600",
+      bgColor: "bg-green-50"
     },
     {
       title: "Limpeza",
       description: "Limpeza e organização de espaços para eventos",
-      icon: <Sparkles className="w-8 h-8 text-purple-600" />,
+      icon: <Sparkles className="w-6 h-6" />,
       salary: "R$ 120-180",
       vacancies: "60+ vagas",
       slug: "limpeza",
-      gradient: "from-purple-500 to-purple-600"
+      gradient: "from-purple-500 to-purple-600",
+      bgColor: "bg-purple-50"
+    },
+    {
+      title: "Churrasqueiro",
+      description: "Preparo de churrasco e grelhados em eventos",
+      icon: <ChefHat className="w-6 h-6" />,
+      salary: "R$ 200-350",
+      vacancies: "35+ vagas",
+      slug: "churrasqueiro",
+      gradient: "from-orange-500 to-orange-600",
+      bgColor: "bg-orange-50"
+    },
+    {
+      title: "Fotógrafo",
+      description: "Cobertura fotográfica de eventos sociais e corporativos",
+      icon: <Camera className="w-6 h-6" />,
+      salary: "R$ 300-600",
+      vacancies: "25+ vagas",
+      slug: "fotografo",
+      gradient: "from-indigo-500 to-indigo-600",
+      bgColor: "bg-indigo-50"
+    },
+    {
+      title: "DJ / Som",
+      description: "Sonorização e animação musical para eventos",
+      icon: <Music className="w-6 h-6" />,
+      salary: "R$ 250-500",
+      vacancies: "40+ vagas",
+      slug: "dj-som",
+      gradient: "from-pink-500 to-pink-600",
+      bgColor: "bg-pink-50"
+    },
+    {
+      title: "Manobrista",
+      description: "Serviços de estacionamento e manobrista",
+      icon: <Car className="w-6 h-6" />,
+      salary: "R$ 140-200",
+      vacancies: "55+ vagas",
+      slug: "manobrista",
+      gradient: "from-teal-500 to-teal-600",
+      bgColor: "bg-teal-50"
     }
   ];
 
@@ -208,25 +256,25 @@ const Index = () => {
             {jobOpportunities.map((job, index) => (
               <Card 
                 key={index} 
-                className="hover:shadow-xl transition-all duration-300 cursor-pointer group border-0 bg-white overflow-hidden"
+                className="hover:shadow-xl transition-all duration-300 cursor-pointer group border-0 bg-white overflow-hidden h-full"
                 onClick={() => navigate(`/eventos/sao-paulo/${job.slug}`)}
               >
                 <CardHeader className="text-center pb-4">
-                  <div className={`mx-auto mb-4 p-4 bg-gradient-to-r ${job.gradient} rounded-2xl w-fit group-hover:scale-110 transition-transform duration-300`}>
-                    <div className="text-white">
+                  <div className={`mx-auto mb-4 p-4 ${job.bgColor} rounded-2xl w-fit group-hover:scale-110 transition-transform duration-300`}>
+                    <div className={`bg-gradient-to-r ${job.gradient} bg-clip-text text-transparent`}>
                       {job.icon}
                     </div>
                   </div>
-                  <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
+                  <CardTitle className="text-lg group-hover:text-blue-600 transition-colors">
                     {job.title}
                   </CardTitle>
-                  <CardDescription className="text-sm">
+                  <CardDescription className="text-sm min-h-[2.5rem] flex items-center justify-center">
                     {job.description}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="text-center space-y-3">
                   <div className="space-y-2">
-                    <div className="flex items-center justify-center gap-2 text-green-600 font-semibold">
+                    <div className="flex items-center justify-center gap-2 text-green-600 font-semibold text-sm">
                       <DollarSign className="w-4 h-4" />
                       {job.salary}
                     </div>
@@ -237,6 +285,7 @@ const Index = () => {
                   <Button 
                     className="w-full group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 transition-all duration-300"
                     variant="outline"
+                    size="sm"
                   >
                     Ver Vagas
                     <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
