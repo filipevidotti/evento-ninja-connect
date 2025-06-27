@@ -29,7 +29,6 @@ const FreelancerProfile = () => {
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && portfolio.length < 9) {
-      // Simular upload de imagem
       const newImages = Array.from(files).slice(0, 9 - portfolio.length);
       setPortfolio(prev => [...prev, ...newImages.map(file => URL.createObjectURL(file))]);
     }
@@ -45,34 +44,34 @@ const FreelancerProfile = () => {
       <FreelancerHeader />
       <BreadcrumbNav items={breadcrumbItems} />
       
-      <div className="max-w-6xl mx-auto p-6 space-y-6">
+      <div className="max-w-6xl mx-auto p-4 lg:p-6 space-y-6">
         {/* Header */}
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center space-x-6">
-                <Avatar className="w-24 h-24">
+          <CardContent className="p-4 lg:p-6">
+            <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+              <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-4 lg:space-y-0 lg:space-x-6">
+                <Avatar className="w-20 h-20 lg:w-24 lg:h-24">
                   <AvatarImage src={user?.avatar} />
-                  <AvatarFallback className="text-2xl">
+                  <AvatarFallback className="text-xl lg:text-2xl">
                     {user?.name?.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
-                <div>
-                  <div className="flex items-center space-x-2 mb-2">
-                    <h1 className="text-3xl font-bold">{user?.name}</h1>
+                <div className="text-center lg:text-left">
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:space-x-2 mb-2">
+                    <h1 className="text-2xl lg:text-3xl font-bold">{user?.name}</h1>
                     <VerificationBadge />
                   </div>
-                  <div className="flex items-center space-x-4 text-gray-600 mb-2">
-                    <div className="flex items-center space-x-1">
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:space-x-4 text-gray-600 mb-2 space-y-1 lg:space-y-0">
+                    <div className="flex items-center justify-center lg:justify-start space-x-1">
                       <MapPin className="w-4 h-4" />
                       <span>{user?.city}</span>
                     </div>
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center justify-center lg:justify-start space-x-1">
                       <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                       <span>{user?.rating || 'Novo'} • 12 eventos</span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2 mb-3">
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:space-x-2 mb-3 space-y-2 lg:space-y-0">
                     <Badge variant={isAvailable ? "default" : "secondary"}>
                       {isAvailable ? "Disponível" : "Ocupado"}
                     </Badge>
@@ -80,13 +79,14 @@ const FreelancerProfile = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => setIsAvailable(!isAvailable)}
+                      className="w-full lg:w-auto"
                     >
                       <Edit className="w-4 h-4 mr-1" />
                       Alterar Status
                     </Button>
                   </div>
                   {/* Medalha de Reputação */}
-                  <div className="mt-2">
+                  <div className="flex justify-center lg:justify-start mt-2">
                     <ReputationBadge 
                       level="gold" 
                       points={1250} 
@@ -95,7 +95,7 @@ const FreelancerProfile = () => {
                   </div>
                 </div>
               </div>
-              <Button onClick={shareProfile} variant="outline">
+              <Button onClick={shareProfile} variant="outline" className="w-full lg:w-auto">
                 <Share2 className="w-4 h-4 mr-2" />
                 Compartilhar Perfil
               </Button>
@@ -104,13 +104,21 @@ const FreelancerProfile = () => {
         </Card>
 
         <Tabs defaultValue="about" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="about">Sobre</TabsTrigger>
-            <TabsTrigger value="courses">Cursos</TabsTrigger>
-            <TabsTrigger value="portfolio">Portfólio</TabsTrigger>
-            <TabsTrigger value="history">Histórico</TabsTrigger>
-            <TabsTrigger value="reviews">Avaliações</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5">
+            <TabsTrigger value="about" className="text-xs lg:text-sm">Sobre</TabsTrigger>
+            <TabsTrigger value="courses" className="text-xs lg:text-sm">Cursos</TabsTrigger>
+            <TabsTrigger value="portfolio" className="text-xs lg:text-sm">Portfólio</TabsTrigger>
+            <TabsTrigger value="history" className="text-xs lg:text-sm hidden lg:inline-flex">Histórico</TabsTrigger>
+            <TabsTrigger value="reviews" className="text-xs lg:text-sm hidden lg:inline-flex">Avaliações</TabsTrigger>
           </TabsList>
+
+          {/* Tabs extras para mobile */}
+          <div className="lg:hidden">
+            <TabsList className="grid w-full grid-cols-2 mt-2">
+              <TabsTrigger value="history" className="text-xs">Histórico</TabsTrigger>
+              <TabsTrigger value="reviews" className="text-xs">Avaliações</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="about" className="space-y-6">
             <Card>

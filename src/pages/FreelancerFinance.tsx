@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -49,6 +50,13 @@ const FreelancerFinance = () => {
   const handleWithdrawRequest = () => {
     // Função para solicitar saque
     alert('Solicitação de saque enviada com sucesso!');
+  };
+
+  const chartConfig = {
+    earnings: {
+      label: "Ganhos",
+      color: "#3b82f6",
+    },
   };
 
   return (
@@ -179,12 +187,20 @@ const FreelancerFinance = () => {
         </div>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
             <TabsTrigger value="overview" className="text-xs lg:text-sm">Visão Geral</TabsTrigger>
             <TabsTrigger value="transactions" className="text-xs lg:text-sm">Transações</TabsTrigger>
-            <TabsTrigger value="simulator" className="text-xs lg:text-sm">Simulador</TabsTrigger>
-            <TabsTrigger value="settings" className="text-xs lg:text-sm">Configurações</TabsTrigger>
+            <TabsTrigger value="simulator" className="text-xs lg:text-sm hidden lg:inline-flex">Simulador</TabsTrigger>
+            <TabsTrigger value="settings" className="text-xs lg:text-sm hidden lg:inline-flex">Configurações</TabsTrigger>
           </TabsList>
+
+          {/* Tabs extras para mobile */}
+          <div className="lg:hidden">
+            <TabsList className="grid w-full grid-cols-2 mt-2">
+              <TabsTrigger value="simulator" className="text-xs">Simulador</TabsTrigger>
+              <TabsTrigger value="settings" className="text-xs">Configurações</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="overview" className="space-y-6">
             <Card>
@@ -193,13 +209,30 @@ const FreelancerFinance = () => {
                 <CardDescription>Evolução dos seus ganhos nos últimos 6 meses</CardDescription>
               </CardHeader>
               <CardContent>
-                <ChartContainer config={{}} className="h-64 lg:h-80">
+                <ChartContainer config={chartConfig} className="h-64 lg:h-80">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={earningsData}>
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="earnings" fill="#3b82f6" />
+                    <BarChart data={earningsData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                      <XAxis 
+                        dataKey="month" 
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: '#666', fontSize: 12 }}
+                      />
+                      <YAxis 
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: '#666', fontSize: 12 }}
+                        tickFormatter={(value) => `R$ ${value}`}
+                      />
+                      <ChartTooltip 
+                        content={<ChartTooltipContent />}
+                        formatter={(value: any) => [`R$ ${value}`, 'Ganhos']}
+                      />
+                      <Bar 
+                        dataKey="earnings" 
+                        fill={chartConfig.earnings.color}
+                        radius={[4, 4, 0, 0]}
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </ChartContainer>
