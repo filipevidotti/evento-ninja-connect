@@ -10,20 +10,21 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import FreelancerDashboard from "./pages/FreelancerDashboard";
 import ProducerDashboard from "./pages/ProducerDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import Plans from "./pages/Plans";
 import Success from "./pages/Success";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const ProtectedRoute = ({ children, allowedType }: { children: React.ReactNode, allowedType?: 'freelancer' | 'producer' }) => {
+const ProtectedRoute = ({ children, allowedType }: { children: React.ReactNode, allowedType?: 'freelancer' | 'producer' | 'admin' }) => {
   const { user } = useAuth();
   
   if (!user) {
     return <Navigate to="/login" replace />;
   }
   
-  if (allowedType && user.type !== allowedType) {
+  if (allowedType && allowedType !== 'admin' && user.type !== allowedType) {
     return <Navigate to={user.type === 'freelancer' ? '/freelancer/dashboard' : '/producer/dashboard'} replace />;
   }
   
@@ -66,6 +67,14 @@ const App = () => (
                 element={
                   <ProtectedRoute allowedType="producer">
                     <ProducerDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/dashboard" 
+                element={
+                  <ProtectedRoute allowedType="admin">
+                    <AdminDashboard />
                   </ProtectedRoute>
                 } 
               />
