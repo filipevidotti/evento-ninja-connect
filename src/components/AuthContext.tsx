@@ -65,9 +65,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const refreshUser = async () => {
-    setLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+      
       if (session?.user) {
         const profile = await fetchUserProfile(session.user.id);
         if (profile) {
@@ -85,10 +86,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             courses: profile.courses || [],
             otherKnowledge: profile.other_knowledge || ''
           });
+        } else {
+          setUser(null);
         }
       } else {
         setUser(null);
       }
+    } catch (error) {
+      console.error('Error refreshing user:', error);
+      setUser(null);
+      setSession(null);
     } finally {
       setLoading(false);
     }
@@ -97,6 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let mounted = true;
 
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.email);
@@ -122,6 +130,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               courses: profile.courses || [],
               otherKnowledge: profile.other_knowledge || ''
             });
+          } else if (mounted) {
+            setUser(null);
           }
         } else if (mounted) {
           setUser(null);
@@ -134,16 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     // Initial session check
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (mounted) {
-        setSession(session);
-        if (session?.user) {
-          refreshUser();
-        } else {
-          setLoading(false);
-        }
-      }
-    });
+    refreshUser();
 
     return () => {
       mounted = false;
@@ -159,7 +160,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Login error:', error);
+        return false;
+      }
       return true;
     } catch (error) {
       console.error('Login error:', error);
@@ -190,7 +194,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Register error:', error);
+        return false;
+      }
       return true;
     } catch (error) {
       console.error('Register error:', error);
@@ -227,7 +234,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         })
         .eq('id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Update user error:', error);
+        return false;
+      }
 
       setUser(prev => prev ? { ...prev, ...userData } : null);
       return true;
