@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
-import { Wallet, TrendingUp, Calendar, Download, CreditCard } from 'lucide-react';
+import { Wallet, TrendingUp, Calendar, Download, CreditCard, DollarSign, Clock } from 'lucide-react';
 
 const FreelancerFinance = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('this-month');
@@ -42,6 +42,11 @@ const FreelancerFinance = () => {
     }
   };
 
+  const handleWithdrawRequest = () => {
+    // Função para solicitar saque
+    alert('Solicitação de saque enviada com sucesso!');
+  };
+
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -63,7 +68,29 @@ const FreelancerFinance = () => {
       </div>
 
       {/* Cards de Resumo */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Saldo Disponível</CardTitle>
+            <DollarSign className="h-4 w-4 text-green-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">R$ 1.850</div>
+            <p className="text-xs text-muted-foreground">Pronto para saque</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Aguardando Liberação</CardTitle>
+            <Clock className="h-4 w-4 text-orange-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-orange-600">R$ 1.000</div>
+            <p className="text-xs text-muted-foreground">Em processamento</p>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Ganhos Este Mês</CardTitle>
@@ -107,6 +134,18 @@ const FreelancerFinance = () => {
             <p className="text-xs text-muted-foreground">Previsão para próxima semana</p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Botão de Solicitação de Saque */}
+      <div className="flex justify-center">
+        <Button 
+          onClick={handleWithdrawRequest}
+          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
+          size="lg"
+        >
+          <DollarSign className="w-5 h-5 mr-2" />
+          Solicitar Saque
+        </Button>
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
