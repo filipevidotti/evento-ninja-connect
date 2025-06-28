@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { User, Edit, Save, X, Plus, Award } from 'lucide-react';
+import { User, Edit, Save, X, Plus, Award, Phone } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useCourses } from '@/hooks/useCourses';
@@ -19,6 +20,8 @@ const EditableProfile = () => {
     name: user?.name || '',
     city: user?.city || '',
     phone: user?.phone || '',
+    whatsapp: user?.whatsapp || '',
+    referencePhone: user?.referencePhone || '',
     description: user?.description || '',
     skills: user?.skills || []
   });
@@ -54,6 +57,8 @@ const EditableProfile = () => {
       name: user?.name || '',
       city: user?.city || '',
       phone: user?.phone || '',
+      whatsapp: user?.whatsapp || '',
+      referencePhone: user?.referencePhone || '',
       description: user?.description || '',
       skills: user?.skills || []
     });
@@ -152,19 +157,6 @@ const EditableProfile = () => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Telefone</label>
-            {isEditing ? (
-              <Input
-                value={editedUser.phone}
-                onChange={(e) => setEditedUser({ ...editedUser, phone: e.target.value })}
-                placeholder="Seu telefone"
-              />
-            ) : (
-              <p className="text-sm py-2">{user?.phone || 'Não informado'}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
             <label className="text-sm font-medium">Descrição</label>
             {isEditing ? (
               <Textarea
@@ -237,6 +229,59 @@ const EditableProfile = () => {
         </CardContent>
       </Card>
 
+      {/* Seção de Contato */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Phone className="w-5 h-5" />
+            Informações de Contato
+          </CardTitle>
+          <CardDescription>Seus dados de contato para comunicação</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Telefone</label>
+              {isEditing ? (
+                <Input
+                  value={editedUser.phone}
+                  onChange={(e) => setEditedUser({ ...editedUser, phone: e.target.value })}
+                  placeholder="(11) 99999-9999"
+                />
+              ) : (
+                <p className="text-sm py-2">{user?.phone || 'Não informado'}</p>
+              )}
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">WhatsApp</label>
+              {isEditing ? (
+                <Input
+                  value={editedUser.whatsapp}
+                  onChange={(e) => setEditedUser({ ...editedUser, whatsapp: e.target.value })}
+                  placeholder="(11) 99999-9999"
+                />
+              ) : (
+                <p className="text-sm py-2">{user?.whatsapp || 'Não informado'}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Telefone de Referência</label>
+            {isEditing ? (
+              <Input
+                value={editedUser.referencePhone}
+                onChange={(e) => setEditedUser({ ...editedUser, referencePhone: e.target.value })}
+                placeholder="(11) 99999-9999 - Contato de emergência"
+              />
+            ) : (
+              <p className="text-sm py-2">{user?.referencePhone || 'Não informado'}</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Cursos Concluídos */}
       {user?.type === 'freelancer' && completedCourses.length > 0 && (
         <Card>
@@ -253,7 +298,7 @@ const EditableProfile = () => {
                 <div key={course.id} className="border rounded-lg p-4 bg-green-50">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h4 className="font-mediu0m text-sm">{course.title}</h4>
+                      <h4 className="font-medium text-sm">{course.title}</h4>
                       <p className="text-xs text-gray-600 mt-1">{course.category}</p>
                       <p className="text-xs text-gray-500 mt-2">
                         Concluído em {new Date(course.completed_at).toLocaleDateString('pt-BR')}

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Star, MapPin, Calendar, Share2, Camera, Edit, Award, Save, X, Plus } from 'lucide-react';
+import { Star, MapPin, Calendar, Share2, Camera, Edit, Award, Save, X, Plus, Phone } from 'lucide-react';
 import { useAuth } from '@/components/AuthContext';
 import VerificationBadge from '@/components/VerificationBadge';
 import BreadcrumbNav from '@/components/BreadcrumbNav';
@@ -28,10 +27,14 @@ const FreelancerProfile = () => {
   const [isAvailable, setIsAvailable] = useState(true);
   const [isEditingAbout, setIsEditingAbout] = useState(false);
   const [isEditingSkills, setIsEditingSkills] = useState(false);
+  const [isEditingContact, setIsEditingContact] = useState(false);
   const [editedUser, setEditedUser] = useState({
     name: user?.name || 'João Silva',
     description: user?.description || 'Profissional experiente em eventos com mais de 5 anos de experiência. Especializado em atendimento ao cliente e organização de eventos corporativos.',
-    skills: user?.skills || ['Atendimento ao Cliente', 'Organização', 'Comunicação', 'Pontualidade']
+    skills: user?.skills || ['Atendimento ao Cliente', 'Organização', 'Comunicação', 'Pontualidade'],
+    phone: user?.phone || '',
+    whatsapp: user?.whatsapp || '',
+    referencePhone: user?.referencePhone || ''
   });
   const [newSkill, setNewSkill] = useState('');
 
@@ -105,6 +108,27 @@ const FreelancerProfile = () => {
     }
   };
 
+  const handleSaveContact = async () => {
+    const success = await updateUser({
+      phone: editedUser.phone,
+      whatsapp: editedUser.whatsapp,
+      referencePhone: editedUser.referencePhone
+    });
+    if (success) {
+      toast({
+        title: "Contato atualizado!",
+        description: "Suas informações de contato foram salvas com sucesso."
+      });
+      setIsEditingContact(false);
+    } else {
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar as informações de contato.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleCancelAbout = () => {
     setEditedUser({
       ...editedUser,
@@ -121,6 +145,16 @@ const FreelancerProfile = () => {
     });
     setIsEditingSkills(false);
     setNewSkill('');
+  };
+
+  const handleCancelContact = () => {
+    setEditedUser({
+      ...editedUser,
+      phone: user?.phone || '',
+      whatsapp: user?.whatsapp || '',
+      referencePhone: user?.referencePhone || ''
+    });
+    setIsEditingContact(false);
   };
 
   const addSkill = (skill: string) => {
@@ -219,8 +253,9 @@ const FreelancerProfile = () => {
         </Card>
 
         <Tabs defaultValue="about" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-6">
             <TabsTrigger value="about" className="text-xs lg:text-sm">Sobre</TabsTrigger>
+            <TabsTrigger value="contact" className="text-xs lg:text-sm">Contato</TabsTrigger>
             <TabsTrigger value="courses" className="text-xs lg:text-sm">Cursos</TabsTrigger>
             <TabsTrigger value="portfolio" className="text-xs lg:text-sm">Portfólio</TabsTrigger>
             <TabsTrigger value="history" className="text-xs lg:text-sm hidden lg:inline-flex">Histórico</TabsTrigger>
@@ -366,6 +401,89 @@ const FreelancerProfile = () => {
                     </Badge>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="contact" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Phone className="w-5 h-5" />
+                    Informações de Contato
+                  </CardTitle>
+                  {!isEditingContact ? (
+                    <Button onClick={() => setIsEditingContact(true)} variant="outline" size="sm">
+                      <Edit className="w-4 h-4 mr-2" />
+                      Editar
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button onClick={handleCancelContact} variant="outline" size="sm">
+                        <X className="w-4 h-4 mr-1" />
+                        Cancelar
+                      </Button>
+                      <Button onClick={handleSaveContact} size="sm">
+                        <Save className="w-4 h-4 mr-1" />
+                        Salvar
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {isEditingContact ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Telefone</label>
+                        <Input
+                          value={editedUser.phone}
+                          onChange={(e) => setEditedUser({ ...editedUser, phone: e.target.value })}
+                          placeholder="(11) 99999-9999"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">WhatsApp</label>
+                        <Input
+                          value={editedUser.whatsapp}
+                          onChange={(e) => setEditedUser({ ...editedUser, whatsapp: e.target.value })}
+                          placeholder="(11) 99999-9999"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Telefone de Referência</label>
+                      <Input
+                        value={editedUser.referencePhone}
+                        onChange={(e) => setEditedUser({ ...editedUser, referencePhone: e.target.value })}
+                        placeholder="(11) 99999-9999 - Contato de emergência"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-600">Telefone</label>
+                        <p className="text-sm py-2">{editedUser.phone || 'Não informado'}</p>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-600">WhatsApp</label>
+                        <p className="text-sm py-2">{editedUser.whatsapp || 'Não informado'}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-600">Telefone de Referência</label>
+                      <p className="text-sm py-2">{editedUser.referencePhone || 'Não informado'}</p>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

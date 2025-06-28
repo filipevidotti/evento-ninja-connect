@@ -8,6 +8,8 @@ export interface User {
   type: 'freelancer' | 'producer';
   city: string;
   phone?: string;
+  whatsapp?: string;
+  referencePhone?: string;
   rating?: number;
   avatar?: string;
   skills?: string[];
@@ -45,6 +47,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     type: 'freelancer',
     city: 'São Paulo',
     phone: '(11) 99999-9999',
+    whatsapp: '(11) 99999-9999',
+    referencePhone: '(11) 88888-8888',
     rating: 4.5,
     avatar: '',
     skills: ['Fotografia', 'Edição'],
