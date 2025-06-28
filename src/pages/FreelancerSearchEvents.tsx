@@ -177,7 +177,8 @@ const FreelancerSearchEvents = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                  {/* Event info - mobile responsive */}
+                  <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2 sm:gap-4 text-sm">
                     <div className="flex items-center space-x-2">
                       <Calendar className="w-4 h-4 text-gray-400" />
                       <span>{new Date(event.data).toLocaleDateString('pt-BR')}</span>
@@ -196,10 +197,10 @@ const FreelancerSearchEvents = () => {
                         
                         return (
                           <div key={func.id} className="border rounded-lg p-3 bg-gray-50">
-                            <div className="flex items-center justify-between mb-2">
-                              <h5 className="font-medium">{func.cargo}</h5>
-                              <div className="flex items-center space-x-2">
-                                <span className="text-green-600 font-medium">R$ {func.valor}</span>
+                            <div className="space-y-3">
+                              {/* Function title */}
+                              <div className="flex items-center justify-between">
+                                <h5 className="font-medium">{func.cargo}</h5>
                                 {applicationStatus && (
                                   <Badge 
                                     variant={
@@ -212,34 +213,42 @@ const FreelancerSearchEvents = () => {
                                   </Badge>
                                 )}
                               </div>
-                            </div>
-                            <div className="flex items-center justify-between text-sm text-gray-600">
-                              <div className="flex items-center space-x-4">
-                                <div className="flex items-center space-x-1">
+                              
+                              {/* Vagas and Valor on same line for mobile and desktop */}
+                              <div className="flex items-center justify-between text-sm">
+                                <div className="flex items-center space-x-1 text-gray-600">
                                   <Users className="w-3 h-3" />
                                   <span>{func.quantidade} vaga{func.quantidade !== 1 ? 's' : ''}</span>
                                 </div>
-                                <div className="flex items-center space-x-1">
+                                <div className="flex items-center space-x-1 text-green-600 font-medium">
                                   <DollarSign className="w-3 h-3" />
                                   <span>R$ {func.valor}</span>
                                 </div>
                               </div>
-                              {!applicationStatus ? (
-                                <Button 
-                                  size="sm"
-                                  onClick={() => handleApply(event.id, func.id)}
-                                >
-                                  Candidatar-se
-                                </Button>
-                              ) : (
-                                <span className="text-xs text-gray-500">Já aplicado</span>
+                              
+                              {/* Button on separate line */}
+                              <div className="flex justify-end">
+                                {!applicationStatus ? (
+                                  <Button 
+                                    size="sm"
+                                    onClick={() => handleApply(event.id, func.id)}
+                                  >
+                                    Candidatar-se
+                                  </Button>
+                                ) : (
+                                  <span className="text-xs text-gray-500">Já aplicado</span>
+                                )}
+                              </div>
+                              
+                              {/* Requirements on separate line */}
+                              {func.requirements && (
+                                <div className="pt-2 border-t border-gray-200">
+                                  <p className="text-xs text-gray-600">
+                                    <strong>Requisitos:</strong> {func.requirements}
+                                  </p>
+                                </div>
                               )}
                             </div>
-                            {func.requirements && (
-                              <p className="text-xs text-gray-600 mt-2">
-                                <strong>Requisitos:</strong> {func.requirements}
-                              </p>
-                            )}
                           </div>
                         );
                       })}
