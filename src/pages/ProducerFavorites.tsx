@@ -60,18 +60,22 @@ const ProducerFavorites = () => {
       <BreadcrumbNav items={breadcrumbItems} />
       
       <div className="max-w-7xl mx-auto p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <Heart className="w-8 h-8 mr-3 text-red-500" />
-              Freelancers Favoritos
-            </h1>
-            <p className="text-gray-600 mt-1">Gerencie seus freelancers favoritos e organize por equipes</p>
+        {/* Header - Layout responsivo */}
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center space-x-3">
+              <Heart className="w-8 h-8 text-red-500 flex-shrink-0" />
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                Freelancers Favoritos
+              </h1>
+            </div>
+            <Badge variant="secondary" className="text-sm sm:text-lg px-3 py-1 sm:px-4 sm:py-2 self-start sm:self-center">
+              {favoriteFreelancers.length} favoritos
+            </Badge>
           </div>
-          <Badge variant="secondary" className="text-lg px-4 py-2">
-            {favoriteFreelancers.length} favoritos
-          </Badge>
+          <p className="text-gray-600 text-sm sm:text-base">
+            Gerencie seus freelancers favoritos e organize por equipes
+          </p>
         </div>
 
         {/* Filtros e Busca */}

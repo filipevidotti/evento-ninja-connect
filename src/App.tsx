@@ -71,6 +71,7 @@ function App() {
                 <Route path="/producer/create-team" element={<ProducerCreateTeam />} />
                 <Route path="/producer/teams/edit/:teamId" element={<ProducerEditTeam />} />
                 <Route path="/producer/complaint" element={<ProducerComplaint />} />
+                <Route path="/producer/checkin" element={<ProducerCheckIn />} />
                 
                 {/* Admin Routes */}
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
