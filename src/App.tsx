@@ -68,10 +68,9 @@ function App() {
                 <Route path="/producer/favorites" element={<ProducerFavorites />} />
                 <Route path="/producer/finance" element={<ProducerFinance />} />
                 <Route path="/producer/team-management" element={<ProducerTeamManagement />} />
-                <Route path="/producer/create-team" element={<ProducerCreateTeam />} />
+                <Route path="/producer/teams/create" element={<ProducerCreateTeam />} />
                 <Route path="/producer/teams/edit/:teamId" element={<ProducerEditTeam />} />
                 <Route path="/producer/complaint" element={<ProducerComplaint />} />
-                <Route path="/producer/checkin" element={<ProducerCheckIn />} />
                 
                 {/* Admin Routes */}
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />

@@ -47,12 +47,12 @@ const ApplicationsManager: React.FC<ApplicationsManagerProps> = ({
                       const eventFunction = event.functions.find(f => f.id === application.function_id);
                       
                       return (
-                        <div key={application.id} className="p-3 bg-gray-50 rounded-lg space-y-3">
+                        <div key={application.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center space-x-3">
                             <Avatar>
                               <AvatarFallback>{application.user_name?.charAt(0) || 'U'}</AvatarFallback>
                             </Avatar>
-                            <div className="flex-1 min-w-0">
+                            <div>
                               <p className="font-medium">{application.user_name}</p>
                               <p className="text-sm text-gray-600">{application.user_email}</p>
                               <p className="text-sm text-gray-600">
@@ -63,16 +63,14 @@ const ApplicationsManager: React.FC<ApplicationsManagerProps> = ({
                               </p>
                             </div>
                           </div>
-                          
-                          {/* Botões em linha separada no mobile */}
-                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2">
+                          <div className="flex items-center gap-2">
                             {application.status === 'pendente' ? (
                               <>
                                 <Button
                                   size="sm"
                                   variant="outline"
                                   onClick={() => onApplicationAction(application.id, 'recusado')}
-                                  className="text-red-600 hover:text-red-700 hover:bg-red-50 flex-1 sm:flex-none"
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
                                 >
                                   <XCircle className="w-4 h-4 mr-1" />
                                   Recusar
@@ -80,7 +78,7 @@ const ApplicationsManager: React.FC<ApplicationsManagerProps> = ({
                                 <Button
                                   size="sm"
                                   onClick={() => onApplicationAction(application.id, 'aprovado')}
-                                  className="bg-green-600 hover:bg-green-700 flex-1 sm:flex-none"
+                                  className="bg-green-600 hover:bg-green-700"
                                 >
                                   <CheckCircle className="w-4 h-4 mr-1" />
                                   Aprovar
@@ -88,8 +86,8 @@ const ApplicationsManager: React.FC<ApplicationsManagerProps> = ({
                               </>
                             ) : (
                               <Badge 
-                                className={`w-full sm:w-auto justify-center ${application.status === 'aprovado' ? 
-                                  'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+                                className={application.status === 'aprovado' ? 
+                                  'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}
                               >
                                 {application.status === 'aprovado' ? (
                                   <><CheckCircle className="w-3 h-3 mr-1" />Aprovado</>

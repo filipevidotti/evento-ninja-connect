@@ -172,31 +172,20 @@ const ProducerDashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="events" className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            {/* Abas responsivas */}
-            <TabsList className="grid grid-cols-2 sm:grid-cols-4 w-full sm:max-w-lg h-auto">
-              <TabsTrigger value="events" className="text-xs sm:text-sm px-2 py-2">
-                Eventos
-              </TabsTrigger>
-              <TabsTrigger value="applications" className="text-xs sm:text-sm px-2 py-2">
-                Candidaturas
-              </TabsTrigger>
-              <TabsTrigger value="finance" className="text-xs sm:text-sm px-2 py-2">
-                Financeiro
-              </TabsTrigger>
-              <TabsTrigger value="profile" className="text-xs sm:text-sm px-2 py-2">
-                Perfil
-              </TabsTrigger>
+          <div className="flex items-center justify-between">
+            <TabsList className="grid grid-cols-4 max-w-lg">
+              <TabsTrigger value="events">Meus Eventos</TabsTrigger>
+              <TabsTrigger value="applications">Candidaturas</TabsTrigger>
+              <TabsTrigger value="finance">Financeiro</TabsTrigger>
+              <TabsTrigger value="profile">Perfil</TabsTrigger>
             </TabsList>
             
-            {/* Botão criar evento */}
             <Button 
-              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 w-full sm:w-auto"
+              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
               onClick={() => setShowCreateEvent(true)}
             >
               <Plus className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Criar Evento</span>
-              <span className="sm:hidden">Criar</span>
+              Criar Evento
             </Button>
           </div>
 
