@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -107,23 +108,29 @@ const ProducerTeamManagement = () => {
 
         {selectedEvent && (
           <Tabs defaultValue="team" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
-              <TabsTrigger value="team">Equipe</TabsTrigger>
-              <TabsTrigger value="chat">Chat</TabsTrigger>
-              <TabsTrigger value="checkin">Check-in</TabsTrigger>
-              <TabsTrigger value="reports">Relatórios</TabsTrigger>
-            </TabsList>
+            {/* Mobile-friendly tabs with scrollable container */}
+            <div className="overflow-x-auto">
+              <TabsList className="grid grid-cols-4 w-full min-w-[400px] lg:min-w-0">
+                <TabsTrigger value="team" className="text-xs sm:text-sm">Equipe</TabsTrigger>
+                <TabsTrigger value="chat" className="text-xs sm:text-sm">Chat</TabsTrigger>
+                <TabsTrigger value="checkin" className="text-xs sm:text-sm">Check-in</TabsTrigger>
+                <TabsTrigger value="reports" className="text-xs sm:text-sm">Relatórios</TabsTrigger>
+              </TabsList>
+            </div>
 
             <TabsContent value="team" className="space-y-6">
               <div className="grid gap-6">
                 {mockTeamStructure.map((group) => (
                   <Card key={group.function}>
                     <CardHeader>
-                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                      <div className="flex flex-col space-y-4">
+                        {/* Function title on separate line */}
                         <CardTitle className="flex items-center space-x-2">
                           <Users className="w-5 h-5" />
                           <span>{group.function}</span>
                         </CardTitle>
+                        
+                        {/* Status and action buttons on separate line */}
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                           <Badge variant={group.confirmed >= group.required ? "default" : "destructive"}>
                             {group.confirmed}/{group.required} confirmados
@@ -139,7 +146,7 @@ const ProducerTeamManagement = () => {
                     <CardContent>
                       <div className="grid gap-4">
                         {group.members.map((member) => (
-                          <div key={member.id} className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 bg-white border rounded-lg">
+                          <div key={member.id} className="p-4 bg-white border rounded-lg space-y-4">
                             <div className="flex items-center space-x-3">
                               <Avatar>
                                 <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
@@ -162,8 +169,8 @@ const ProducerTeamManagement = () => {
                               </div>
                             </div>
                             
-                            {/* Botões separados em linha própria no mobile */}
-                            <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+                            {/* Action buttons on separate line */}
+                            <div className="flex flex-col sm:flex-row gap-2">
                               <Button variant="outline" size="sm" className="w-full sm:w-auto">
                                 Contatar
                               </Button>

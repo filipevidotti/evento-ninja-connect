@@ -50,19 +50,88 @@ const ProducerHeader: React.FC<ProducerHeaderProps> = ({ user, onLogout, onCreat
   return (
     <header className="bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <h1 
-              className="text-lg sm:text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent cursor-pointer"
-              onClick={() => navigate('/producer/dashboard')}
-            >
-              EventConnect
-            </h1>
-            <Badge variant="secondary" className="bg-purple-100 text-purple-800 text-xs">Organizador</Badge>
+        <div className="flex flex-col space-y-2 lg:flex-row lg:justify-between lg:items-center lg:space-y-0">
+          {/* Top row - Title and verification badge */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <h1 
+                className="text-lg sm:text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent cursor-pointer"
+                onClick={() => navigate('/producer/dashboard')}
+              >
+                EventConnect
+              </h1>
+              <Badge variant="secondary" className="bg-purple-100 text-purple-800 text-xs">Organizador</Badge>
+            </div>
+            
+            {/* Mobile menu and verification badge */}
+            <div className="lg:hidden flex items-center space-x-2">
+              <VerificationBadge />
+              <Avatar className="h-7 w-7">
+                <AvatarFallback className="text-xs">{user?.name?.charAt(0) || 'U'}</AvatarFallback>
+              </Avatar>
+              
+              <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="sm" className="p-2">
+                    <Menu className="h-4 w-4" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-64 p-3">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-base font-semibold">Menu</h2>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setIsMenuOpen(false)}
+                      className="p-1"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center space-x-2 mb-3 p-2 bg-gray-50 rounded-lg">
+                    <Avatar className="w-8 h-8">
+                      <AvatarFallback className="text-xs">{user?.name?.charAt(0) || 'U'}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium text-xs">{user?.name}</p>
+                      <p className="text-xs text-gray-600">{user?.city}</p>
+                    </div>
+                  </div>
+
+                  <nav className="space-y-1">
+                    {menuItems.map((item) => (
+                      <Button
+                        key={item.path}
+                        variant="ghost"
+                        size="sm"
+                        className="w-full justify-start h-8 px-2"
+                        onClick={() => handleNavigation(item.path)}
+                      >
+                        <item.icon className="w-3 h-3 mr-2" />
+                        <span className="text-xs">{item.label}</span>
+                      </Button>
+                    ))}
+                    
+                    <div className="pt-1 border-t">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 h-8 px-2"
+                        onClick={onLogout}
+                      >
+                        <LogOut className="w-3 h-3 mr-2" />
+                        <span className="text-xs">Sair</span>
+                      </Button>
+                    </div>
+                  </nav>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
-          
-          {/* Desktop Navigation - Mais compacto */}
-          <div className="hidden xl:flex items-center space-x-1">
+
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center space-x-1">
             <VerificationBadge />
             
             {menuItems.map((item) => (
@@ -86,72 +155,6 @@ const ProducerHeader: React.FC<ProducerHeaderProps> = ({ user, onLogout, onCreat
                 Sair
               </Button>
             </div>
-          </div>
-
-          {/* Mobile Navigation */}
-          <div className="xl:hidden flex items-center space-x-2">
-            <VerificationBadge />
-            <Avatar className="h-7 w-7">
-              <AvatarFallback className="text-xs">{user?.name?.charAt(0) || 'U'}</AvatarFallback>
-            </Avatar>
-            
-            <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="p-2">
-                  <Menu className="h-4 w-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-64 p-3">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-base font-semibold">Menu</h2>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => setIsMenuOpen(false)}
-                    className="p-1"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-
-                <div className="flex items-center space-x-2 mb-3 p-2 bg-gray-50 rounded-lg">
-                  <Avatar className="w-8 h-8">
-                    <AvatarFallback className="text-xs">{user?.name?.charAt(0) || 'U'}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium text-xs">{user?.name}</p>
-                    <p className="text-xs text-gray-600">{user?.city}</p>
-                  </div>
-                </div>
-
-                <nav className="space-y-1">
-                  {menuItems.map((item) => (
-                    <Button
-                      key={item.path}
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start h-8 px-2"
-                      onClick={() => handleNavigation(item.path)}
-                    >
-                      <item.icon className="w-3 h-3 mr-2" />
-                      <span className="text-xs">{item.label}</span>
-                    </Button>
-                  ))}
-                  
-                  <div className="pt-1 border-t">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 h-8 px-2"
-                      onClick={onLogout}
-                    >
-                      <LogOut className="w-3 h-3 mr-2" />
-                      <span className="text-xs">Sair</span>
-                    </Button>
-                  </div>
-                </nav>
-              </SheetContent>
-            </Sheet>
           </div>
         </div>
       </div>
