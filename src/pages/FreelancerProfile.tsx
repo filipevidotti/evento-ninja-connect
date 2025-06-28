@@ -2,24 +2,47 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Star, MapPin, Calendar, Share2, Camera, Edit, Award } from 'lucide-react';
+import { Star, MapPin, Calendar, Share2, Camera, Edit, Award, Save, X, Plus } from 'lucide-react';
 import { useAuth } from '@/components/AuthContext';
 import VerificationBadge from '@/components/VerificationBadge';
 import BreadcrumbNav from '@/components/BreadcrumbNav';
 import FreelancerHeader from '@/components/FreelancerHeader';
 import ReputationBadge from '@/components/ReputationBadge';
 import { useCourses } from '@/hooks/useCourses';
+import { useToast } from '@/hooks/use-toast';
 
 const FreelancerProfile = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { getCompletedCourses } = useCourses();
-  const [portfolio, setPortfolio] = useState<string[]>([]);
+  const { toast } = useToast();
+  const [portfolio, setPortfolio] = useState<string[]>([
+    'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop'
+  ]);
   const [isAvailable, setIsAvailable] = useState(true);
+  const [isEditingAbout, setIsEditingAbout] = useState(false);
+  const [isEditingSkills, setIsEditingSkills] = useState(false);
+  const [editedUser, setEditedUser] = useState({
+    name: user?.name || 'João Silva',
+    description: user?.description || 'Profissional experiente em eventos com mais de 5 anos de experiência. Especializado em atendimento ao cliente e organização de eventos corporativos.',
+    skills: user?.skills || ['Atendimento ao Cliente', 'Organização', 'Comunicação', 'Pontualidade']
+  });
+  const [newSkill, setNewSkill] = useState('');
 
   const completedCourses = getCompletedCourses();
+
+  const predefinedSkills = [
+    'Garçom', 'Limpeza', 'Segurança', 'Word', 'Treinamento em defesa pessoal',
+    'Excel', 'PowerPoint', 'Atendimento ao Cliente', 'Bartender', 'Cozinheiro',
+    'Recepcionista', 'Vendas', 'Marketing', 'Fotografia', 'DJ', 'Organização',
+    'Comunicação', 'Pontualidade', 'Trabalho em Equipe'
+  ];
 
   const breadcrumbItems = [
     { label: 'Dashboard', path: '/freelancer/dashboard' },
@@ -37,6 +60,90 @@ const FreelancerProfile = () => {
   const shareProfile = () => {
     const profileUrl = `${window.location.origin}/freelancer/profile/public/${user?.id}`;
     navigator.clipboard.writeText(profileUrl);
+    toast({
+      title: "Link copiado!",
+      description: "O link do seu perfil foi copiado para a área de transferência."
+    });
+  };
+
+  const handleSaveAbout = async () => {
+    const success = await updateUser({
+      name: editedUser.name,
+      description: editedUser.description
+    });
+    if (success) {
+      toast({
+        title: "Perfil atualizado!",
+        description: "Suas informações foram salvas com sucesso."
+      });
+      setIsEditingAbout(false);
+    } else {
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o perfil.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSaveSkills = async () => {
+    const success = await updateUser({
+      skills: editedUser.skills
+    });
+    if (success) {
+      toast({
+        title: "Habilidades atualizadas!",
+        description: "Suas habilidades foram salvas com sucesso."
+      });
+      setIsEditingSkills(false);
+    } else {
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar as habilidades.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCancelAbout = () => {
+    setEditedUser({
+      ...editedUser,
+      name: user?.name || 'João Silva',
+      description: user?.description || 'Profissional experiente em eventos com mais de 5 anos de experiência.'
+    });
+    setIsEditingAbout(false);
+  };
+
+  const handleCancelSkills = () => {
+    setEditedUser({
+      ...editedUser,
+      skills: user?.skills || ['Atendimento ao Cliente', 'Organização', 'Comunicação', 'Pontualidade']
+    });
+    setIsEditingSkills(false);
+    setNewSkill('');
+  };
+
+  const addSkill = (skill: string) => {
+    if (!editedUser.skills.includes(skill)) {
+      setEditedUser({
+        ...editedUser,
+        skills: [...editedUser.skills, skill]
+      });
+    }
+    setNewSkill('');
+  };
+
+  const removeSkill = (skillToRemove: string) => {
+    setEditedUser({
+      ...editedUser,
+      skills: editedUser.skills.filter(skill => skill !== skillToRemove)
+    });
+  };
+
+  const addCustomSkill = () => {
+    if (newSkill.trim() && !editedUser.skills.includes(newSkill.trim())) {
+      addSkill(newSkill.trim());
+    }
   };
 
   return (
@@ -45,33 +152,47 @@ const FreelancerProfile = () => {
       <BreadcrumbNav items={breadcrumbItems} />
       
       <div className="max-w-6xl mx-auto p-4 lg:p-6 space-y-6">
-        {/* Header */}
+        {/* Header - Mobile Responsive */}
         <Card>
           <CardContent className="p-4 lg:p-6">
-            <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
-              <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-4 lg:space-y-0 lg:space-x-6">
-                <Avatar className="w-20 h-20 lg:w-24 lg:h-24">
-                  <AvatarImage src={user?.avatar} />
-                  <AvatarFallback className="text-xl lg:text-2xl">
-                    {user?.name?.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="text-center lg:text-left">
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:space-x-2 mb-2">
-                    <h1 className="text-2xl lg:text-3xl font-bold">{user?.name}</h1>
-                    <VerificationBadge />
-                  </div>
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:space-x-4 text-gray-600 mb-2 space-y-1 lg:space-y-0">
-                    <div className="flex items-center justify-center lg:justify-start space-x-1">
-                      <MapPin className="w-4 h-4" />
-                      <span>{user?.city}</span>
+            <div className="flex flex-col space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
+                  <Avatar className="w-20 h-20 lg:w-24 lg:h-24">
+                    <AvatarImage src={user?.avatar} />
+                    <AvatarFallback className="text-xl lg:text-2xl">
+                      {(user?.name || 'João Silva')?.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="text-center sm:text-left">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-2">
+                      <h1 className="text-2xl lg:text-3xl font-bold">{user?.name || 'João Silva'}</h1>
+                      <div className="flex justify-center sm:justify-start mt-1 sm:mt-0">
+                        <VerificationBadge />
+                      </div>
                     </div>
-                    <div className="flex items-center justify-center lg:justify-start space-x-1">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span>{user?.rating || 'Novo'} • 12 eventos</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 text-gray-600 mb-2">
+                      <div className="flex items-center justify-center sm:justify-start space-x-1">
+                        <MapPin className="w-4 h-4" />
+                        <span>{user?.city || 'São Paulo'}</span>
+                      </div>
+                      <div className="flex items-center justify-center sm:justify-start space-x-1">
+                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        <span>{user?.rating || '4.8'} • 12 eventos</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:space-x-2 mb-3 space-y-2 lg:space-y-0">
+                </div>
+                <Button onClick={shareProfile} variant="outline" className="w-full sm:w-auto">
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Compartilhar Perfil
+                </Button>
+              </div>
+              
+              {/* Status and Actions - Separate row for mobile */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                  <div className="flex items-center justify-center sm:justify-start gap-2">
                     <Badge variant={isAvailable ? "default" : "secondary"}>
                       {isAvailable ? "Disponível" : "Ocupado"}
                     </Badge>
@@ -79,14 +200,12 @@ const FreelancerProfile = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => setIsAvailable(!isAvailable)}
-                      className="w-full lg:w-auto"
                     >
                       <Edit className="w-4 h-4 mr-1" />
                       Alterar Status
                     </Button>
                   </div>
-                  {/* Medalha de Reputação */}
-                  <div className="flex justify-center lg:justify-start mt-2">
+                  <div className="flex justify-center sm:justify-start">
                     <ReputationBadge 
                       level="gold" 
                       points={1250} 
@@ -95,10 +214,6 @@ const FreelancerProfile = () => {
                   </div>
                 </div>
               </div>
-              <Button onClick={shareProfile} variant="outline" className="w-full lg:w-auto">
-                <Share2 className="w-4 h-4 mr-2" />
-                Compartilhar Perfil
-              </Button>
             </div>
           </CardContent>
         </Card>
@@ -112,7 +227,7 @@ const FreelancerProfile = () => {
             <TabsTrigger value="reviews" className="text-xs lg:text-sm hidden lg:inline-flex">Avaliações</TabsTrigger>
           </TabsList>
 
-          {/* Tabs extras para mobile */}
+          {/* Mobile extra tabs */}
           <div className="lg:hidden">
             <TabsList className="grid w-full grid-cols-2 mt-2">
               <TabsTrigger value="history" className="text-xs">Histórico</TabsTrigger>
@@ -123,28 +238,131 @@ const FreelancerProfile = () => {
           <TabsContent value="about" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Sobre mim</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Sobre mim</CardTitle>
+                  {!isEditingAbout ? (
+                    <Button onClick={() => setIsEditingAbout(true)} variant="outline" size="sm">
+                      <Edit className="w-4 h-4 mr-2" />
+                      Editar
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button onClick={handleCancelAbout} variant="outline" size="sm">
+                        <X className="w-4 h-4 mr-1" />
+                        Cancelar
+                      </Button>
+                      <Button onClick={handleSaveAbout} size="sm">
+                        <Save className="w-4 h-4 mr-1" />
+                        Salvar
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </CardHeader>
-              <CardContent>
-                <p className="text-gray-700 mb-4">
-                  {user?.description || "Adicione uma descrição sobre você..."}
-                </p>
-                <Button variant="outline">
-                  <Edit className="w-4 h-4 mr-2" />
-                  Editar Descrição
-                </Button>
+              <CardContent className="space-y-4">
+                {isEditingAbout ? (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Nome</label>
+                      <Input
+                        value={editedUser.name}
+                        onChange={(e) => setEditedUser({ ...editedUser, name: e.target.value })}
+                        placeholder="Seu nome completo"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Descrição</label>
+                      <Textarea
+                        value={editedUser.description}
+                        onChange={(e) => setEditedUser({ ...editedUser, description: e.target.value })}
+                        placeholder="Conte um pouco sobre você..."
+                        rows={4}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-gray-700">
+                        {editedUser.description || "Adicione uma descrição sobre você..."}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>Especializações</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Especializações</CardTitle>
+                  {!isEditingSkills ? (
+                    <Button onClick={() => setIsEditingSkills(true)} variant="outline" size="sm">
+                      <Edit className="w-4 h-4 mr-2" />
+                      Editar
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button onClick={handleCancelSkills} variant="outline" size="sm">
+                        <X className="w-4 h-4 mr-1" />
+                        Cancelar
+                      </Button>
+                      <Button onClick={handleSaveSkills} size="sm">
+                        <Save className="w-4 h-4 mr-1" />
+                        Salvar
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
+                {isEditingSkills && (
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <Input
+                        value={newSkill}
+                        onChange={(e) => setNewSkill(e.target.value)}
+                        placeholder="Adicionar nova habilidade"
+                        onKeyPress={(e) => e.key === 'Enter' && addCustomSkill()}
+                      />
+                      <Button onClick={addCustomSkill} size="sm">
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    
+                    <div>
+                      <p className="text-xs text-gray-600 mb-2">Habilidades sugeridas:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {predefinedSkills
+                          .filter(skill => !editedUser.skills.includes(skill))
+                          .map(skill => (
+                            <Button
+                              key={skill}
+                              variant="outline"
+                              size="sm"
+                              onClick={() => addSkill(skill)}
+                              className="text-xs h-7"
+                            >
+                              + {skill}
+                            </Button>
+                          ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="flex flex-wrap gap-2">
-                  {user?.skills?.map((skill, index) => (
-                    <Badge key={index} variant="secondary">
+                  {editedUser.skills.map(skill => (
+                    <Badge key={skill} variant="secondary" className="flex items-center gap-1">
                       {skill}
+                      {isEditingSkills && (
+                        <button
+                          onClick={() => removeSkill(skill)}
+                          className="ml-1 hover:text-red-600"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
                     </Badge>
                   ))}
                 </div>
@@ -247,16 +465,22 @@ const FreelancerProfile = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {[1, 2, 3, 4, 5].map((event) => (
-                    <div key={event} className="flex items-center justify-between p-4 border rounded-lg">
+                  {[
+                    { id: 1, name: 'Casamento dos Santos', producer: 'Eventos Premium', role: 'Garçom', date: '15 de Janeiro, 2024', status: 'Concluído', payment: 'R$ 180,00' },
+                    { id: 2, name: 'Festa Corporativa', producer: 'Business Events', role: 'Recepcionista', date: '22 de Janeiro, 2024', status: 'Concluído', payment: 'R$ 150,00' },
+                    { id: 3, name: 'Aniversário de Empresa', producer: 'Mega Eventos', role: 'Limpeza', date: '28 de Janeiro, 2024', status: 'Concluído', payment: 'R$ 120,00' },
+                    { id: 4, name: 'Formatura UNESP', producer: 'Formaturas SP', role: 'Segurança', date: '05 de Fevereiro, 2024', status: 'Concluído', payment: 'R$ 200,00' },
+                    { id: 5, name: 'Workshop de Marketing', producer: 'Eventos Tech', role: 'Suporte Técnico', date: '12 de Fevereiro, 2024', status: 'Concluído', payment: 'R$ 160,00' }
+                  ].map((event) => (
+                    <div key={event.id} className="flex items-center justify-between p-4 border rounded-lg">
                       <div>
-                        <h3 className="font-medium">Evento {event}</h3>
-                        <p className="text-sm text-gray-600">Produtor ABC • Garçom</p>
-                        <p className="text-sm text-gray-500">15 de Janeiro, 2024</p>
+                        <h3 className="font-medium">{event.name}</h3>
+                        <p className="text-sm text-gray-600">{event.producer} • {event.role}</p>
+                        <p className="text-sm text-gray-500">{event.date}</p>
                       </div>
                       <div className="text-right">
-                        <Badge variant="secondary">Concluído</Badge>
-                        <p className="text-sm text-gray-600 mt-1">R$ 180,00</p>
+                        <Badge variant="secondary">{event.status}</Badge>
+                        <p className="text-sm text-gray-600 mt-1">{event.payment}</p>
                       </div>
                     </div>
                   ))}
@@ -272,25 +496,30 @@ const FreelancerProfile = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {[1, 2, 3].map((review) => (
-                    <div key={review} className="border-b pb-4 last:border-b-0">
+                  {[
+                    { id: 1, producer: 'Eventos Premium', rating: 5, comment: 'Excelente profissional, pontual e dedicado. Recomendo!', date: '20/01/2024' },
+                    { id: 2, producer: 'Business Events', rating: 5, comment: 'Muito atencioso e prestativo. Trabalho impecável!', date: '25/01/2024' },
+                    { id: 3, producer: 'Mega Eventos', rating: 4, comment: 'Bom trabalho, chegou no horário e cumpriu todas as tarefas.', date: '30/01/2024' }
+                  ].map((review) => (
+                    <div key={review.id} className="border-b pb-4 last:border-b-0">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2">
                           <Avatar className="w-8 h-8">
-                            <AvatarFallback>P{review}</AvatarFallback>
+                            <AvatarFallback>{review.producer.charAt(0)}</AvatarFallback>
                           </Avatar>
-                          <span className="font-medium">Produtor {review}</span>
+                          <span className="font-medium">{review.producer}</span>
                         </div>
                         <div className="flex items-center space-x-1">
                           {[1, 2, 3, 4, 5].map((star) => (
-                            <Star key={star} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                            <Star 
+                              key={star} 
+                              className={`w-4 h-4 ${star <= review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} 
+                            />
                           ))}
                         </div>
                       </div>
-                      <p className="text-gray-700 text-sm">
-                        Excelente profissional, pontual e dedicado. Recomendo!
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">Evento realizado em 20/01/2024</p>
+                      <p className="text-gray-700 text-sm">{review.comment}</p>
+                      <p className="text-xs text-gray-500 mt-1">Evento realizado em {review.date}</p>
                     </div>
                   ))}
                 </div>
