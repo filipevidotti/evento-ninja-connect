@@ -63,8 +63,6 @@ const ProducerHeader: React.FC<ProducerHeaderProps> = ({ user, onLogout, onCreat
           
           {/* Desktop Navigation - Mais compacto */}
           <div className="hidden xl:flex items-center space-x-1">
-            <VerificationBadge />
-            
             {menuItems.map((item) => (
               <Button
                 key={item.path}
@@ -90,7 +88,6 @@ const ProducerHeader: React.FC<ProducerHeaderProps> = ({ user, onLogout, onCreat
 
           {/* Mobile Navigation */}
           <div className="xl:hidden flex items-center space-x-2">
-            <VerificationBadge />
             <Avatar className="h-7 w-7">
               <AvatarFallback className="text-xs">{user?.name?.charAt(0) || 'U'}</AvatarFallback>
             </Avatar>
@@ -153,6 +150,16 @@ const ProducerHeader: React.FC<ProducerHeaderProps> = ({ user, onLogout, onCreat
               </SheetContent>
             </Sheet>
           </div>
+        </div>
+        
+        {/* Verification Status - Separado do header principal */}
+        <div className="mt-2 xl:hidden">
+          <VerificationBadge />
+        </div>
+        
+        {/* Desktop Verification - Posicionado separadamente */}
+        <div className="hidden xl:block absolute top-16 right-4">
+          <VerificationBadge />
         </div>
       </div>
     </header>
