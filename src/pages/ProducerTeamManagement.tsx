@@ -107,7 +107,7 @@ const ProducerTeamManagement = () => {
 
         {selectedEvent && (
           <Tabs defaultValue="team" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
               <TabsTrigger value="team">Equipe</TabsTrigger>
               <TabsTrigger value="chat">Chat</TabsTrigger>
               <TabsTrigger value="checkin">Check-in</TabsTrigger>
@@ -119,17 +119,17 @@ const ProducerTeamManagement = () => {
                 {mockTeamStructure.map((group) => (
                   <Card key={group.function}>
                     <CardHeader>
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                         <CardTitle className="flex items-center space-x-2">
                           <Users className="w-5 h-5" />
                           <span>{group.function}</span>
                         </CardTitle>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                           <Badge variant={group.confirmed >= group.required ? "default" : "destructive"}>
                             {group.confirmed}/{group.required} confirmados
                           </Badge>
                           {group.confirmed < group.required && (
-                            <Button size="sm" variant="outline">
+                            <Button size="sm" variant="outline" className="w-full sm:w-auto">
                               Buscar +{group.required - group.confirmed}
                             </Button>
                           )}
@@ -137,16 +137,16 @@ const ProducerTeamManagement = () => {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="grid gap-3">
+                      <div className="grid gap-4">
                         {group.members.map((member) => (
-                          <div key={member.id} className="flex items-center justify-between p-3 bg-white border rounded-lg">
+                          <div key={member.id} className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 bg-white border rounded-lg">
                             <div className="flex items-center space-x-3">
                               <Avatar>
                                 <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
                               </Avatar>
-                              <div>
+                              <div className="flex-1">
                                 <p className="font-medium">{member.name}</p>
-                                <div className="flex items-center space-x-2">
+                                <div className="flex flex-wrap items-center gap-2 mt-1">
                                   <Badge 
                                     variant={member.status === 'confirmed' ? 'default' : 'secondary'}
                                     className="text-xs"
@@ -161,11 +161,13 @@ const ProducerTeamManagement = () => {
                                 </div>
                               </div>
                             </div>
-                            <div className="flex space-x-2">
-                              <Button variant="outline" size="sm">
+                            
+                            {/* Botões separados em linha própria no mobile */}
+                            <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+                              <Button variant="outline" size="sm" className="w-full sm:w-auto">
                                 Contatar
                               </Button>
-                              <Button variant="ghost" size="sm">
+                              <Button variant="ghost" size="sm" className="w-full sm:w-auto">
                                 Ver Perfil
                               </Button>
                             </div>

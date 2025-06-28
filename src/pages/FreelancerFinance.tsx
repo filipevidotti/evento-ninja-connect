@@ -48,7 +48,6 @@ const FreelancerFinance = () => {
   };
 
   const handleWithdrawRequest = () => {
-    // Função para solicitar saque
     alert('Solicitação de saque enviada com sucesso!');
   };
 
@@ -77,32 +76,38 @@ const FreelancerFinance = () => {
       </div>
       
       <div className="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
-        <div className="flex items-center gap-4 mb-6">
+        {/* Header melhorado - título e seleção de período separados */}
+        <div className="flex flex-col lg:flex-row lg:items-start gap-4 mb-6">
           {/* Back Button - Desktop */}
           <Button 
             variant="outline" 
             size="sm" 
             onClick={() => navigate('/freelancer/dashboard')}
-            className="hidden lg:flex items-center gap-2"
+            className="hidden lg:flex items-center gap-2 self-start"
           >
             <ArrowLeft className="w-4 h-4" />
             Voltar
           </Button>
+          
           <div className="flex-1">
-            <h1 className="text-2xl lg:text-3xl font-bold">Financeiro</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold mb-2">Financeiro</h1>
             <p className="text-gray-600">Gerencie seus ganhos e pagamentos</p>
           </div>
-          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-            <SelectTrigger className="w-40 lg:w-48">
-              <SelectValue placeholder="Selecionar período" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="this-month">Este mês</SelectItem>
-              <SelectItem value="last-month">Mês passado</SelectItem>
-              <SelectItem value="last-3-months">Últimos 3 meses</SelectItem>
-              <SelectItem value="this-year">Este ano</SelectItem>
-            </SelectContent>
-          </Select>
+          
+          {/* Seleção de período separada */}
+          <div className="w-full lg:w-auto">
+            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+              <SelectTrigger className="w-full lg:w-48">
+                <SelectValue placeholder="Selecionar período" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="this-month">Este mês</SelectItem>
+                <SelectItem value="last-month">Mês passado</SelectItem>
+                <SelectItem value="last-3-months">Últimos 3 meses</SelectItem>
+                <SelectItem value="this-year">Este ano</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Cards de Resumo */}
@@ -174,11 +179,11 @@ const FreelancerFinance = () => {
           </Card>
         </div>
 
-        {/* Botão de Solicitação de Saque */}
-        <div className="flex justify-center">
+        {/* Botão de Solicitação de Saque - Agora separado e destacado */}
+        <div className="flex justify-center py-4">
           <Button 
             onClick={handleWithdrawRequest}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 lg:px-8 py-2 lg:py-3 text-base lg:text-lg w-full sm:w-auto"
+            className="bg-green-600 hover:bg-green-700 text-white px-6 lg:px-8 py-3 text-base lg:text-lg w-full sm:w-auto"
             size="lg"
           >
             <DollarSign className="w-5 h-5 mr-2" />
@@ -186,19 +191,22 @@ const FreelancerFinance = () => {
           </Button>
         </div>
 
+        {/* Tabs melhoradas - layout responsivo aprimorado */}
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
-            <TabsTrigger value="overview" className="text-xs lg:text-sm">Visão Geral</TabsTrigger>
-            <TabsTrigger value="transactions" className="text-xs lg:text-sm">Transações</TabsTrigger>
-            <TabsTrigger value="simulator" className="text-xs lg:text-sm hidden lg:inline-flex">Simulador</TabsTrigger>
-            <TabsTrigger value="settings" className="text-xs lg:text-sm hidden lg:inline-flex">Configurações</TabsTrigger>
-          </TabsList>
-
-          {/* Tabs extras para mobile */}
-          <div className="lg:hidden">
-            <TabsList className="grid w-full grid-cols-2 mt-2">
-              <TabsTrigger value="simulator" className="text-xs">Simulador</TabsTrigger>
-              <TabsTrigger value="settings" className="text-xs">Configurações</TabsTrigger>
+          <div className="w-full overflow-x-auto">
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 min-w-fit">
+              <TabsTrigger value="overview" className="text-xs lg:text-sm whitespace-nowrap px-2 lg:px-4">
+                Visão Geral
+              </TabsTrigger>
+              <TabsTrigger value="transactions" className="text-xs lg:text-sm whitespace-nowrap px-2 lg:px-4">
+                Transações
+              </TabsTrigger>
+              <TabsTrigger value="simulator" className="text-xs lg:text-sm whitespace-nowrap px-2 lg:px-4">
+                Simulador
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="text-xs lg:text-sm whitespace-nowrap px-2 lg:px-4">
+                Configurações
+              </TabsTrigger>
             </TabsList>
           </div>
 
