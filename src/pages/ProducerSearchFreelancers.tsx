@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,7 +12,11 @@ import { Search, Filter, Heart, Eye, UserPlus, Star, MapPin, Clock } from 'lucid
 import { useAuth } from '@/components/AuthContext';
 import ProducerHeader from '@/components/ProducerHeader';
 import BreadcrumbNav from '@/components/BreadcrumbNav';
+import FreelancerProfileModal from '@/components/FreelancerProfileModal';
+import InviteFreelancerModal from '@/components/InviteFreelancerModal';
+import CompareFreelancersModal from '@/components/CompareFreelancersModal';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useToast } from '@/hooks/use-toast';
 import {
   Sheet,
   SheetContent,
@@ -26,6 +29,7 @@ import {
 const ProducerSearchFreelancers = () => {
   const { user, logout } = useAuth();
   const isMobile = useIsMobile();
+  const { toast } = useToast();
 
   const breadcrumbItems = [
     { label: 'Dashboard', path: '/producer/dashboard' },
@@ -40,6 +44,12 @@ const ProducerSearchFreelancers = () => {
   const [availability, setAvailability] = useState(false);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [selectedFreelancers, setSelectedFreelancers] = useState<string[]>([]);
+
+  // Modal states
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [compareModalOpen, setCompareModalOpen] = useState(false);
+  const [selectedFreelancer, setSelectedFreelancer] = useState<any>(null);
 
   const mockFreelancers = [
     {
@@ -89,6 +99,12 @@ const ProducerSearchFreelancers = () => {
         ? prev.filter(id => id !== freelancerId)
         : [...prev, freelancerId]
     );
+    
+    const action = favorites.includes(freelancerId) ? 'removido dos' : 'adicionado aos';
+    toast({
+      title: "Favoritos atualizado",
+      description: `Freelancer ${action} favoritos.`
+    });
   };
 
   const toggleSelection = (freelancerId: string) => {
@@ -97,6 +113,34 @@ const ProducerSearchFreelancers = () => {
         ? prev.filter(id => id !== freelancerId)
         : [...prev, freelancerId]
     );
+  };
+
+  const handleViewProfile = (freelancer: any) => {
+    setSelectedFreelancer(freelancer);
+    setProfileModalOpen(true);
+  };
+
+  const handleInvite = (freelancerId: string) => {
+    const freelancer = mockFreelancers.find(f => f.id === freelancerId);
+    if (freelancer) {
+      setSelectedFreelancer(freelancer);
+      setInviteModalOpen(true);
+    }
+  };
+
+  const handleSendInvite = (inviteData: any) => {
+    toast({
+      title: "Convite enviado!",
+      description: `Convite enviado para ${selectedFreelancer?.name} com sucesso.`
+    });
+  };
+
+  const handleCompare = () => {
+    const freelancersToCompare = mockFreelancers.filter(f => 
+      selectedFreelancers.includes(f.id)
+    );
+    setSelectedFreelancer(freelancersToCompare);
+    setCompareModalOpen(true);
   };
 
   const FiltersContent = () => (
@@ -237,6 +281,7 @@ const ProducerSearchFreelancers = () => {
                     className="w-full" 
                     size="sm"
                     disabled={selectedFreelancers.length < 2}
+                    onClick={handleCompare}
                   >
                     Comparar
                   </Button>
@@ -318,12 +363,21 @@ const ProducerSearchFreelancers = () => {
                       </div>
                       
                       <div className="flex space-x-2">
-                        <Button variant="outline" size="sm" className="flex-1">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1"
+                          onClick={() => handleViewProfile(freelancer)}
+                        >
                           <Eye className="w-4 h-4 mr-1" />
                           Ver Perfil
                         </Button>
                         
-                        <Button size="sm" className="flex-1">
+                        <Button 
+                          size="sm" 
+                          className="flex-1"
+                          onClick={() => handleInvite(freelancer.id)}
+                        >
                           <UserPlus className="w-4 h-4 mr-1" />
                           Convidar
                         </Button>
@@ -361,6 +415,7 @@ const ProducerSearchFreelancers = () => {
                     <Button 
                       className="w-full" 
                       disabled={selectedFreelancers.length < 2}
+                      onClick={handleCompare}
                     >
                       Comparar
                     </Button>
@@ -464,12 +519,19 @@ const ProducerSearchFreelancers = () => {
                                 <Heart className={`w-4 h-4 ${favorites.includes(freelancer.id) ? 'fill-current' : ''}`} />
                               </Button>
                               
-                              <Button variant="outline" size="sm">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleViewProfile(freelancer)}
+                              >
                                 <Eye className="w-4 h-4 mr-1" />
                                 Ver Perfil
                               </Button>
                               
-                              <Button size="sm">
+                              <Button 
+                                size="sm"
+                                onClick={() => handleInvite(freelancer.id)}
+                              >
                                 <UserPlus className="w-4 h-4 mr-1" />
                                 Convidar
                               </Button>
@@ -485,6 +547,30 @@ const ProducerSearchFreelancers = () => {
           </div>
         )}
       </div>
+
+      {/* Modals */}
+      <FreelancerProfileModal
+        isOpen={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+        freelancer={selectedFreelancer}
+        onInvite={handleInvite}
+        onToggleFavorite={toggleFavorite}
+        isFavorite={selectedFreelancer ? favorites.includes(selectedFreelancer.id) : false}
+      />
+
+      <InviteFreelancerModal
+        isOpen={inviteModalOpen}
+        onClose={() => setInviteModalOpen(false)}
+        freelancerName={selectedFreelancer?.name || ''}
+        onSendInvite={handleSendInvite}
+      />
+
+      <CompareFreelancersModal
+        isOpen={compareModalOpen}
+        onClose={() => setCompareModalOpen(false)}
+        freelancers={Array.isArray(selectedFreelancer) ? selectedFreelancer : []}
+        onInvite={handleInvite}
+      />
     </div>
   );
 };
