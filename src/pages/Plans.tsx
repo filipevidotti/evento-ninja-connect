@@ -3,13 +3,16 @@ import React from 'react';
 import { useAuth } from '@/components/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
 import PlanCard from '@/components/PlanCard';
+import AdminHeader from '@/components/AdminHeader';
+import FreelancerHeader from '@/components/FreelancerHeader';
+import ProducerHeader from '@/components/ProducerHeader';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Plans: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { subscription, createCheckout, loading } = useSubscription();
 
   // Show loading state while checking auth
@@ -120,42 +123,56 @@ const Plans: React.FC = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate(-1)}
-            className="mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar
-          </Button>
-          
-          <div className="text-center">
-            <h1 className="text-4xl font-bold mb-4">
-              Planos para {user.type === 'freelancer' ? 'Freelancers' : 'Produtores'}
-            </h1>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Escolha o plano ideal para impulsionar sua carreira e encontrar as melhores oportunidades.
-            </p>
-          </div>
-        </div>
+  const renderHeader = () => {
+    if (user.type === 'freelancer') {
+      return <FreelancerHeader />;
+    } else if (user.type === 'producer') {
+      return <ProducerHeader user={user} onLogout={logout} onCreateEvent={() => {}} />;
+    } else {
+      return <AdminHeader />;
+    }
+  };
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {currentPlans.map((plan) => (
-            <PlanCard
-              key={plan.id}
-              title={plan.title}
-              price={plan.price}
-              features={plan.features}
-              isCurrentPlan={subscription?.subscription_tier === plan.id}
-              isPopular={plan.isPopular}
-              onSelect={() => handleSelectPlan(plan.id)}
-              disabled={subscription?.subscription_tier === plan.id}
-            />
-          ))}
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {renderHeader()}
+      
+      <div className="py-8">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="mb-8">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate(-1)}
+              className="mb-4"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar
+            </Button>
+            
+            <div className="text-center">
+              <h1 className="text-4xl font-bold mb-4">
+                Planos para {user.type === 'freelancer' ? 'Freelancers' : 'Produtores'}
+              </h1>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Escolha o plano ideal para impulsionar sua carreira e encontrar as melhores oportunidades.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {currentPlans.map((plan) => (
+              <PlanCard
+                key={plan.id}
+                title={plan.title}
+                price={plan.price}
+                features={plan.features}
+                isCurrentPlan={subscription?.subscription_tier === plan.id}
+                isPopular={plan.isPopular}
+                onSelect={() => handleSelectPlan(plan.id)}
+                disabled={subscription?.subscription_tier === plan.id}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>
