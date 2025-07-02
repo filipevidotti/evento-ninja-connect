@@ -58,17 +58,19 @@ const ProducerHeader: React.FC<ProducerHeaderProps> = ({ user, onLogout, onCreat
                 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent cursor-pointer"
                 onClick={() => navigate('/producer/dashboard')}
               >
-                EventConnect
+                O Freela
               </h1>
               <Badge variant="secondary" className="bg-purple-100 text-purple-800 text-xs">Organizador</Badge>
             </div>
             
-            {/* Mobile menu and verification badge */}
-            <div className="lg:hidden flex items-center space-x-2">
-              <VerificationBadge />
-              <Avatar className="h-7 w-7">
-                <AvatarFallback className="text-xs">{user?.name?.charAt(0) || 'U'}</AvatarFallback>
-              </Avatar>
+            {/* Mobile menu and verification badge - separated for better layout */}
+            <div className="lg:hidden flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
+                <VerificationBadge />
+                <Avatar className="h-7 w-7">
+                  <AvatarFallback className="text-xs">{user?.name?.charAt(0) || 'U'}</AvatarFallback>
+                </Avatar>
+              </div>
               
               <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
                 <SheetTrigger asChild>

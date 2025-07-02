@@ -20,7 +20,7 @@ const AdminHeader = () => {
               className="text-2xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent cursor-pointer"
               onClick={() => navigate('/admin/dashboard')}
             >
-              EventConnect
+              O Freela
             </h1>
             <Badge variant="secondary" className="bg-red-100 text-red-800">
               <Shield className="w-3 h-3 mr-1" />

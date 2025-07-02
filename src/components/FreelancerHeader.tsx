@@ -51,7 +51,7 @@ const FreelancerHeader = () => {
               onClick={() => navigate('/freelancer/dashboard')}
               className="text-xl font-bold text-blue-600 hover:text-blue-700"
             >
-              FreelanceEvents
+              O Freela
             </button>
           </div>
 

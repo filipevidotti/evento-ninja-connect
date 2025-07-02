@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -162,7 +163,7 @@ const Index = () => {
           <div className="text-center">
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                EventConnect
+                O Freela
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
@@ -215,7 +216,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Por que escolher o EventConnect?
+              Por que escolher o O Freela?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Uma plataforma completa que facilita a conexão entre talentos e oportunidades no mercado de eventos.
@@ -494,7 +495,7 @@ const Index = () => {
             {/* Logo and Description */}
             <div className="md:col-span-1">
               <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                EventConnect
+                O Freela
               </h3>
               <p className="text-gray-400 mb-4">
                 Conectando talentos aos melhores eventos do Brasil
@@ -621,7 +622,7 @@ const Index = () => {
 
           <div className="border-t border-gray-800 pt-8 text-center">
             <div className="flex justify-center space-x-6 text-gray-400">
-              <span>© 2025 EventConnect</span>
+              <span>© 2025 O Freela</span>
               <span>•</span>
               <span>Todos os direitos reservados</span>
             </div>
